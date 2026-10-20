@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Acesso ao sistema EcoAvanza" />
+    <title>Entrar | EcoAvanza</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}" />
+    <script src="{{ url_for('static', path='js/login.js') }}" defer></script>
+  </head>
+  <body class="login-page">
+    <main class="login-shell">
+      <section class="login-visual" aria-hidden="true">
+        <div class="login-visual__shade"></div>
+      </section>
+
+      <section class="login-content" aria-labelledby="login-title">
+        <div class="login-card">
+          <header class="brand" aria-label="EcoAvanza">
+            <img
+              class="brand__logo"
+              src="{{ url_for('static', path='images/logo-ecoavanza.png') }}"
+              alt="EcoAvanza — Pequenas ações, grandes cambios"
+            />
+          </header>
+
+          <div class="login-heading">
+            <h1 id="login-title">Accede a tu cuenta</h1>
+            <p>Inicie sesión para continuar en el panel de administración.</p>
+          </div>
+
+          <form class="login-form" action="/login" method="post" novalidate>
+            <div class="field">
+              <label for="usuario">Usuario</label>
+              <div class="field__control">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0" />
+                </svg>
+                <input
+                  id="usuario"
+                  name="usuario"
+                  type="text"
+                  value="{{ usuario }}"
+                  autocomplete="username"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  required
+                  autofocus
+                />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="senha">Contraseña</label>
+              <div class="field__control">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="5" y="10" width="14" height="10" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                </svg>
+                <input
+                  id="senha"
+                  name="senha"
+                  type="password"
+                  autocomplete="current-password"
+                  required
+                />
+                <button
+                  class="password-toggle"
+                  type="button"
+                  aria-label="Mostrar senha"
+                  aria-controls="senha"
+                  aria-pressed="false"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                    <circle cx="12" cy="12" r="2.5" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <p class="form-error" role="alert">{{ erro or "" }}</p>
+
+            <button class="primary-button" type="submit">Entrar</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

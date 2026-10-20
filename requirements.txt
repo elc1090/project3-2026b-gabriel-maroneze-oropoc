@@ -1,3 +1,6 @@
 fastapi[standard]
 psycopg[binary]
-
+jinja2
+python-multipart
+pwdlib[argon2]
+itsdangerous

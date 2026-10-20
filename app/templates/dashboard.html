@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Painel | EcoAvanza</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}" />
+  </head>
+
+  <body class="dashboard-page">
+    <header class="dashboard-header">
+      <div class="dashboard-brand">EcoAvanza</div>
+
+      <form action="/logout" method="post">
+        <button class="secondary-button" type="submit">Sair</button>
+      </form>
+    </header>
+
+    <main class="dashboard-main">
+      <p class="dashboard-kicker">Sessão autenticada</p>
+      <h1>Hola, {{ usuario }}!</h1>
+      <p>
+        O login foi realizado com sucesso.
+      </p>
+    </main>
+  </body>
+</html>

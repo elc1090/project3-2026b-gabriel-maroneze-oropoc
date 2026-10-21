@@ -90,11 +90,10 @@
       <main class="app-workspace" aria-label="Área principal da aplicação">
         <header class="workspace-header">
           <div class="company-menu">
-            <button
-              class="company-menu__trigger"
-              type="button"
-              aria-expanded="false"
-              aria-controls="company-menu-panel"
+            <a
+              class="company-menu__trigger company-menu__profile-link"
+              href="#perfil-empresa"
+              aria-label="Editar informações da empresa"
             >
               <span class="company-avatar" aria-hidden="true">
                 <svg viewBox="0 0 48 48">
@@ -110,7 +109,15 @@
                 <span class="company-menu__name">{{ empresa }}</span>
                 <span class="company-menu__label">Minha empresa</span>
               </span>
+            </a>
 
+            <button
+              class="company-menu__menu-trigger"
+              type="button"
+              aria-label="Abrir menu da conta"
+              aria-expanded="false"
+              aria-controls="company-menu-panel"
+            >
               <svg
                 class="company-menu__chevron"
                 viewBox="0 0 24 24"
@@ -129,6 +136,350 @@
             </div>
           </div>
         </header>
+
+        <section
+          class="company-home-page"
+          data-view="minha-empresa"
+          data-default-company-name="{{ usuario }}"
+          aria-labelledby="company-home-title"
+        >
+          <div class="company-home-heading">
+            <p class="dashboard-kicker">Visão geral</p>
+            <h1 id="company-home-title">
+              <span data-home-company-name>{{ usuario }}</span>
+            </h1>
+            <p>Resumo do perfil e do diagnóstico de sustentabilidade da empresa.</p>
+          </div>
+
+          <section class="company-overview-card" aria-labelledby="company-overview-title">
+            <div class="company-overview-card__heading">
+              <div>
+                <p class="quiz-panel__eyebrow">Perfil da empresa</p>
+                <h2 id="company-overview-title">Dados cadastrais</h2>
+              </div>
+              <a class="secondary-button company-overview-edit" href="#perfil-empresa">
+                Editar perfil
+              </a>
+            </div>
+
+            <dl class="company-overview-grid">
+              <div class="company-overview-item">
+                <dt>Nome da empresa</dt>
+                <dd data-overview-field="company_name">Não informado</dd>
+              </div>
+              <div class="company-overview-item">
+                <dt>Proprietário(a) ou responsável</dt>
+                <dd data-overview-field="owner">Não informado</dd>
+              </div>
+              <div class="company-overview-item">
+                <dt>Setor</dt>
+                <dd data-overview-field="sector">Não informado</dd>
+              </div>
+              <div class="company-overview-item">
+                <dt>Número de funcionários</dt>
+                <dd data-overview-field="employees">Não informado</dd>
+              </div>
+              <div class="company-overview-item">
+                <dt>Ano de criação da empresa</dt>
+                <dd data-overview-field="founded_year">Não informado</dd>
+              </div>
+              <div class="company-overview-item">
+                <dt>Data de criação do perfil</dt>
+                <dd data-overview-field="profile_created_at">Não informado</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="diagnostic-overview" aria-labelledby="diagnostic-overview-title">
+            <div class="diagnostic-overview__heading">
+              <div>
+                <p class="quiz-panel__eyebrow">Sustentabilidade</p>
+                <h2 id="diagnostic-overview-title">Diagnóstico da empresa</h2>
+                <p>
+                  Acompanhe quantas perguntas foram respondidas e veja o resultado
+                  geral do diagnóstico.
+                </p>
+              </div>
+              <span class="diagnostic-overview__status">Diagnóstico ainda não realizado</span>
+            </div>
+
+            <div class="diagnostic-overview__metrics">
+              <article class="diagnostic-metric">
+                <span class="diagnostic-metric__label">Perguntas respondidas</span>
+                <strong class="diagnostic-metric__value" data-diagnostic-answered>—</strong>
+                <span class="diagnostic-metric__note">Nenhum dado disponível</span>
+              </article>
+              <article class="diagnostic-metric">
+                <span class="diagnostic-metric__label">Resultado geral</span>
+                <strong class="diagnostic-metric__value diagnostic-metric__value--text">
+                  Ainda sem resultado
+                </strong>
+                <span class="diagnostic-metric__note">Faça o diagnóstico para ver sua avaliação</span>
+              </article>
+              <article class="diagnostic-metric diagnostic-metric--progress">
+                <span class="diagnostic-metric__label">Progresso do diagnóstico</span>
+                <div
+                  class="diagnostic-progress"
+                  role="progressbar"
+                  aria-label="Progresso do diagnóstico"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                >
+                  <span></span>
+                </div>
+                <span class="diagnostic-metric__note">Os resultados aparecerão aqui quando disponíveis</span>
+              </article>
+            </div>
+          </section>
+        </section>
+
+        <section
+          class="company-profile-page"
+          data-view="perfil-empresa"
+          data-profile-user="{{ usuario }}"
+          aria-labelledby="company-profile-title"
+          hidden
+        >
+          <div class="company-profile-heading">
+            <a class="profile-back-link" href="#minha-empresa">
+              <span aria-hidden="true">←</span>
+              Voltar ao painel
+            </a>
+            <p class="dashboard-kicker">Perfil da empresa</p>
+            <h1 id="company-profile-title">Informações da empresa</h1>
+            <p>
+              Mantenha os dados da empresa atualizados para acompanhar melhor
+              seu planejamento sustentável.
+            </p>
+          </div>
+
+          <form class="company-profile-form" data-company-profile-form>
+            <div class="company-profile-form__heading">
+              <h2>Dados cadastrais</h2>
+              <p>Os campos marcados com * são obrigatórios.</p>
+            </div>
+
+            <div class="company-profile-fields">
+              <div class="profile-field">
+                <label for="profile-created-at">Data de criação do perfil *</label>
+                <input
+                  id="profile-created-at"
+                  name="profile_created_at"
+                  type="date"
+                  required
+                />
+              </div>
+
+              <div class="profile-field">
+                <label for="company-founded-year">Ano de criação da empresa *</label>
+                <input
+                  id="company-founded-year"
+                  name="founded_year"
+                  type="number"
+                  inputmode="numeric"
+                  min="1800"
+                  max="2100"
+                  placeholder="Ex.: 2018"
+                  required
+                />
+              </div>
+
+              <div class="profile-field">
+                <label for="company-name">Nome da empresa *</label>
+                <input
+                  id="company-name"
+                  name="company_name"
+                  type="text"
+                  minlength="2"
+                  maxlength="120"
+                  autocomplete="organization"
+                  placeholder="Nome da empresa"
+                  required
+                />
+              </div>
+
+              <div class="profile-field">
+                <label for="company-owner">Proprietário(a) ou responsável *</label>
+                <input
+                  id="company-owner"
+                  name="owner"
+                  type="text"
+                  minlength="2"
+                  maxlength="120"
+                  autocomplete="name"
+                  placeholder="Nome do responsável"
+                  required
+                />
+              </div>
+
+              <div class="profile-field">
+                <label for="company-employees">Número de funcionários *</label>
+                <input
+                  id="company-employees"
+                  name="employees"
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  max="1000000"
+                  placeholder="Ex.: 12"
+                  required
+                />
+              </div>
+
+              <div class="profile-field">
+                <label for="company-sector">Setor da empresa *</label>
+                <input
+                  id="company-sector"
+                  name="sector"
+                  type="text"
+                  minlength="2"
+                  maxlength="100"
+                  placeholder="Ex.: Comércio, tecnologia, agricultura"
+                  required
+                />
+              </div>
+            </div>
+
+            <p class="profile-form-message" data-profile-message role="status" hidden></p>
+            <div class="company-profile-form__footer">
+              <a class="secondary-button profile-cancel-button" href="#minha-empresa">
+                Cancelar
+              </a>
+              <button class="primary-button" type="submit">Salvar informações</button>
+            </div>
+          </form>
+        </section>
+
+        <section
+          class="sustainability-page"
+          data-view="rota-sustentavel"
+          data-plan-key="ecoavanza-plan-{{ usuario }}"
+          aria-labelledby="sustainability-title"
+          hidden
+        >
+          <div class="sustainability-heading">
+            <p class="dashboard-kicker">Planejamento da empresa</p>
+            <h1 id="sustainability-title">Rota Sustentável</h1>
+            <p>
+              Escolha ações, organize as atividades na agenda e acompanhe a
+              evolução do seu plano de sustentabilidade.
+            </p>
+          </div>
+
+          <nav
+            class="plan-tabs"
+            aria-label="Etapas do plano sustentável"
+            role="tablist"
+          >
+            <button
+              class="plan-tab is-active"
+              type="button"
+              id="tab-actions"
+              data-plan-tab="actions"
+              aria-controls="plan-actions"
+              aria-selected="true"
+              tabindex="0"
+              role="tab"
+            >
+              <span class="plan-tab__number">1</span>
+              <span>Escolher ações</span>
+              <span class="plan-tab__count" data-count-selected>0</span>
+            </button>
+            <button
+              class="plan-tab"
+              type="button"
+              id="tab-agenda"
+              data-plan-tab="agenda"
+              aria-controls="plan-agenda"
+              aria-selected="false"
+              tabindex="-1"
+              role="tab"
+            >
+              <span class="plan-tab__number">2</span>
+              <span>Organizar agenda</span>
+              <span class="plan-tab__count" data-count-pending>0</span>
+            </button>
+            <button
+              class="plan-tab"
+              type="button"
+              id="tab-overview"
+              data-plan-tab="overview"
+              aria-controls="plan-overview"
+              aria-selected="false"
+              tabindex="-1"
+              role="tab"
+            >
+              <span class="plan-tab__number">3</span>
+              <span>Visão geral</span>
+            </button>
+          </nav>
+
+          <div class="plan-storage-message" data-storage-message role="status" hidden></div>
+
+          <section
+            class="plan-step"
+            id="plan-actions"
+            data-plan-panel="actions"
+            role="tabpanel"
+            aria-labelledby="tab-actions"
+          >
+            <div class="plan-step__heading">
+              <div>
+                <p class="quiz-panel__eyebrow">Etapa 1</p>
+                <h2>Quais ações fazem sentido para sua empresa?</h2>
+                <p>Selecione as iniciativas que deseja incluir no seu plano.</p>
+              </div>
+              <span class="plan-step__summary" data-actions-summary>0 ações selecionadas</span>
+            </div>
+            <div class="action-catalog" data-action-catalog></div>
+            <div class="plan-step__footer">
+              <button class="primary-button" type="button" data-go-agenda>
+                Continuar para a agenda
+              </button>
+            </div>
+          </section>
+
+          <section
+            class="plan-step"
+            id="plan-agenda"
+            data-plan-panel="agenda"
+            role="tabpanel"
+            aria-labelledby="tab-agenda"
+            hidden
+          >
+            <div class="plan-step__heading">
+              <div>
+                <p class="quiz-panel__eyebrow">Etapa 2</p>
+                <h2>Organize as atividades</h2>
+                <p>
+                  Defina uma data para cada ação selecionada. Ao agendar, ela
+                  aparecerá como em processo de aplicação.
+                </p>
+              </div>
+            </div>
+            <div class="agenda-list" data-agenda-list></div>
+          </section>
+
+          <section
+            class="plan-step"
+            id="plan-overview"
+            data-plan-panel="overview"
+            role="tabpanel"
+            aria-labelledby="tab-overview"
+            hidden
+          >
+            <div class="plan-step__heading">
+              <div>
+                <p class="quiz-panel__eyebrow">Etapa 3</p>
+                <h2>Visão geral do plano</h2>
+                <p>Acompanhe o estado de cada ação da sua empresa.</p>
+              </div>
+            </div>
+            <div class="plan-status-summary" data-status-summary></div>
+            <div class="overview-groups" data-overview-groups></div>
+          </section>
+        </section>
       </main>
     </div>
   </body>

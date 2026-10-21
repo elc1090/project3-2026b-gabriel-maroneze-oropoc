@@ -1,6 +1,12 @@
-const menuTrigger = document.querySelector(".company-menu__trigger");
+const menuTrigger = document.querySelector(".company-menu__menu-trigger");
 const menuPanel = document.querySelector(".company-menu__panel");
 const navigationLinks = document.querySelectorAll(".sidebar-link");
+const companyHomePage = document.querySelector('[data-view="minha-empresa"]');
+const homeCompanyName = document.querySelector("[data-home-company-name]");
+const companyProfilePage = document.querySelector('[data-view="perfil-empresa"]');
+const companyProfileForm = document.querySelector("[data-company-profile-form]");
+const profileMessage = document.querySelector("[data-profile-message]");
+const companyNameDisplay = document.querySelector("[data-company-name]");
 const sustainabilityPage = document.querySelector('[data-view="rota-sustentavel"]');
 const planTabs = document.querySelectorAll("[data-plan-tab]");
 const planPanels = document.querySelectorAll("[data-plan-panel]");
@@ -104,8 +110,119 @@ const statusLabels = {
   implemented: "Implementada",
 };
 const storageKey = sustainabilityPage?.dataset.planKey;
+const profileStorageKey = companyProfilePage
+  ? `ecoavanza-company-profile-${encodeURIComponent(
+      companyProfilePage.dataset.profileUser.trim().toLowerCase(),
+    )}`
+  : null;
 let planActions = [];
 let activeTab = "actions";
+
+function showProfileMessage(message, isError = false) {
+  profileMessage.textContent = message;
+  profileMessage.classList.toggle("is-error", isError);
+  profileMessage.hidden = !message;
+}
+
+function getTodayString() {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
+}
+
+function formatProfileDate(dateString) {
+  if (!dateString) {
+    return "Não informado";
+  }
+
+  const [year, month, day] = dateString.split("-").map(Number);
+  if (!year || !month || !day) {
+    return "Não informado";
+  }
+  return new Intl.DateTimeFormat("pt-BR").format(
+    new Date(year, month - 1, day),
+  );
+}
+
+function renderCompanyOverview(profile = {}) {
+  const defaultName = companyHomePage.dataset.defaultCompanyName;
+  const companyName = profile.company_name?.trim() || defaultName;
+  homeCompanyName.textContent = companyName;
+  companyNameDisplay.textContent = companyName;
+
+  const displayValues = {
+    company_name: profile.company_name?.trim() || "Não informado",
+    owner: profile.owner?.trim() || "Não informado",
+    sector: profile.sector?.trim() || "Não informado",
+    employees:
+      profile.employees !== undefined && profile.employees !== ""
+        ? `${Number(profile.employees).toLocaleString("pt-BR")} ${Number(profile.employees) === 1 ? "funcionário" : "funcionários"}`
+        : "Não informado",
+    founded_year: profile.founded_year || "Não informado",
+    profile_created_at: formatProfileDate(profile.profile_created_at),
+  };
+
+  Object.entries(displayValues).forEach(([fieldName, value]) => {
+    const field = document.querySelector(`[data-overview-field="${fieldName}"]`);
+    field.textContent = String(value);
+  });
+}
+
+function loadCompanyProfile() {
+  const dateInput = companyProfileForm.elements.profile_created_at;
+  dateInput.value = getTodayString();
+  renderCompanyOverview();
+
+  try {
+    const savedProfile = window.localStorage.getItem(profileStorageKey);
+    if (!savedProfile) {
+      return;
+    }
+
+    const profile = JSON.parse(savedProfile);
+    for (const fieldName of [
+      "profile_created_at",
+      "founded_year",
+      "company_name",
+      "owner",
+      "employees",
+      "sector",
+    ]) {
+      if (typeof profile[fieldName] === "string" || typeof profile[fieldName] === "number") {
+        companyProfileForm.elements[fieldName].value = String(profile[fieldName]);
+      }
+    }
+    if (profile.company_name) {
+      companyNameDisplay.textContent = profile.company_name;
+    }
+    renderCompanyOverview(profile);
+  } catch (error) {
+    console.error("Não foi possível carregar o perfil da empresa.", error);
+    showProfileMessage(
+      "Não foi possível carregar os dados salvos neste navegador.",
+      true,
+    );
+  }
+}
+
+function saveCompanyProfile(event) {
+  event.preventDefault();
+  const formData = new FormData(companyProfileForm);
+  const profile = Object.fromEntries(formData.entries());
+
+  try {
+    window.localStorage.setItem(profileStorageKey, JSON.stringify(profile));
+    renderCompanyOverview(profile);
+    showProfileMessage("Informações da empresa salvas com sucesso.");
+  } catch (error) {
+    console.error("Não foi possível salvar o perfil da empresa.", error);
+    showProfileMessage(
+      "Não foi possível salvar as informações neste navegador. Tente novamente.",
+      true,
+    );
+  }
+}
 
 if (menuTrigger && menuPanel) {
   menuTrigger.addEventListener("click", () => {
@@ -121,6 +238,13 @@ if (menuTrigger && menuPanel) {
     }
   });
 }
+
+document.querySelector(".company-menu__profile-link")?.addEventListener("click", () => {
+  menuTrigger?.setAttribute("aria-expanded", "false");
+  if (menuPanel) {
+    menuPanel.hidden = true;
+  }
+});
 
 function setStorageMessage(message) {
   storageMessage.textContent = message;
@@ -492,6 +616,19 @@ function updateActiveNavigation() {
   if (sustainabilityPage) {
     sustainabilityPage.hidden = currentHash !== "#rota-sustentavel";
   }
+
+  if (companyHomePage) {
+    companyHomePage.hidden = currentHash !== "#minha-empresa";
+  }
+
+  if (companyProfilePage) {
+    companyProfilePage.hidden = currentHash !== "#perfil-empresa";
+  }
+}
+
+if (companyProfileForm && profileStorageKey) {
+  loadCompanyProfile();
+  companyProfileForm.addEventListener("submit", saveCompanyProfile);
 }
 
 if (sustainabilityPage && actionCatalog && storageKey) {

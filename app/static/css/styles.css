@@ -598,6 +598,420 @@ input {
   background: #fff1f0;
 }
 
+.sustainability-page {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 10px clamp(24px, 4vw, 68px) 64px;
+}
+
+.sustainability-heading {
+  margin-bottom: 28px;
+}
+
+.sustainability-heading .dashboard-kicker {
+  margin-bottom: 8px;
+}
+
+.sustainability-heading h1 {
+  margin: 0;
+  color: var(--forest-950);
+  font-size: clamp(2rem, 3.4vw, 3rem);
+  letter-spacing: -0.05em;
+}
+
+.sustainability-heading > p:last-child {
+  max-width: 720px;
+  margin: 10px 0 0;
+  color: var(--ink-700);
+  line-height: 1.6;
+}
+
+.plan-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 7px;
+  background: #f4f8f2;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+}
+
+.plan-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  gap: 10px;
+  padding: 8px 12px;
+  color: var(--ink-700);
+  font-size: 0.92rem;
+  font-weight: 750;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.plan-tab:hover {
+  background: #fff;
+}
+
+.plan-tab.is-active {
+  color: var(--forest-950);
+  background: #fff;
+  border-color: var(--line-strong);
+  box-shadow: 0 2px 8px rgba(20, 50, 34, 0.06);
+}
+
+.plan-tab__number {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  flex: none;
+  place-items: center;
+  color: var(--forest-800);
+  font-size: 0.8rem;
+  background: var(--sage-100);
+  border-radius: 50%;
+}
+
+.plan-tab__count {
+  display: grid;
+  min-width: 23px;
+  height: 23px;
+  flex: none;
+  place-items: center;
+  color: var(--forest-800);
+  font-size: 0.75rem;
+  background: var(--sage-100);
+  border-radius: 999px;
+}
+
+.plan-step {
+  padding: clamp(20px, 3vw, 32px);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 12px 34px rgba(20, 50, 34, 0.05);
+}
+
+.plan-step__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.plan-step__heading h2 {
+  margin: 0;
+  color: var(--forest-950);
+  font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+  letter-spacing: -0.035em;
+}
+
+.plan-step__heading > div > p:last-child {
+  max-width: 720px;
+  margin: 8px 0 0;
+  color: var(--ink-700);
+  line-height: 1.55;
+}
+
+.plan-step__summary {
+  flex: none;
+  padding: 8px 12px;
+  color: var(--forest-800);
+  font-size: 0.82rem;
+  font-weight: 750;
+  background: var(--sage-100);
+  border-radius: 999px;
+}
+
+.action-catalog {
+  display: grid;
+  gap: 24px;
+}
+
+.action-category__title,
+.agenda-section-title,
+.overview-group__title {
+  margin: 0 0 12px;
+  color: var(--forest-900);
+  font-size: 1rem;
+}
+
+.action-category__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.action-card {
+  display: flex;
+  align-items: flex-start;
+  min-height: 100px;
+  gap: 13px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.action-card:hover {
+  background: #f9fbf7;
+  border-color: var(--line-strong);
+}
+
+.action-card.is-locked {
+  background: #f7f9f6;
+  cursor: not-allowed;
+}
+
+.action-card input {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin: 2px 0 0;
+  accent-color: var(--forest-700);
+}
+
+.action-card input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.action-card__content {
+  display: grid;
+  gap: 6px;
+}
+
+.action-card__title {
+  color: var(--ink-950);
+  font-size: 0.92rem;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.action-card__description {
+  color: var(--ink-500);
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.plan-step__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #edf1eb;
+}
+
+.plan-step__footer .primary-button {
+  min-height: 46px;
+}
+
+.plan-storage-message {
+  margin-bottom: 16px;
+  padding: 12px 15px;
+  color: #8d2019;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  background: #fff1f0;
+  border: 1px solid #f0c3bf;
+  border-radius: 10px;
+}
+
+.agenda-section-title--spaced {
+  margin-top: 30px;
+}
+
+.agenda-section-description {
+  margin: -4px 0 14px;
+  color: var(--ink-500);
+  font-size: 0.88rem;
+}
+
+.agenda-list,
+.overview-groups {
+  display: grid;
+  gap: 12px;
+}
+
+.agenda-card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(260px, 1.1fr);
+  align-items: start;
+  gap: 24px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.agenda-card--scheduled {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  background: #fbfcfa;
+}
+
+.agenda-card__category,
+.overview-action__category {
+  margin: 0 0 6px;
+  color: var(--forest-700);
+  font-size: 0.77rem;
+  font-weight: 800;
+}
+
+.agenda-card__title {
+  margin: 0;
+  color: var(--ink-950);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.agenda-card__description {
+  margin: 7px 0 0;
+  color: var(--ink-500);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.agenda-card__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.agenda-field__label {
+  color: var(--ink-700);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.agenda-card__form input {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  color: var(--ink-950);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.agenda-card__form input:focus {
+  border-color: var(--forest-700);
+  outline: 3px solid var(--focus);
+}
+
+.agenda-card__form button {
+  grid-column: 1 / -1;
+  min-height: 42px;
+  margin-top: 3px;
+}
+
+.agenda-card__date,
+.overview-action__date {
+  margin: 8px 0 0;
+  color: var(--ink-700);
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.agenda-card .secondary-button {
+  min-height: 42px;
+}
+
+.plan-empty {
+  margin: 0;
+  padding: 18px;
+  color: var(--ink-500);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  background: #f8faf7;
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+}
+
+.plan-status-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.status-card {
+  display: grid;
+  gap: 8px;
+  min-height: 112px;
+  align-content: center;
+  padding: 18px;
+  background: #f8faf7;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--line-strong);
+  border-radius: 12px;
+}
+
+.status-card--awaiting {
+  border-left-color: #cf9a37;
+}
+
+.status-card--in_progress {
+  border-left-color: var(--forest-700);
+}
+
+.status-card--implemented {
+  border-left-color: #427c61;
+}
+
+.status-card__count {
+  color: var(--forest-950);
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.status-card__label {
+  color: var(--ink-700);
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.overview-group__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.overview-action {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.overview-action__title {
+  margin: 0 0 6px;
+  color: var(--ink-950);
+  font-size: 0.92rem;
+}
+
+.overview-action__badge {
+  display: inline-flex;
+  margin-top: 8px;
+  padding: 5px 9px;
+  color: var(--forest-800);
+  font-size: 0.75rem;
+  font-weight: 750;
+  background: var(--sage-100);
+  border-radius: 999px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
 @media (max-width: 760px) {
   .app-shell {
     grid-template-columns: 76px minmax(0, 1fr);
@@ -650,5 +1064,42 @@ input {
 
   .company-menu__name {
     max-width: 115px;
+  }
+
+  .sustainability-page {
+    padding: 8px 18px 40px;
+  }
+
+  .plan-tabs {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .plan-tab {
+    justify-content: flex-start;
+  }
+
+  .plan-step__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .action-category__list,
+  .overview-group__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .agenda-card,
+  .agenda-card--scheduled {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .agenda-card--scheduled .secondary-button {
+    width: 100%;
+  }
+
+  .plan-status-summary {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

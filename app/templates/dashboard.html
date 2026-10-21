@@ -130,6 +130,136 @@
             </div>
           </div>
         </header>
+
+        <section
+          class="sustainability-page"
+          data-view="rota-sustentavel"
+          data-plan-key="ecoavanza-plan-{{ usuario }}"
+          aria-labelledby="sustainability-title"
+          hidden
+        >
+          <div class="sustainability-heading">
+            <p class="dashboard-kicker">Planejamento da empresa</p>
+            <h1 id="sustainability-title">Rota Sustentável</h1>
+            <p>
+              Escolha ações, organize as atividades na agenda e acompanhe a
+              evolução do seu plano de sustentabilidade.
+            </p>
+          </div>
+
+          <nav
+            class="plan-tabs"
+            aria-label="Etapas do plano sustentável"
+            role="tablist"
+          >
+            <button
+              class="plan-tab is-active"
+              type="button"
+              id="tab-actions"
+              data-plan-tab="actions"
+              aria-controls="plan-actions"
+              aria-selected="true"
+              tabindex="0"
+              role="tab"
+            >
+              <span class="plan-tab__number">1</span>
+              <span>Escolher ações</span>
+              <span class="plan-tab__count" data-count-selected>0</span>
+            </button>
+            <button
+              class="plan-tab"
+              type="button"
+              id="tab-agenda"
+              data-plan-tab="agenda"
+              aria-controls="plan-agenda"
+              aria-selected="false"
+              tabindex="-1"
+              role="tab"
+            >
+              <span class="plan-tab__number">2</span>
+              <span>Organizar agenda</span>
+              <span class="plan-tab__count" data-count-pending>0</span>
+            </button>
+            <button
+              class="plan-tab"
+              type="button"
+              id="tab-overview"
+              data-plan-tab="overview"
+              aria-controls="plan-overview"
+              aria-selected="false"
+              tabindex="-1"
+              role="tab"
+            >
+              <span class="plan-tab__number">3</span>
+              <span>Visão geral</span>
+            </button>
+          </nav>
+
+          <div class="plan-storage-message" data-storage-message role="status" hidden></div>
+
+          <section
+            class="plan-step"
+            id="plan-actions"
+            data-plan-panel="actions"
+            role="tabpanel"
+            aria-labelledby="tab-actions"
+          >
+            <div class="plan-step__heading">
+              <div>
+                <p class="quiz-panel__eyebrow">Etapa 1</p>
+                <h2>Quais ações fazem sentido para sua empresa?</h2>
+                <p>Selecione as iniciativas que deseja incluir no seu plano.</p>
+              </div>
+              <span class="plan-step__summary" data-actions-summary>0 ações selecionadas</span>
+            </div>
+            <div class="action-catalog" data-action-catalog></div>
+            <div class="plan-step__footer">
+              <button class="primary-button" type="button" data-go-agenda>
+                Continuar para a agenda
+              </button>
+            </div>
+          </section>
+
+          <section
+            class="plan-step"
+            id="plan-agenda"
+            data-plan-panel="agenda"
+            role="tabpanel"
+            aria-labelledby="tab-agenda"
+            hidden
+          >
+            <div class="plan-step__heading">
+              <div>
+                <p class="quiz-panel__eyebrow">Etapa 2</p>
+                <h2>Organize as atividades</h2>
+                <p>
+                  Defina uma data para cada ação selecionada. Ao agendar, ela
+                  aparecerá como em processo de aplicação.
+                </p>
+              </div>
+            </div>
+            <div class="agenda-list" data-agenda-list></div>
+          </section>
+
+          <section
+            class="plan-step"
+            id="plan-overview"
+            data-plan-panel="overview"
+            role="tabpanel"
+            aria-labelledby="tab-overview"
+            hidden
+          >
+            <div class="plan-step__heading">
+              <div>
+                <p class="quiz-panel__eyebrow">Etapa 3</p>
+                <h2>Visão geral do plano</h2>
+                <p>Acompanhe o estado de cada ação da sua empresa.</p>
+              </div>
+            </div>
+            <div class="plan-status-summary" data-status-summary></div>
+            <div class="overview-groups" data-overview-groups></div>
+          </section>
+        </section>
       </main>
     </div>
   </body>

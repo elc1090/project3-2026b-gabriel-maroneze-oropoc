@@ -267,6 +267,132 @@ def pergunta_ativa_existe(pergunta_id: int) -> bool:
             return cursor.fetchone() is not None
 
 
+def calcular_pontuacao(valor_total: int, quantidade_perguntas: int) -> int:
+    """
+    Converte a soma das respostas, de 0 a 3, para uma escala de 0 a 100.
+    """
+
+    if quantidade_perguntas == 0:
+        return 0
+
+    pontuacao = (valor_total / (quantidade_perguntas * 3)) * 100
+
+    return int(pontuacao + 0.5)
+
+
+def definir_nivel(pontuacao: int) -> str:
+    if pontuacao <= 24:
+        return "Inicial"
+
+    if pontuacao <= 49:
+        return "Em desenvolvimento"
+
+    if pontuacao <= 74:
+        return "Intermediário"
+
+    return "Avançado"
+
+
+def carregar_resultados_diagnostico(diagnostico_id: int) -> dict:
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT finalizado_em
+                FROM diagnosticos
+                WHERE id = %s
+                """,
+                (diagnostico_id,),
+            )
+
+            finalizado_em = cursor.fetchone()[0]
+
+            cursor.execute(
+                """
+                SELECT
+                    d.id,
+                    d.nome,
+                    d.ordem,
+                    COUNT(p.id) AS quantidade_perguntas,
+                    COALESCE(SUM(r.valor), 0) AS valor_total
+                FROM dimensoes d
+                JOIN perguntas p ON p.dimensao_id = d.id
+                LEFT JOIN respostas_diagnostico r
+                    ON r.pergunta_id = p.id
+                    AND r.diagnostico_id = %s
+                WHERE p.ativa = TRUE
+                GROUP BY d.id, d.nome, d.ordem
+                ORDER BY d.ordem
+                """,
+                (diagnostico_id,),
+            )
+
+            dimensoes = [
+                {
+                    "id": linha[0],
+                    "nome": linha[1],
+                    "ordem": linha[2],
+                    "quantidade_perguntas": linha[3],
+                    "pontuacao": calcular_pontuacao(linha[4], linha[3]),
+                }
+                for linha in cursor.fetchall()
+            ]
+
+            cursor.execute(
+                """
+                SELECT
+                    p.id,
+                    p.texto,
+                    d.nome,
+                    r.valor
+                FROM respostas_diagnostico r
+                JOIN perguntas p ON p.id = r.pergunta_id
+                JOIN dimensoes d ON d.id = p.dimensao_id
+                WHERE r.diagnostico_id = %s
+                  AND p.ativa = TRUE
+                ORDER BY r.valor DESC, d.ordem, p.ordem
+                """,
+                (diagnostico_id,),
+            )
+
+            respostas = [
+                {
+                    "pergunta_id": linha[0],
+                    "pergunta": linha[1],
+                    "dimensao": linha[2],
+                    "valor": linha[3],
+                }
+                for linha in cursor.fetchall()
+            ]
+
+    pontuacao_geral = int(
+        (sum(dimensao["pontuacao"] for dimensao in dimensoes) / len(dimensoes))
+        + 0.5
+    )
+
+    fortalezas = [
+        resposta
+        for resposta in respostas
+        if resposta["valor"] >= 2
+    ][:3]
+
+    oportunidades = [
+        resposta
+        for resposta in sorted(respostas, key=lambda resposta: resposta["valor"])
+        if resposta["valor"] <= 1
+    ][:3]
+
+    return {
+        "diagnostico_id": diagnostico_id,
+        "finalizado_em": finalizado_em,
+        "pontuacao_geral": pontuacao_geral,
+        "nivel": definir_nivel(pontuacao_geral),
+        "dimensoes": dimensoes,
+        "fortalezas": fortalezas,
+        "oportunidades": oportunidades,
+    }
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     inicializar_banco()
@@ -275,7 +401,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(
     title="ECOAVANZA",
-    version="0.6.0",
+    version="0.7.0",
     lifespan=lifespan,
 )
 
@@ -385,7 +511,19 @@ def diagnostico(request: Request):
             "usuario": request.session.get("empresa_nome"),
         },
     )
+    
+@app.get("/resultados", response_class=HTMLResponse, include_in_schema=False)
+def resultados(request: Request):
+    if not request.session.get("empresa_id"):
+        return RedirectResponse(url="/", status_code=303)
 
+    return templates.TemplateResponse(
+        request=request,
+        name="resultados.html",
+        context={
+            "empresa": request.session.get("empresa_nome"),
+        },
+    )
 
 @app.get("/api/diagnostico/atual", include_in_schema=False)
 def obter_diagnostico_atual(request: Request):
@@ -565,3 +703,26 @@ def concluir_diagnostico(request: Request):
             "finalizado_em": diagnostico_concluido[2],
         },
     }
+
+
+@app.get("/api/resultados/atual", include_in_schema=False)
+def obter_resultados_atuais(request: Request):
+    empresa_id = request.session.get("empresa_id")
+
+    if not empresa_id:
+        raise HTTPException(
+            status_code=401,
+            detail="É necessário iniciar uma sessão para acessar os resultados.",
+        )
+
+    diagnostico = buscar_ultimo_diagnostico_concluido(empresa_id)
+
+    if diagnostico is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Ainda não existe um diagnóstico concluído para esta empresa.",
+        )
+
+    diagnostico_id, _ = diagnostico
+
+    return carregar_resultados_diagnostico(diagnostico_id)

@@ -3,10 +3,15 @@ const menuPanel = document.querySelector(".company-menu__panel");
 const navigationLinks = document.querySelectorAll(".sidebar-link");
 const companyHomePage = document.querySelector('[data-view="minha-empresa"]');
 const homeCompanyName = document.querySelector("[data-home-company-name]");
+const companyDisplayName = document.querySelector("[data-company-display-name]");
 const companyProfilePage = document.querySelector('[data-view="perfil-empresa"]');
 const companyProfileForm = document.querySelector("[data-company-profile-form]");
 const profileMessage = document.querySelector("[data-profile-message]");
-const companyNameDisplay = document.querySelector("[data-company-name]");
+const resultsPage = document.querySelector('[data-view="resultados"]');
+const wastePage = document.querySelector('[data-view="residuos"]');
+const helpPage = document.querySelector('[data-view="ajuda"]');
+const wasteForm = document.querySelector("[data-waste-form]");
+const wasteMessage = document.querySelector("[data-waste-message]");
 const sustainabilityPage = document.querySelector('[data-view="rota-sustentavel"]');
 const planTabs = document.querySelectorAll("[data-plan-tab]");
 const planPanels = document.querySelectorAll("[data-plan-panel]");
@@ -109,14 +114,9 @@ const statusLabels = {
   in_progress: "Em processo de aplicação",
   implemented: "Implementada",
 };
-const storageKey = sustainabilityPage?.dataset.planKey;
-const profileStorageKey = companyProfilePage
-  ? `ecoavanza-company-profile-${encodeURIComponent(
-      companyProfilePage.dataset.profileUser.trim().toLowerCase(),
-    )}`
-  : null;
 let planActions = [];
 let activeTab = "actions";
+let planSaveQueue = Promise.resolve();
 
 function showProfileMessage(message, isError = false) {
   profileMessage.textContent = message;
@@ -149,7 +149,7 @@ function renderCompanyOverview(profile = {}) {
   const defaultName = companyHomePage.dataset.defaultCompanyName;
   const companyName = profile.company_name?.trim() || defaultName;
   homeCompanyName.textContent = companyName;
-  companyNameDisplay.textContent = companyName;
+  companyDisplayName.textContent = companyName;
 
   const displayValues = {
     company_name: profile.company_name?.trim() || "Não informado",
@@ -169,18 +169,22 @@ function renderCompanyOverview(profile = {}) {
   });
 }
 
-function loadCompanyProfile() {
+async function loadCompanyProfile() {
   const dateInput = companyProfileForm.elements.profile_created_at;
   dateInput.value = getTodayString();
   renderCompanyOverview();
 
   try {
-    const savedProfile = window.localStorage.getItem(profileStorageKey);
-    if (!savedProfile) {
+    const response = await fetch("/api/perfil", { credentials: "same-origin" });
+    if (response.status === 401) {
+      window.location.assign("/");
       return;
     }
-
-    const profile = JSON.parse(savedProfile);
+    if (!response.ok) {
+      throw new Error("Não foi possível carregar o perfil da empresa.");
+    }
+    const data = await response.json();
+    const profile = data.perfil ?? {};
     for (const fieldName of [
       "profile_created_at",
       "founded_year",
@@ -189,38 +193,50 @@ function loadCompanyProfile() {
       "employees",
       "sector",
     ]) {
-      if (typeof profile[fieldName] === "string" || typeof profile[fieldName] === "number") {
+      if (profile[fieldName] !== undefined && profile[fieldName] !== null) {
         companyProfileForm.elements[fieldName].value = String(profile[fieldName]);
       }
     }
-    if (profile.company_name) {
-      companyNameDisplay.textContent = profile.company_name;
+    if (!profile.company_name && data.nome_empresa) {
+      companyProfileForm.elements.company_name.value = data.nome_empresa;
     }
     renderCompanyOverview(profile);
   } catch (error) {
     console.error("Não foi possível carregar o perfil da empresa.", error);
     showProfileMessage(
-      "Não foi possível carregar os dados salvos neste navegador.",
+      error.message ?? "Não foi possível carregar os dados do servidor.",
       true,
     );
   }
 }
 
-function saveCompanyProfile(event) {
+async function saveCompanyProfile(event) {
   event.preventDefault();
   const formData = new FormData(companyProfileForm);
   const profile = Object.fromEntries(formData.entries());
+  profile.founded_year = Number(profile.founded_year);
+  profile.employees = Number(profile.employees);
 
   try {
-    window.localStorage.setItem(profileStorageKey, JSON.stringify(profile));
-    renderCompanyOverview(profile);
+    const response = await fetch("/api/perfil", {
+      method: "PUT",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(profile),
+    });
+    if (response.status === 401) {
+      window.location.assign("/");
+      return;
+    }
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail ?? "Não foi possível salvar o perfil.");
+    }
+    renderCompanyOverview(data.perfil);
     showProfileMessage("Informações da empresa salvas com sucesso.");
   } catch (error) {
     console.error("Não foi possível salvar o perfil da empresa.", error);
-    showProfileMessage(
-      "Não foi possível salvar as informações neste navegador. Tente novamente.",
-      true,
-    );
+    showProfileMessage(error.message ?? "Não foi possível salvar as informações.", true);
   }
 }
 
@@ -278,29 +294,47 @@ function normalizeSavedPlan(savedPlan) {
 }
 
 function savePlan() {
-  try {
-    window.localStorage.setItem(storageKey, JSON.stringify(planActions));
-    setStorageMessage("");
-  } catch (error) {
-    console.error("Não foi possível salvar o plano sustentável.", error);
-    setStorageMessage(
-      "Não foi possível salvar as alterações neste navegador. Elas podem ser perdidas ao fechar a página.",
-    );
-  }
+  const actions = planActions.map((action) => ({ ...action }));
+  planSaveQueue = planSaveQueue
+    .then(async () => {
+      const response = await fetch("/api/plano", {
+        method: "PUT",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ actions }),
+      });
+      if (response.status === 401) {
+        window.location.assign("/");
+        return;
+      }
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail ?? "Não foi possível salvar o plano.");
+      }
+      setStorageMessage("");
+    })
+    .catch((error) => {
+      console.error("Não foi possível salvar o plano sustentável.", error);
+      setStorageMessage(error.message ?? "Não foi possível salvar as alterações.");
+    });
+  return planSaveQueue;
 }
 
-function loadPlan() {
+async function loadPlan() {
   try {
-    const savedPlan = window.localStorage.getItem(storageKey);
-    if (savedPlan) {
-      planActions = normalizeSavedPlan(JSON.parse(savedPlan));
+    const response = await fetch("/api/plano", { credentials: "same-origin" });
+    if (response.status === 401) {
+      window.location.assign("/");
+      return;
     }
+    if (!response.ok) {
+      throw new Error("Não foi possível carregar o plano sustentável.");
+    }
+    const data = await response.json();
+    planActions = normalizeSavedPlan(data.actions);
   } catch (error) {
     console.error("Não foi possível carregar o plano sustentável.", error);
-    planActions = [];
-    setStorageMessage(
-      "Não foi possível carregar o plano salvo. As alterações desta sessão não serão recuperadas.",
-    );
+    setStorageMessage(error.message ?? "Não foi possível carregar o plano salvo.");
   }
 }
 
@@ -369,7 +403,7 @@ function renderActionCatalog() {
         } else {
           planActions = planActions.filter((item) => item.id !== action.id);
         }
-        savePlan();
+        void savePlan();
         renderPlan();
       });
     });
@@ -453,7 +487,7 @@ function renderAgenda() {
         planAction.status = "in_progress";
         planAction.date = dateInput.value;
         planAction.notes = notesInput.value.trim();
-        savePlan();
+        void savePlan();
         renderPlan();
       });
       agendaList.append(card);
@@ -483,7 +517,7 @@ function renderAgenda() {
         completeButton.type = "button";
         completeButton.addEventListener("click", () => {
           planAction.status = "implemented";
-          savePlan();
+          void savePlan();
           renderPlan();
         });
         details.append(category, title, date);
@@ -513,6 +547,152 @@ function getLocalDateString() {
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+function renderDiagnosticDimensions(container, dimensions) {
+  container.replaceChildren();
+  dimensions.forEach((dimension) => {
+    const group = createElement("section", "overview-group");
+    const heading = createElement("h3", "overview-group__title", dimension.nome);
+    const summary = createElement(
+      "p",
+      "plan-empty",
+      `${dimension.resultado}% de aproveitamento · ${dimension.respondidas}/${dimension.total_perguntas} perguntas`,
+    );
+    group.append(heading, summary);
+    container.append(group);
+  });
+}
+
+async function loadDiagnosticResults() {
+  const status = document.querySelector("[data-diagnostic-status]");
+  const answered = document.querySelector("[data-diagnostic-answered]");
+  const score = document.querySelector("[data-diagnostic-score]");
+  const progressBar = document.querySelector("[data-diagnostic-progress-bar]");
+  const progressNote = document.querySelector("[data-diagnostic-progress-note]");
+  const homeDimensions = document.querySelector("[data-diagnostic-dimensions]");
+  const resultsStatus = document.querySelector("[data-results-status]");
+  const resultsAnswered = document.querySelector("[data-results-answered]");
+  const resultsScore = document.querySelector("[data-results-score]");
+  const resultsDimensions = document.querySelector("[data-results-dimensions]");
+
+  try {
+    const response = await fetch("/api/diagnostico/resultados", {
+      credentials: "same-origin",
+    });
+    if (response.status === 401) {
+      window.location.assign("/");
+      return;
+    }
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail ?? "Não foi possível carregar os resultados.");
+    }
+
+    const countText = `${data.respondidas} de ${data.total_perguntas}`;
+    answered.textContent = countText;
+    resultsAnswered.textContent = countText;
+    progressBar.style.width = `${data.progresso}%`;
+    progressNote.textContent = data.disponivel
+      ? "Diagnóstico concluído"
+      : `Progresso atual: ${data.progresso}%. Conclua o diagnóstico para ver a avaliação.`;
+    status.textContent = data.disponivel ? "Diagnóstico concluído" : "Diagnóstico em andamento";
+    resultsStatus.textContent = data.disponivel ? "Resultado disponível" : "Resultado ainda não disponível";
+    score.textContent = data.disponivel ? `${data.resultado_geral}%` : "Pendente";
+    resultsScore.textContent = data.disponivel ? `${data.resultado_geral}%` : "Pendente";
+    renderDiagnosticDimensions(homeDimensions, data.dimensoes);
+    renderDiagnosticDimensions(resultsDimensions, data.dimensoes);
+  } catch (error) {
+    console.error("Não foi possível carregar os resultados do diagnóstico.", error);
+    status.textContent = "Resultados indisponíveis";
+    answered.textContent = "—";
+    score.textContent = "—";
+    resultsStatus.textContent = error.message ?? "Resultados indisponíveis";
+    resultsAnswered.textContent = "—";
+    resultsScore.textContent = "—";
+    progressNote.textContent = "Tente recarregar a página.";
+  }
+}
+
+const wasteCategoryLabels = {
+  organico: "Orgânico",
+  reciclavel: "Reciclável",
+  perigoso: "Perigoso",
+  rejeito: "Rejeito",
+};
+
+async function loadWasteRecords() {
+  const list = document.querySelector("[data-waste-list]");
+  if (!list) return;
+  try {
+    const response = await fetch("/api/residuos", { credentials: "same-origin" });
+    if (response.status === 401) {
+      window.location.assign("/");
+      return;
+    }
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail ?? "Não foi possível carregar os resíduos.");
+    }
+    list.replaceChildren();
+    if (data.residuos.length === 0) {
+      list.append(createElement("p", "plan-empty", "Nenhum resíduo registrado ainda."));
+      return;
+    }
+    data.residuos.forEach((item) => {
+      const row = createElement("article", "overview-action");
+      row.append(
+        createElement("h3", "overview-action__title", item.nome),
+        createElement(
+          "p",
+          "overview-action__category",
+          `${wasteCategoryLabels[item.categoria] ?? item.categoria} · ${Number(item.quantidade_kg).toLocaleString("pt-BR")} kg`,
+        ),
+        createElement("p", "overview-action__date", formatDate(item.criado_em.slice(0, 10))),
+      );
+      list.append(row);
+    });
+  } catch (error) {
+    console.error("Não foi possível carregar os registros de resíduos.", error);
+    list.replaceChildren(createElement("p", "plan-empty", error.message));
+  }
+}
+
+async function submitWasteRecord(event) {
+  event.preventDefault();
+  const submit = wasteForm.querySelector('button[type="submit"]');
+  submit.disabled = true;
+  wasteMessage.hidden = true;
+  const payload = Object.fromEntries(new FormData(wasteForm).entries());
+  payload.quantidade_kg = Number(payload.quantidade_kg);
+  try {
+    const response = await fetch("/residuos", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (response.status === 401) {
+      window.location.assign("/");
+      return;
+    }
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail ?? "Não foi possível registrar o resíduo.");
+    }
+    wasteForm.reset();
+    wasteMessage.textContent = "Resíduo registrado com sucesso.";
+    wasteMessage.classList.remove("is-error");
+    wasteMessage.hidden = false;
+    await loadWasteRecords();
+  } catch (error) {
+    console.error("Não foi possível registrar o resíduo.", error);
+    wasteMessage.textContent = error.message ?? "Não foi possível registrar o resíduo.";
+    wasteMessage.classList.add("is-error");
+    wasteMessage.hidden = false;
+  } finally {
+    submit.disabled = false;
+  }
 }
 
 function renderOverview() {
@@ -624,18 +804,26 @@ function updateActiveNavigation() {
   if (companyProfilePage) {
     companyProfilePage.hidden = currentHash !== "#perfil-empresa";
   }
+
+  if (resultsPage) resultsPage.hidden = currentHash !== "#resultados";
+  if (wastePage) wastePage.hidden = currentHash !== "#residuos";
+  if (helpPage) helpPage.hidden = currentHash !== "#ajuda";
 }
 
-if (companyProfileForm && profileStorageKey) {
-  loadCompanyProfile();
+if (companyProfileForm) {
+  void loadCompanyProfile();
   companyProfileForm.addEventListener("submit", saveCompanyProfile);
 }
 
-if (sustainabilityPage && actionCatalog && storageKey) {
-  loadPlan();
-  renderPlan();
-  showTab(activeTab);
+if (sustainabilityPage && actionCatalog) {
+  void loadPlan().then(() => {
+    renderPlan();
+    showTab(activeTab);
+  });
 }
 
+void loadDiagnosticResults();
+void loadWasteRecords();
+if (wasteForm) wasteForm.addEventListener("submit", submitWasteRecord);
 window.addEventListener("hashchange", updateActiveNavigation);
 updateActiveNavigation();

@@ -59,6 +59,13 @@
             <span>Resultados</span>
           </a>
 
+          <a class="sidebar-link" href="#residuos" data-page="Resíduos">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7h16M10 11v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3" />
+            </svg>
+            <span>Resíduos</span>
+          </a>
+
           <a
             class="sidebar-link"
             href="#rota-sustentavel"
@@ -106,7 +113,7 @@
               </span>
 
               <span class="company-menu__text">
-                <span class="company-menu__name">{{ empresa }}</span>
+                <span class="company-menu__name" data-company-display-name>{{ empresa }}</span>
                 <span class="company-menu__label">Minha empresa</span>
               </span>
             </a>
@@ -140,13 +147,13 @@
         <section
           class="company-home-page"
           data-view="minha-empresa"
-          data-default-company-name="{{ usuario }}"
+          data-default-company-name="{{ empresa }}"
           aria-labelledby="company-home-title"
         >
           <div class="company-home-heading">
             <p class="dashboard-kicker">Visão geral</p>
             <h1 id="company-home-title">
-              <span data-home-company-name>{{ usuario }}</span>
+              <span data-home-company-name>{{ empresa }}</span>
             </h1>
             <p>Resumo do perfil e do diagnóstico de sustentabilidade da empresa.</p>
           </div>
@@ -200,19 +207,19 @@
                   geral do diagnóstico.
                 </p>
               </div>
-              <span class="diagnostic-overview__status">Diagnóstico ainda não realizado</span>
+              <span class="diagnostic-overview__status" data-diagnostic-status>Diagnóstico ainda não realizado</span>
             </div>
 
             <div class="diagnostic-overview__metrics">
               <article class="diagnostic-metric">
                 <span class="diagnostic-metric__label">Perguntas respondidas</span>
-                <strong class="diagnostic-metric__value" data-diagnostic-answered>—</strong>
+                <strong class="diagnostic-metric__value" data-diagnostic-answered>Carregando...</strong>
                 <span class="diagnostic-metric__note">Nenhum dado disponível</span>
               </article>
               <article class="diagnostic-metric">
                 <span class="diagnostic-metric__label">Resultado geral</span>
                 <strong class="diagnostic-metric__value diagnostic-metric__value--text">
-                  Ainda sem resultado
+                  <span data-diagnostic-score>Carregando...</span>
                 </strong>
                 <span class="diagnostic-metric__note">Faça o diagnóstico para ver sua avaliação</span>
               </article>
@@ -226,18 +233,106 @@
                   aria-valuemax="100"
                   aria-valuenow="0"
                 >
-                  <span></span>
+                  <span data-diagnostic-progress-bar></span>
                 </div>
-                <span class="diagnostic-metric__note">Os resultados aparecerão aqui quando disponíveis</span>
+                <span class="diagnostic-metric__note" data-diagnostic-progress-note>Carregando resultados...</span>
               </article>
             </div>
+            <div class="overview-groups" data-diagnostic-dimensions></div>
           </section>
+        </section>
+
+        <section class="company-profile-page" data-view="resultados" aria-labelledby="results-title" hidden>
+          <div class="company-profile-heading">
+            <p class="dashboard-kicker">Sustentabilidade</p>
+            <h1 id="results-title">Resultados do diagnóstico</h1>
+            <p>Veja a avaliação por dimensão e acompanhe o progresso da sua empresa.</p>
+          </div>
+          <div class="diagnostic-overview">
+            <span class="diagnostic-overview__status" data-results-status>Carregando resultados...</span>
+            <div class="diagnostic-overview__metrics">
+              <article class="diagnostic-metric">
+                <span class="diagnostic-metric__label">Perguntas respondidas</span>
+                <strong class="diagnostic-metric__value" data-results-answered>—</strong>
+              </article>
+              <article class="diagnostic-metric">
+                <span class="diagnostic-metric__label">Resultado geral</span>
+                <strong class="diagnostic-metric__value" data-results-score>—</strong>
+              </article>
+            </div>
+          </div>
+          <div class="overview-groups" data-results-dimensions></div>
+        </section>
+
+        <section class="company-profile-page" data-view="residuos" aria-labelledby="waste-title" hidden>
+          <div class="company-profile-heading">
+            <p class="dashboard-kicker">Gestão ambiental</p>
+            <h1 id="waste-title">Registro de resíduos</h1>
+            <p>Registre os resíduos gerados pela empresa e consulte os lançamentos salvos.</p>
+          </div>
+          <form class="company-profile-form" data-waste-form>
+            <div class="company-profile-form__heading">
+              <h2>Novo registro</h2>
+              <p>Informe o resíduo, a categoria e a quantidade em quilogramas.</p>
+            </div>
+            <div class="company-profile-fields">
+              <div class="profile-field">
+                <label for="waste-name">Resíduo *</label>
+                <input id="waste-name" name="nome" type="text" minlength="2" maxlength="120" required />
+              </div>
+              <div class="profile-field">
+                <label for="waste-category">Categoria *</label>
+                <select id="waste-category" name="categoria" required>
+                  <option value="organico">Orgânico</option>
+                  <option value="reciclavel">Reciclável</option>
+                  <option value="perigoso">Perigoso</option>
+                  <option value="rejeito">Rejeito</option>
+                </select>
+              </div>
+              <div class="profile-field">
+                <label for="waste-quantity">Quantidade (kg) *</label>
+                <input id="waste-quantity" name="quantidade_kg" type="number" min="0.01" step="0.01" required />
+              </div>
+            </div>
+            <p class="profile-form-message" data-waste-message role="status" hidden></p>
+            <div class="company-profile-form__footer">
+              <button class="primary-button" type="submit">Registrar resíduo</button>
+            </div>
+          </form>
+          <section class="company-overview-card" aria-labelledby="waste-list-title">
+            <div class="company-overview-card__heading"><h2 id="waste-list-title">Registros da empresa</h2></div>
+            <div class="overview-groups" data-waste-list><p>Carregando registros...</p></div>
+          </section>
+        </section>
+
+        <section class="company-profile-page" data-view="ajuda" aria-labelledby="help-title" hidden>
+          <div class="company-profile-heading">
+            <p class="dashboard-kicker">Central de suporte</p>
+            <h1 id="help-title">Ajuda</h1>
+            <p>Orientações para usar o EcoAvanza.</p>
+          </div>
+          <div class="company-overview-card">
+            <div class="company-overview-card__heading"><h2>Acessar o sistema</h2></div>
+            <p>Use o e-mail e a senha da empresa para entrar. O menu no cabeçalho permite encerrar a sessão.</p>
+          </div>
+          <div class="company-overview-card">
+            <div class="company-overview-card__heading"><h2>Diagnóstico</h2></div>
+            <p>Responda às perguntas por dimensão. Cada resposta é salva automaticamente; ao concluir, as respostas ficam disponíveis para consulta.</p>
+          </div>
+          <div class="company-overview-card">
+            <div class="company-overview-card__heading"><h2>Perfil e plano sustentável</h2></div>
+            <p>Salve os dados do perfil e acompanhe as ações escolhidas, agendadas e implementadas. As informações ficam vinculadas à sua empresa.</p>
+          </div>
+          <div class="company-overview-card">
+            <div class="company-overview-card__heading"><h2>Precisa de suporte?</h2></div>
+            <p>Entre em contato com a equipe responsável pela implantação do sistema na sua organização.</p>
+          </div>
         </section>
 
         <section
           class="company-profile-page"
           data-view="perfil-empresa"
-          data-profile-user="{{ usuario }}"
+          data-profile-user="{{ empresa }}"
           aria-labelledby="company-profile-title"
           hidden
         >
@@ -354,7 +449,6 @@
         <section
           class="sustainability-page"
           data-view="rota-sustentavel"
-          data-plan-key="ecoavanza-plan-{{ usuario }}"
           aria-labelledby="sustainability-title"
           hidden
         >

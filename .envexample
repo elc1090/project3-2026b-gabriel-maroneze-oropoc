@@ -1,9 +1,15 @@
 POSTGRES_DB=gestao_ambiental
 POSTGRES_USER=gestao_app
-POSTGRES_PASSWORD=defina-uma-senha
+POSTGRES_PASSWORD=troque-por-uma-senha-forte
 
 DB_HOST=db
 DB_PORT=5432
+SESSION_SECRET=troque-por-um-segredo-aleatorio-longo
+COOKIE_HTTPS_ONLY=false
+
+INITIAL_COMPANY_NAME=Minha Empresa
+INITIAL_ADMIN_USER=admin@example.com
+INITIAL_ADMIN_PASSWORD=troque-por-uma-senha-forte
 
 PGADMIN_DEFAULT_EMAIL=admin@local.dev
-PGADMIN_DEFAULT_PASSWORD=defina-outra-senha
+PGADMIN_DEFAULT_PASSWORD=troque-por-outra-senha-forte

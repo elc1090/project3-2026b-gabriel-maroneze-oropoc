@@ -31,17 +31,18 @@
 
           <form class="login-form" action="/login" method="post" novalidate>
             <div class="field">
-              <label for="usuario">Usuario</label>
+              <label for="email">E-mail</label>
               <div class="field__control">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0" />
                 </svg>
                 <input
-                  id="usuario"
-                  name="usuario"
-                  type="text"
-                  value="{{ usuario }}"
-                  autocomplete="username"
+                  id="email"
+                  name="email"
+                  type="email"
+                  value="{{ email }}"
+                  placeholder="empresa@email.com"
+                  autocomplete="email"
                   autocapitalize="none"
                   spellcheck="false"
                   required

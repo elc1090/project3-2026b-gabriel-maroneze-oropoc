@@ -366,3 +366,289 @@ input {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Estrutura inicial da aplicação */
+
+.app-page {
+  min-width: 320px;
+  background: #fff;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.app-sidebar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 38px 18px 26px;
+  overflow: hidden;
+  color: #fff;
+  background: var(--forest-950);
+}
+
+/* Logo sem caixa branca */
+.sidebar-brand {
+  display: flex;
+  width: 100%;
+  height: 104px;
+  margin: 0 0 40px;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-brand img {
+  display: block;
+  width: 200px;
+  height: 150px;
+  object-fit: contain;
+
+  /*
+    Deixa o fundo branco da imagem invisível e converte a marca
+    em uma versão clara adequada para o fundo verde.
+  */
+  filter: grayscale(1) invert(1);
+  mix-blend-mode: screen;
+}
+
+.sidebar-nav {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 10px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  min-height: 58px;
+  gap: 16px;
+  padding: 0 18px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  border-radius: 10px;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.sidebar-link svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sidebar-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.sidebar-link.is-active {
+  color: #fff;
+  background: #527f3b;
+}
+
+.sidebar-botanical {
+  flex: 1;
+  min-height: 260px;
+  margin: 14px -18px -26px;
+  pointer-events: none;
+}
+
+.sidebar-help {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+}
+
+.app-workspace {
+  min-width: 0;
+  background: #fff;
+}
+
+.workspace-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 24px clamp(28px, 4vw, 68px);
+}
+
+.company-menu {
+  position: relative;
+}
+
+.company-menu__trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 8px 5px 5px;
+  color: var(--ink-950);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.company-menu__trigger:hover,
+.company-menu__trigger[aria-expanded="true"] {
+  background: var(--sage-100);
+}
+
+.company-avatar {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  overflow: hidden;
+  color: var(--forest-800);
+  background: #e6efdd;
+  border: 1px solid #d0dec7;
+  border-radius: 50%;
+}
+
+.company-avatar svg {
+  width: 46px;
+  height: 46px;
+  fill: #d6e8bf;
+}
+
+.company-avatar path {
+  fill: none;
+  stroke: var(--forest-800);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.company-menu__text {
+  display: grid;
+  gap: 3px;
+}
+
+.company-menu__name {
+  max-width: 170px;
+  overflow: hidden;
+  color: var(--ink-950);
+  font-size: 0.92rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.company-menu__label {
+  color: var(--ink-500);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.company-menu__chevron {
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  fill: none;
+  stroke: var(--ink-700);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.company-menu__panel {
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  z-index: 2;
+  min-width: 178px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 16px 36px rgba(20, 50, 34, 0.14);
+}
+
+.company-menu__logout {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  color: #8d2019;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.company-menu__logout:hover {
+  background: #fff1f0;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .app-sidebar {
+    align-items: center;
+    padding: 16px 10px;
+  }
+
+  .sidebar-brand {
+    width: 48px;
+    height: 48px;
+    margin: 0 0 26px;
+    border-radius: 50%;
+  }
+
+  .sidebar-brand img {
+    width: 39px;
+    height: 39px;
+  }
+
+  .sidebar-nav {
+    width: 100%;
+  }
+
+  .sidebar-link {
+    justify-content: center;
+    min-height: 48px;
+    padding: 0;
+  }
+
+  .sidebar-link span,
+  .sidebar-botanical {
+    display: none;
+  }
+
+  .sidebar-help {
+    margin-top: auto;
+  }
+
+  .workspace-header {
+    padding: 18px;
+  }
+
+  .company-menu__label,
+  .company-menu__chevron {
+    display: none;
+  }
+
+  .company-menu__name {
+    max-width: 115px;
+  }
+}

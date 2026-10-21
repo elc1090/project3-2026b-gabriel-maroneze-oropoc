@@ -3,25 +3,134 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Painel | EcoAvanza</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}" />
+    <meta name="description" content="Painel inicial da EcoAvanza" />
+    <title>Minha empresa | EcoAvanza</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/styles.css') }}"
+    />
+    <script
+      src="{{ url_for('static', path='js/dashboard.js') }}"
+      defer
+    ></script>
   </head>
 
-  <body class="dashboard-page">
-    <header class="dashboard-header">
-      <div class="dashboard-brand">EcoAvanza</div>
+  <body class="app-page">
+    <div class="app-shell">
+      <aside class="app-sidebar" aria-label="Navegação principal">
+        <a
+          class="sidebar-brand"
+          href="#minha-empresa"
+          aria-label="EcoAvanza — Minha empresa"
+        >
+          <img
+            src="{{ url_for('static', path='images/logo-ecoavanza.png') }}"
+            alt="EcoAvanza"
+          />
+        </a>
 
-      <form action="/logout" method="post">
-        <button class="secondary-button" type="submit">Sair</button>
-      </form>
-    </header>
+        <nav class="sidebar-nav" aria-label="Seções da aplicação">
+          <a
+            class="sidebar-link is-active"
+            href="#minha-empresa"
+            data-page="Minha empresa"
+            aria-current="page"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z" />
+              <path d="M9 21v-7h6v7" />
+            </svg>
+            <span>Minha empresa</span>
+          </a>
 
-    <main class="dashboard-main">
-      <p class="dashboard-kicker">Sessão autenticada</p>
-      <h1>Hola, {{ usuario }}!</h1>
-      <p>
-        O login foi realizado com sucesso.
-      </p>
-    </main>
+          <a class="sidebar-link" href="#diagnostico" data-page="Diagnóstico">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 3h8l3 3v15H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" />
+              <path d="M15 3v4h4M9 12h6M9 16h6" />
+            </svg>
+            <span>Diagnóstico</span>
+          </a>
+
+          <a class="sidebar-link" href="#resultados" data-page="Resultados">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 20V10M12 20V4M19 20v-7" />
+            </svg>
+            <span>Resultados</span>
+          </a>
+
+          <a
+            class="sidebar-link"
+            href="#rota-sustentavel"
+            data-page="Rota Sustentável"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M7 20a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM17 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+              />
+              <path d="M10.5 15.5c1.4-.5 2.6-1.5 3.4-3M7 12V8M17 16v4" />
+            </svg>
+            <span>Rota Sustentável</span>
+          </a>
+        </nav>
+
+        <!-- Espaço livre na barra verde -->
+        <div class="sidebar-botanical" aria-hidden="true"></div>
+
+        <a class="sidebar-link sidebar-help" href="#ajuda" data-page="Ajuda">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path
+              d="M9.5 9a2.6 2.6 0 1 1 4.1 2.1c-1.2.8-1.6 1.3-1.6 2.4M12 17h.01"
+            />
+          </svg>
+          <span>Ajuda</span>
+        </a>
+      </aside>
+
+      <main class="app-workspace" aria-label="Área principal da aplicação">
+        <header class="workspace-header">
+          <div class="company-menu">
+            <button
+              class="company-menu__trigger"
+              type="button"
+              aria-expanded="false"
+              aria-controls="company-menu-panel"
+            >
+              <span class="company-avatar" aria-hidden="true">
+                <svg viewBox="0 0 48 48">
+                  <circle cx="24" cy="24" r="24" />
+                  <path d="M15 32V20l7-5v17m0-11 7-4v15m-14 0h18" />
+                  <path
+                    d="M31 13c2.2 0 4 1.8 4 4-2.2 0-4-1.8-4-4Z"
+                  />
+                </svg>
+              </span>
+
+              <span class="company-menu__text">
+                <span class="company-menu__name">{{ usuario }}</span>
+                <span class="company-menu__label">Minha empresa</span>
+              </span>
+
+              <svg
+                class="company-menu__chevron"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d="m7 10 5 5 5-5" />
+              </svg>
+            </button>
+
+            <div class="company-menu__panel" id="company-menu-panel" hidden>
+              <form action="/logout" method="post">
+                <button class="company-menu__logout" type="submit">
+                  Sair da sessão
+                </button>
+              </form>
+            </div>
+          </div>
+        </header>
+      </main>
+    </div>
   </body>
 </html>

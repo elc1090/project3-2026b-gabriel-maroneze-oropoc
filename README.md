@@ -36,6 +36,7 @@ Ele fica disponível em <http://localhost:5050>.
 ## Fluxos disponíveis
 
 - Login e sessão da empresa.
+- Cadastro de novas contas com validação de e-mail e senha de pelo menos 8 caracteres.
 - Diagnóstico com 20 perguntas, respostas salvas automaticamente e conclusão.
 - Resultados por dimensão, calculados a partir das respostas.
 - Perfil da empresa persistido no banco.

@@ -4,3 +4,4 @@ jinja2
 python-multipart
 pwdlib[argon2]
 itsdangerous
+email-validator

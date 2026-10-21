@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pwdlib import PasswordHash
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field, TypeAdapter, ValidationError
 from starlette.middleware.sessions import SessionMiddleware
 
 
@@ -159,6 +159,13 @@ def inicializar_banco() -> None:
                 """,
             ):
                 cursor.execute(statement)
+
+            cursor.execute(
+                """
+                CREATE UNIQUE INDEX IF NOT EXISTS empresas_email_acesso_lower_unique
+                ON empresas (LOWER(email_acesso))
+                """
+            )
 
             dimensoes = [
                 ("Ambiental", 1, [
@@ -310,6 +317,11 @@ def autenticar_empresa(email: str, senha: str) -> tuple[int, str] | None:
         return None
 
     return empresa_id, nome_empresa
+
+
+def validar_email(email: str) -> str:
+    email_validado = TypeAdapter(EmailStr).validate_python(email.strip())
+    return str(email_validado).lower()
 
 
 def buscar_diagnostico_em_andamento(
@@ -617,6 +629,85 @@ def pagina_login(request: Request):
         name="login.html",
         context={"erro": None, "email": ""},
     )
+
+
+@app.get("/cadastro", response_class=HTMLResponse, include_in_schema=False)
+def pagina_cadastro(request: Request):
+    if request.session.get("empresa_id"):
+        return RedirectResponse(url="/painel", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="cadastro.html",
+        context={"erro": None, "email": ""},
+    )
+
+
+@app.post("/cadastro", response_class=HTMLResponse, include_in_schema=False)
+def cadastrar_empresa(
+    request: Request,
+    email: Annotated[str, Form()],
+    senha: Annotated[str, Form()],
+):
+    email_original = email.strip()
+    try:
+        email_validado = validar_email(email_original)
+    except ValidationError:
+        return templates.TemplateResponse(
+            request=request,
+            name="cadastro.html",
+            context={"erro": "Informe um endereço de e-mail válido.", "email": email_original},
+            status_code=422,
+        )
+
+    if len(senha) < 8:
+        return templates.TemplateResponse(
+            request=request,
+            name="cadastro.html",
+            context={
+                "erro": "A senha precisa ter pelo menos 8 caracteres.",
+                "email": email_original,
+            },
+            status_code=422,
+        )
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO empresas (nome, email_acesso, senha_hash)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (LOWER(email_acesso)) DO NOTHING
+                RETURNING id, nome
+                """,
+                ("Minha Empresa", email_validado, password_hash.hash(senha)),
+            )
+            empresa = cursor.fetchone()
+
+            if empresa is not None:
+                cursor.execute(
+                    """
+                    INSERT INTO planos_sustentaveis (empresa_id, acoes)
+                    VALUES (%s, '[]'::jsonb)
+                    """,
+                    (empresa[0],),
+                )
+
+    if empresa is None:
+        return templates.TemplateResponse(
+            request=request,
+            name="cadastro.html",
+            context={
+                "erro": "Já existe uma conta cadastrada com esse e-mail.",
+                "email": email_original,
+            },
+            status_code=409,
+        )
+
+    request.session.clear()
+    request.session["empresa_id"] = empresa[0]
+    request.session["empresa_nome"] = empresa[1]
+    return RedirectResponse(url="/painel", status_code=303)
 
 
 @app.post("/login", response_class=HTMLResponse, include_in_schema=False)

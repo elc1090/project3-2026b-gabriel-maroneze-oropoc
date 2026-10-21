@@ -214,6 +214,28 @@ input {
   font-weight: 600;
 }
 
+.account-link {
+  margin: 20px 0 0;
+  color: var(--ink-700);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.account-link a {
+  color: var(--forest-800);
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.account-link a:hover {
+  text-decoration: underline;
+}
+
+.field-hint {
+  color: var(--ink-500);
+  font-size: 0.8rem;
+}
+
 .primary-button,
 .secondary-button {
   padding: 0 24px;

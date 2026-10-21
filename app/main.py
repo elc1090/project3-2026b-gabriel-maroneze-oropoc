@@ -1,5 +1,6 @@
 import os
 from contextlib import asynccontextmanager
+from datetime import date
 from typing import Annotated, Literal
 
 import psycopg
@@ -27,6 +28,44 @@ class ResiduoCreate(BaseModel):
     quantidade_kg: float = Field(gt=0)
 
 
+class PerfilEmpresaUpdate(BaseModel):
+    profile_created_at: date
+    founded_year: int = Field(ge=1800, le=2100)
+    company_name: str = Field(min_length=2, max_length=120)
+    owner: str = Field(min_length=2, max_length=120)
+    employees: int = Field(ge=0, le=1_000_000)
+    sector: str = Field(min_length=2, max_length=100)
+
+
+class PlanoAcao(BaseModel):
+    id: str = Field(min_length=1, max_length=80)
+    status: Literal["awaiting", "in_progress", "implemented"]
+    date: str = Field(default="", max_length=10)
+    notes: str = Field(default="", max_length=160)
+
+
+class PlanoSustentavelUpdate(BaseModel):
+    actions: list[PlanoAcao] = Field(max_length=100)
+
+
+PLANO_ACTION_IDS = frozenset(
+    {
+        "waste-separation",
+        "waste-destination",
+        "reuse-materials",
+        "water-leaks",
+        "water-efficiency",
+        "rainwater",
+        "led-lighting",
+        "energy-routine",
+        "ac-maintenance",
+        "supplier-criteria",
+        "low-impact-products",
+        "purchase-planning",
+    }
+)
+
+
 class RespostaDiagnosticoUpdate(BaseModel):
     """
     0 = Não é realizado
@@ -49,24 +88,152 @@ def abrir_conexao():
 
 
 def inicializar_banco() -> None:
-    nome_empresa = (os.getenv("INITIAL_COMPANY_NAME") or "").strip()
-    email_empresa = (os.getenv("INITIAL_COMPANY_EMAIL") or "").strip().lower()
-    senha_empresa = os.getenv("INITIAL_COMPANY_PASSWORD") or ""
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            for statement in (
+                """
+                CREATE TABLE IF NOT EXISTS empresas (
+                    id BIGSERIAL PRIMARY KEY,
+                    nome VARCHAR(120) NOT NULL,
+                    email_acesso VARCHAR(254) NOT NULL UNIQUE,
+                    senha_hash TEXT NOT NULL
+                )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS dimensoes (
+                    id BIGSERIAL PRIMARY KEY,
+                    nome VARCHAR(80) NOT NULL UNIQUE,
+                    ordem INTEGER NOT NULL UNIQUE
+                )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS perguntas (
+                    id BIGSERIAL PRIMARY KEY,
+                    dimensao_id BIGINT NOT NULL REFERENCES dimensoes(id),
+                    texto TEXT NOT NULL,
+                    ordem INTEGER NOT NULL,
+                    ativa BOOLEAN NOT NULL DEFAULT TRUE,
+                    UNIQUE (dimensao_id, ordem)
+                )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS diagnosticos (
+                    id BIGSERIAL PRIMARY KEY,
+                    empresa_id BIGINT NOT NULL REFERENCES empresas(id),
+                    status VARCHAR(20) NOT NULL DEFAULT 'em_andamento',
+                    iniciado_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    finalizado_em TIMESTAMPTZ
+                )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS respostas_diagnostico (
+                    diagnostico_id BIGINT NOT NULL REFERENCES diagnosticos(id),
+                    pergunta_id BIGINT NOT NULL REFERENCES perguntas(id),
+                    valor SMALLINT NOT NULL CHECK (valor BETWEEN 0 AND 3),
+                    respondida_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (diagnostico_id, pergunta_id)
+                )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS perfis_empresa (
+                    empresa_id BIGINT PRIMARY KEY REFERENCES empresas(id) ON DELETE CASCADE,
+                    dados JSONB NOT NULL
+                )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS planos_sustentaveis (
+                    empresa_id BIGINT PRIMARY KEY REFERENCES empresas(id) ON DELETE CASCADE,
+                    acoes JSONB NOT NULL DEFAULT '[]'::jsonb,
+                    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS residuos (
+                    id BIGSERIAL PRIMARY KEY,
+                    empresa_id BIGINT NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+                    nome VARCHAR(120) NOT NULL,
+                    categoria VARCHAR(20) NOT NULL,
+                    quantidade_kg DOUBLE PRECISION NOT NULL CHECK (quantidade_kg > 0),
+                    criado_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+                """,
+            ):
+                cursor.execute(statement)
 
-    valores = [
-        nome_empresa,
-        email_empresa,
-        senha_empresa,
-    ]
+            dimensoes = [
+                ("Ambiental", 1, [
+                    "A empresa monitora o consumo de água?",
+                    "A empresa acompanha o consumo de energia?",
+                    "Os resíduos são separados para reciclagem?",
+                    "A empresa reduz o uso de materiais descartáveis?",
+                    "Há ações para prevenir impactos ambientais?",
+                ]),
+                ("Social", 2, [
+                    "A empresa promove saúde e segurança no trabalho?",
+                    "A equipe recebe orientação sobre sustentabilidade?",
+                    "A empresa combate discriminação e assédio?",
+                    "Há diálogo com clientes e comunidade?",
+                    "A empresa incentiva condições de trabalho justas?",
+                ]),
+                ("Econômica", 3, [
+                    "A empresa planeja o uso eficiente de recursos?",
+                    "As compras consideram durabilidade e desperdício?",
+                    "A empresa acompanha custos relacionados a recursos?",
+                    "Há planejamento para manter as ações sustentáveis?",
+                    "A empresa avalia oportunidades de eficiência?",
+                ]),
+                ("Governança", 4, [
+                    "Há responsáveis definidos pelas ações sustentáveis?",
+                    "A empresa registra suas políticas e práticas?",
+                    "As decisões consideram impactos de longo prazo?",
+                    "A empresa acompanha metas e resultados?",
+                    "A comunicação sobre práticas é transparente?",
+                ]),
+            ]
+            cursor.execute("SELECT COUNT(*) FROM perguntas")
+            if cursor.fetchone()[0] == 0:
+                for nome_dimensao, ordem, perguntas in dimensoes:
+                    cursor.execute(
+                        """
+                        INSERT INTO dimensoes (nome, ordem)
+                        VALUES (%s, %s)
+                        RETURNING id
+                        """,
+                        (nome_dimensao, ordem),
+                    )
+                    dimensao_id = cursor.fetchone()[0]
+                    cursor.executemany(
+                        """
+                        INSERT INTO perguntas (dimensao_id, texto, ordem)
+                        VALUES (%s, %s, %s)
+                        """,
+                        [
+                            (dimensao_id, texto, ordem_pergunta)
+                            for ordem_pergunta, texto in enumerate(perguntas, 1)
+                        ],
+                    )
 
-    if any(valores) and not all(valores):
-        raise RuntimeError(
-            "Defina INITIAL_COMPANY_NAME, INITIAL_COMPANY_EMAIL "
-            "e INITIAL_COMPANY_PASSWORD juntos."
-        )
+    nome_empresa = (
+        os.getenv("INITIAL_COMPANY_NAME")
+        or "Minha Empresa"
+    ).strip()
+    email_empresa = (
+        os.getenv("INITIAL_COMPANY_EMAIL")
+        or os.getenv("INITIAL_ADMIN_USER")
+        or ""
+    ).strip().lower()
+    senha_empresa = (
+        os.getenv("INITIAL_COMPANY_PASSWORD")
+        or os.getenv("INITIAL_ADMIN_PASSWORD")
+        or ""
+    )
 
-    if not all(valores):
+    if not email_empresa and not senha_empresa:
         return
+    if not email_empresa or not senha_empresa:
+        raise RuntimeError(
+            "Defina usuário/e-mail e senha inicial juntos para criar o acesso."
+        )
 
     with abrir_conexao() as conexao:
         with conexao.cursor() as cursor:
@@ -97,6 +264,24 @@ def inicializar_banco() -> None:
                         password_hash.hash(senha_empresa),
                     ),
                 )
+
+            cursor.execute(
+                """
+                SELECT id
+                FROM empresas
+                WHERE LOWER(email_acesso) = %s
+                """,
+                (email_empresa,),
+            )
+            empresa_id = cursor.fetchone()[0]
+            cursor.execute(
+                """
+                INSERT INTO planos_sustentaveis (empresa_id, acoes)
+                VALUES (%s, '[]'::jsonb)
+                ON CONFLICT (empresa_id) DO NOTHING
+                """,
+                (empresa_id,),
+            )
 
 
 def autenticar_empresa(email: str, senha: str) -> tuple[int, str] | None:
@@ -365,10 +550,251 @@ def verificar_saude():
 
 
 @app.post("/residuos", status_code=201)
-def cadastrar_residuo(residuo: ResiduoCreate):
+def cadastrar_residuo(residuo: ResiduoCreate, request: Request):
+    empresa_id = request.session.get("empresa_id")
+    if not empresa_id:
+        raise HTTPException(status_code=401, detail="Inicie uma sessão para registrar resíduos.")
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO residuos (empresa_id, nome, categoria, quantidade_kg)
+                VALUES (%s, %s, %s, %s)
+                RETURNING id, criado_em
+                """,
+                (empresa_id, residuo.nome.strip(), residuo.categoria, residuo.quantidade_kg),
+            )
+            registro = cursor.fetchone()
+
     return {
-        "mensagem": "Dados validados com sucesso",
+        "mensagem": "Resíduo registrado com sucesso.",
+        "id": registro[0],
+        "criado_em": registro[1],
         "residuo": residuo.model_dump(),
+    }
+
+
+@app.get("/api/residuos", include_in_schema=False)
+def listar_residuos(request: Request):
+    empresa_id = request.session.get("empresa_id")
+    if not empresa_id:
+        raise HTTPException(status_code=401, detail="Inicie uma sessão para consultar resíduos.")
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, nome, categoria, quantidade_kg, criado_em
+                FROM residuos
+                WHERE empresa_id = %s
+                ORDER BY criado_em DESC, id DESC
+                """,
+                (empresa_id,),
+            )
+            residuos_empresa = cursor.fetchall()
+
+    return {
+        "residuos": [
+            {
+                "id": item[0],
+                "nome": item[1],
+                "categoria": item[2],
+                "quantidade_kg": item[3],
+                "criado_em": item[4],
+            }
+            for item in residuos_empresa
+        ]
+    }
+
+
+@app.get("/api/perfil", include_in_schema=False)
+def obter_perfil(request: Request):
+    empresa_id = request.session.get("empresa_id")
+    if not empresa_id:
+        raise HTTPException(status_code=401, detail="Inicie uma sessão para acessar o perfil.")
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                "SELECT dados FROM perfis_empresa WHERE empresa_id = %s",
+                (empresa_id,),
+            )
+            registro = cursor.fetchone()
+            cursor.execute("SELECT nome FROM empresas WHERE id = %s", (empresa_id,))
+            nome_empresa = cursor.fetchone()[0]
+
+    return {"perfil": registro[0] if registro else {}, "nome_empresa": nome_empresa}
+
+
+@app.put("/api/perfil", include_in_schema=False)
+def salvar_perfil(perfil: PerfilEmpresaUpdate, request: Request):
+    empresa_id = request.session.get("empresa_id")
+    if not empresa_id:
+        raise HTTPException(status_code=401, detail="Inicie uma sessão para salvar o perfil.")
+
+    dados = perfil.model_dump(mode="json")
+    dados["company_name"] = dados["company_name"].strip()
+    dados["owner"] = dados["owner"].strip()
+    dados["sector"] = dados["sector"].strip()
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO perfis_empresa (empresa_id, dados)
+                VALUES (%s, %s)
+                ON CONFLICT (empresa_id)
+                DO UPDATE SET dados = EXCLUDED.dados
+                """,
+                (empresa_id, psycopg.types.json.Jsonb(dados)),
+            )
+            cursor.execute(
+                "UPDATE empresas SET nome = %s WHERE id = %s",
+                (dados["company_name"], empresa_id),
+            )
+    request.session["empresa_nome"] = dados["company_name"]
+    return {"mensagem": "Perfil salvo com sucesso.", "perfil": dados}
+
+
+@app.get("/api/plano", include_in_schema=False)
+def obter_plano(request: Request):
+    empresa_id = request.session.get("empresa_id")
+    if not empresa_id:
+        raise HTTPException(status_code=401, detail="Inicie uma sessão para acessar o plano.")
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                "SELECT acoes FROM planos_sustentaveis WHERE empresa_id = %s",
+                (empresa_id,),
+            )
+            registro = cursor.fetchone()
+            if registro is None:
+                cursor.execute(
+                    """
+                    INSERT INTO planos_sustentaveis (empresa_id)
+                    VALUES (%s)
+                    RETURNING acoes
+                    """,
+                    (empresa_id,),
+                )
+                registro = cursor.fetchone()
+
+    return {"actions": registro[0]}
+
+
+@app.put("/api/plano", include_in_schema=False)
+def salvar_plano(plano: PlanoSustentavelUpdate, request: Request):
+    empresa_id = request.session.get("empresa_id")
+    if not empresa_id:
+        raise HTTPException(status_code=401, detail="Inicie uma sessão para salvar o plano.")
+
+    acoes = [acao.model_dump() for acao in plano.actions]
+    if len({acao["id"] for acao in acoes}) != len(acoes):
+        raise HTTPException(status_code=422, detail="O plano contém ações duplicadas.")
+    for acao in acoes:
+        if acao["id"] not in PLANO_ACTION_IDS:
+            raise HTTPException(status_code=422, detail="O plano contém uma ação desconhecida.")
+        if acao["status"] == "in_progress" and not acao["date"]:
+            raise HTTPException(status_code=422, detail="Agende uma data para cada ação em andamento.")
+        if acao["date"]:
+            try:
+                date.fromisoformat(acao["date"])
+            except ValueError as error:
+                raise HTTPException(status_code=422, detail="Use uma data válida no formato AAAA-MM-DD.") from error
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO planos_sustentaveis (empresa_id, acoes)
+                VALUES (%s, %s)
+                ON CONFLICT (empresa_id)
+                DO UPDATE SET
+                    acoes = EXCLUDED.acoes,
+                    atualizado_em = CURRENT_TIMESTAMP
+                """,
+                (empresa_id, psycopg.types.json.Jsonb(acoes)),
+            )
+
+    return {"mensagem": "Plano salvo com sucesso.", "actions": acoes}
+
+
+@app.get("/api/diagnostico/resultados", include_in_schema=False)
+def obter_resultados_diagnostico(request: Request):
+    empresa_id = request.session.get("empresa_id")
+    if not empresa_id:
+        raise HTTPException(status_code=401, detail="Inicie uma sessão para consultar os resultados.")
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, status, finalizado_em
+                FROM diagnosticos
+                WHERE empresa_id = %s AND status = 'concluido'
+                ORDER BY finalizado_em DESC
+                LIMIT 1
+                """,
+                (empresa_id,),
+            )
+            diagnostico = cursor.fetchone()
+            if diagnostico is None:
+                cursor.execute("SELECT COUNT(*) FROM perguntas WHERE ativa = TRUE")
+                total_perguntas = cursor.fetchone()[0]
+                cursor.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM respostas_diagnostico r
+                    JOIN diagnosticos d ON d.id = r.diagnostico_id
+                    WHERE d.empresa_id = %s AND d.status = 'em_andamento'
+                    """,
+                    (empresa_id,),
+                )
+                respondidas = cursor.fetchone()[0]
+                return {
+                    "disponivel": False,
+                    "respondidas": respondidas,
+                    "total_perguntas": total_perguntas,
+                    "progresso": round(respondidas * 100 / total_perguntas) if total_perguntas else 0,
+                    "dimensoes": [],
+                }
+
+            cursor.execute(
+                """
+                SELECT d.nome, COUNT(r.pergunta_id), AVG(r.valor)
+                FROM dimensoes d
+                JOIN perguntas p ON p.dimensao_id = d.id AND p.ativa = TRUE
+                LEFT JOIN respostas_diagnostico r
+                  ON r.pergunta_id = p.id AND r.diagnostico_id = %s
+                GROUP BY d.id, d.nome, d.ordem
+                ORDER BY d.ordem
+                """,
+                (diagnostico[0],),
+            )
+            dimensoes = cursor.fetchall()
+
+    answered = sum(item[1] for item in dimensoes)
+    total = sum(item[1] for item in dimensoes)
+    weighted_sum = sum((item[2] or 0) * item[1] for item in dimensoes)
+    return {
+        "disponivel": True,
+        "status": diagnostico[1],
+        "finalizado_em": diagnostico[2],
+        "respondidas": answered,
+        "total_perguntas": total,
+        "progresso": 100 if total else 0,
+        "resultado_geral": round(weighted_sum * 100 / (answered * 3)) if answered else 0,
+        "dimensoes": [
+            {
+                "nome": item[0],
+                "respondidas": item[1],
+                "total_perguntas": item[1],
+                "resultado": round(item[2] * 100 / 3) if item[2] is not None else 0,
+            }
+            for item in dimensoes
+        ],
     }
 
 

@@ -894,7 +894,8 @@ input {
   font-weight: 700;
 }
 
-.profile-field input {
+.profile-field input,
+.profile-field select {
   width: 100%;
   min-height: 48px;
   padding: 10px 13px;
@@ -906,11 +907,13 @@ input {
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
-.profile-field input:hover {
+.profile-field input:hover,
+.profile-field select:hover {
   border-color: var(--line-strong);
 }
 
-.profile-field input:focus {
+.profile-field input:focus,
+.profile-field select:focus {
   border-color: var(--forest-700);
   box-shadow: 0 0 0 4px var(--focus);
 }

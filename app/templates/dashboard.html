@@ -59,13 +59,6 @@
             <span>Resultados</span>
           </a>
 
-          <a class="sidebar-link" href="#residuos" data-page="Resíduos">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 7h16M10 11v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3" />
-            </svg>
-            <span>Resíduos</span>
-          </a>
-
           <a
             class="sidebar-link"
             href="#rota-sustentavel"
@@ -164,9 +157,6 @@
                 <p class="quiz-panel__eyebrow">Perfil da empresa</p>
                 <h2 id="company-overview-title">Dados cadastrais</h2>
               </div>
-              <a class="secondary-button company-overview-edit" href="#perfil-empresa">
-                Editar perfil
-              </a>
             </div>
 
             <dl class="company-overview-grid">
@@ -262,47 +252,6 @@
             </div>
           </div>
           <div class="overview-groups" data-results-dimensions></div>
-        </section>
-
-        <section class="company-profile-page" data-view="residuos" aria-labelledby="waste-title" hidden>
-          <div class="company-profile-heading">
-            <p class="dashboard-kicker">Gestão ambiental</p>
-            <h1 id="waste-title">Registro de resíduos</h1>
-            <p>Registre os resíduos gerados pela empresa e consulte os lançamentos salvos.</p>
-          </div>
-          <form class="company-profile-form" data-waste-form>
-            <div class="company-profile-form__heading">
-              <h2>Novo registro</h2>
-              <p>Informe o resíduo, a categoria e a quantidade em quilogramas.</p>
-            </div>
-            <div class="company-profile-fields">
-              <div class="profile-field">
-                <label for="waste-name">Resíduo *</label>
-                <input id="waste-name" name="nome" type="text" minlength="2" maxlength="120" required />
-              </div>
-              <div class="profile-field">
-                <label for="waste-category">Categoria *</label>
-                <select id="waste-category" name="categoria" required>
-                  <option value="organico">Orgânico</option>
-                  <option value="reciclavel">Reciclável</option>
-                  <option value="perigoso">Perigoso</option>
-                  <option value="rejeito">Rejeito</option>
-                </select>
-              </div>
-              <div class="profile-field">
-                <label for="waste-quantity">Quantidade (kg) *</label>
-                <input id="waste-quantity" name="quantidade_kg" type="number" min="0.01" step="0.01" required />
-              </div>
-            </div>
-            <p class="profile-form-message" data-waste-message role="status" hidden></p>
-            <div class="company-profile-form__footer">
-              <button class="primary-button" type="submit">Registrar resíduo</button>
-            </div>
-          </form>
-          <section class="company-overview-card" aria-labelledby="waste-list-title">
-            <div class="company-overview-card__heading"><h2 id="waste-list-title">Registros da empresa</h2></div>
-            <div class="overview-groups" data-waste-list><p>Carregando registros...</p></div>
-          </section>
         </section>
 
         <section class="company-profile-page" data-view="ajuda" aria-labelledby="help-title" hidden>

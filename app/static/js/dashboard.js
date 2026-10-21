@@ -8,10 +8,7 @@ const companyProfilePage = document.querySelector('[data-view="perfil-empresa"]'
 const companyProfileForm = document.querySelector("[data-company-profile-form]");
 const profileMessage = document.querySelector("[data-profile-message]");
 const resultsPage = document.querySelector('[data-view="resultados"]');
-const wastePage = document.querySelector('[data-view="residuos"]');
 const helpPage = document.querySelector('[data-view="ajuda"]');
-const wasteForm = document.querySelector("[data-waste-form]");
-const wasteMessage = document.querySelector("[data-waste-message]");
 const sustainabilityPage = document.querySelector('[data-view="rota-sustentavel"]');
 const planTabs = document.querySelectorAll("[data-plan-tab]");
 const planPanels = document.querySelectorAll("[data-plan-panel]");
@@ -614,87 +611,6 @@ async function loadDiagnosticResults() {
   }
 }
 
-const wasteCategoryLabels = {
-  organico: "Orgânico",
-  reciclavel: "Reciclável",
-  perigoso: "Perigoso",
-  rejeito: "Rejeito",
-};
-
-async function loadWasteRecords() {
-  const list = document.querySelector("[data-waste-list]");
-  if (!list) return;
-  try {
-    const response = await fetch("/api/residuos", { credentials: "same-origin" });
-    if (response.status === 401) {
-      window.location.assign("/");
-      return;
-    }
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.detail ?? "Não foi possível carregar os resíduos.");
-    }
-    list.replaceChildren();
-    if (data.residuos.length === 0) {
-      list.append(createElement("p", "plan-empty", "Nenhum resíduo registrado ainda."));
-      return;
-    }
-    data.residuos.forEach((item) => {
-      const row = createElement("article", "overview-action");
-      row.append(
-        createElement("h3", "overview-action__title", item.nome),
-        createElement(
-          "p",
-          "overview-action__category",
-          `${wasteCategoryLabels[item.categoria] ?? item.categoria} · ${Number(item.quantidade_kg).toLocaleString("pt-BR")} kg`,
-        ),
-        createElement("p", "overview-action__date", formatDate(item.criado_em.slice(0, 10))),
-      );
-      list.append(row);
-    });
-  } catch (error) {
-    console.error("Não foi possível carregar os registros de resíduos.", error);
-    list.replaceChildren(createElement("p", "plan-empty", error.message));
-  }
-}
-
-async function submitWasteRecord(event) {
-  event.preventDefault();
-  const submit = wasteForm.querySelector('button[type="submit"]');
-  submit.disabled = true;
-  wasteMessage.hidden = true;
-  const payload = Object.fromEntries(new FormData(wasteForm).entries());
-  payload.quantidade_kg = Number(payload.quantidade_kg);
-  try {
-    const response = await fetch("/residuos", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (response.status === 401) {
-      window.location.assign("/");
-      return;
-    }
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.detail ?? "Não foi possível registrar o resíduo.");
-    }
-    wasteForm.reset();
-    wasteMessage.textContent = "Resíduo registrado com sucesso.";
-    wasteMessage.classList.remove("is-error");
-    wasteMessage.hidden = false;
-    await loadWasteRecords();
-  } catch (error) {
-    console.error("Não foi possível registrar o resíduo.", error);
-    wasteMessage.textContent = error.message ?? "Não foi possível registrar o resíduo.";
-    wasteMessage.classList.add("is-error");
-    wasteMessage.hidden = false;
-  } finally {
-    submit.disabled = false;
-  }
-}
-
 function renderOverview() {
   const counts = updateCounts();
   const statuses = [
@@ -806,7 +722,6 @@ function updateActiveNavigation() {
   }
 
   if (resultsPage) resultsPage.hidden = currentHash !== "#resultados";
-  if (wastePage) wastePage.hidden = currentHash !== "#residuos";
   if (helpPage) helpPage.hidden = currentHash !== "#ajuda";
 }
 
@@ -823,7 +738,5 @@ if (sustainabilityPage && actionCatalog) {
 }
 
 void loadDiagnosticResults();
-void loadWasteRecords();
-if (wasteForm) wasteForm.addEventListener("submit", submitWasteRecord);
 window.addEventListener("hashchange", updateActiveNavigation);
 updateActiveNavigation();

@@ -18,84 +18,146 @@ const overviewGroups = document.querySelector("[data-overview-groups]");
 const statusSummary = document.querySelector("[data-status-summary]");
 const storageMessage = document.querySelector("[data-storage-message]");
 
+
+
 const actionCategories = [
   {
-    name: "Gestão de resíduos",
+    name: "Ambiental",
     actions: [
       {
-        id: "waste-separation",
-        title: "Implantar coleta seletiva",
-        description: "Disponibilizar coletores identificados e orientar a equipe.",
+        id: "environmental-energy-monitoring",
+        title: "Monitorar o consumo de energia",
+        description:
+          "Registrar mensalmente o consumo, identificar equipamentos de maior gasto e definir metas de redução.",
       },
       {
-        id: "waste-destination",
-        title: "Definir destino para resíduos especiais",
-        description: "Mapear pontos ou empresas licenciadas para pilhas, eletrônicos e químicos.",
+        id: "environmental-waste-management",
+        title: "Organizar a gestão de resíduos",
+        description:
+          "Separar os resíduos, identificar coletores e definir uma destinação adequada para cada material.",
       },
       {
-        id: "reuse-materials",
-        title: "Reduzir descartáveis e reutilizar materiais",
-        description: "Priorizar itens reutilizáveis e revisar o uso de materiais no dia a dia.",
+        id: "environmental-water-reduction",
+        title: "Reduzir o consumo de água",
+        description:
+          "Verificar vazamentos, acompanhar contas de água e adotar práticas de uso consciente.",
+      },
+      {
+        id: "environmental-reuse-recycling",
+        title: "Promover reutilização e reciclagem",
+        description:
+          "Priorizar materiais reutilizáveis, reduzir descartáveis e criar rotinas de reciclagem.",
+      },
+      {
+        id: "environmental-impact-reduction",
+        title: "Reduzir impactos ambientais",
+        description:
+          "Mapear fontes de poluição ou desperdício e definir medidas para diminuir seus impactos.",
       },
     ],
   },
   {
-    name: "Uso da água",
+    name: "Social",
     actions: [
       {
-        id: "water-leaks",
-        title: "Inspecionar vazamentos e consumo",
-        description: "Criar uma rotina de inspeção e acompanhar as contas de água.",
+        id: "social-training",
+        title: "Capacitar a equipe",
+        description:
+          "Planejar treinamentos sobre sustentabilidade, segurança e boas práticas no ambiente de trabalho.",
       },
       {
-        id: "water-efficiency",
-        title: "Instalar dispositivos economizadores",
-        description: "Avaliar torneiras, descargas e equipamentos de baixo consumo.",
+        id: "social-equality",
+        title: "Fortalecer igualdade e não discriminação",
+        description:
+          "Definir orientações para garantir respeito, oportunidades justas e inclusão na empresa.",
       },
       {
-        id: "rainwater",
-        title: "Avaliar o aproveitamento de água da chuva",
-        description: "Verificar viabilidade para usos não potáveis, como irrigação e limpeza.",
+        id: "social-health-safety",
+        title: "Melhorar saúde e segurança no trabalho",
+        description:
+          "Identificar riscos, revisar medidas de proteção e orientar os trabalhadores.",
+      },
+      {
+        id: "social-wellbeing",
+        title: "Promover bem-estar dos trabalhadores",
+        description:
+          "Avaliar condições de trabalho e criar ações para melhorar o clima e a qualidade de vida.",
+      },
+      {
+        id: "social-participation",
+        title: "Criar canais de escuta da equipe",
+        description:
+          "Coletar opiniões dos trabalhadores e considerar suas necessidades nas decisões internas.",
       },
     ],
   },
   {
-    name: "Eficiência energética",
+    name: "Econômica",
     actions: [
       {
-        id: "led-lighting",
-        title: "Substituir lâmpadas por LED",
-        description: "Identificar pontos de iluminação e planejar a substituição.",
+        id: "economic-sustainability-budget",
+        title: "Destinar recursos à sustentabilidade",
+        description:
+          "Reservar parte do orçamento para iniciativas ambientais, sociais e de melhoria da gestão.",
       },
       {
-        id: "energy-routine",
-        title: "Criar rotina para desligar equipamentos",
-        description: "Orientar a equipe e definir responsáveis pelo fechamento dos espaços.",
+        id: "economic-cost-control",
+        title: "Controlar custos e uso de recursos",
+        description:
+          "Acompanhar gastos com energia, água, materiais e resíduos para reduzir desperdícios.",
       },
       {
-        id: "ac-maintenance",
-        title: "Revisar manutenção do ar-condicionado",
-        description: "Programar limpeza de filtros e avaliar a eficiência dos equipamentos.",
+        id: "economic-benefit-analysis",
+        title: "Avaliar benefícios econômicos das iniciativas",
+        description:
+          "Comparar custos, economia esperada e benefícios de cada ação sustentável planejada.",
+      },
+      {
+        id: "economic-sustainable-suppliers",
+        title: "Adotar critérios para fornecedores",
+        description:
+          "Avaliar fornecedores considerando preço, qualidade e práticas sociais e ambientais.",
+      },
+      {
+        id: "economic-long-term-investments",
+        title: "Planejar investimentos sustentáveis",
+        description:
+          "Priorizar investimentos que reduzam custos e aumentem a eficiência no longo prazo.",
       },
     ],
   },
   {
-    name: "Compras sustentáveis",
+    name: "Governança",
     actions: [
       {
-        id: "supplier-criteria",
-        title: "Adotar critérios sustentáveis para fornecedores",
-        description: "Incluir práticas ambientais e sociais na avaliação de fornecedores.",
+        id: "governance-code-of-conduct",
+        title: "Criar um código de conduta",
+        description:
+          "Registrar princípios e regras internas sobre ética, respeito e responsabilidade empresarial.",
       },
       {
-        id: "low-impact-products",
-        title: "Priorizar produtos reutilizáveis ou recicláveis",
-        description: "Revisar itens comprados e reduzir embalagens e descartáveis.",
+        id: "governance-transparency",
+        title: "Aumentar a transparência nas decisões",
+        description:
+          "Definir como decisões, recursos e responsabilidades serão comunicados internamente.",
       },
       {
-        id: "purchase-planning",
-        title: "Planejar compras conforme o estoque",
-        description: "Definir uma rotina de conferência para evitar excessos e desperdício.",
+        id: "governance-legal-compliance",
+        title: "Revisar obrigações legais",
+        description:
+          "Criar uma rotina para verificar licenças, documentos e exigências aplicáveis à empresa.",
+      },
+      {
+        id: "governance-responsibilities",
+        title: "Definir responsáveis pelas ações sustentáveis",
+        description:
+          "Indicar pessoas responsáveis por acompanhar e revisar cada iniciativa do plano.",
+      },
+      {
+        id: "governance-conflict-prevention",
+        title: "Prevenir conflitos de interesse",
+        description:
+          "Estabelecer orientações para identificar condutas inadequadas e agir de forma ética.",
       },
     ],
   },

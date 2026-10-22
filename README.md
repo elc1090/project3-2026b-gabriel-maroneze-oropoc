@@ -2,7 +2,7 @@
 # Projeto: Aplicação com cadastro e autenticação de usuários integrando frontend, backend e persistência
 
 
-
+<img width="640" height="308" alt="WhatsApp-Video-2026-10-22-at-10 01 05" src="https://github.com/user-attachments/assets/44fddc0d-a510-496f-8a63-5a69edc03b48" />
 
 
 

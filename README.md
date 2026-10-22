@@ -35,11 +35,10 @@ __Joao Daniel:__ Sobre a proposta sugerida, gostei da ideia e da oportunidade ú
 
 ### Processo
 
-Substitua este texto (toda a seção) por uma descrição do processo de desenvolvimento **em primeira pessoa, sem ajuda de IA**.
-
-Para trabalhos em dupla, explicar primeiramente como a dupla se organizou para realizar o trabalho: se houve ou não uma divisão, quem fez o quê, etc.
-
-Cada pessoa deve explicar e justificar suas escolhas, destacando o que já sabia ou não, como lidou com dúvidas ou dificuldades específicas, que adaptações foram necessárias, etc. Evitar comentários genéricos como "pedi ajuda para IA e resolvi", dando preferência para expor detalhes específicos de um problema e sua solução.
+ Primeiramente, estavamos na duvida de como iamos organizar os materias enviados pelas outras alunas do Chile, o que elas queriam e as nossas possibilidaades de execucao. Essa primeira fase demorou muito pois ainda nao tinhamos a total dimensao do que elas queriam, foi quando elas nos enviaram um pdf com todas as telas que queriam e varias abas aberta e cheias de informacoes (umas redundantes, outras desnecessarias, layouts muito carregados), isso nos assustou num primeiro momento mas o Joao lembrou das atividades de engenharia de software e IHC para criar um mini projeto para nos situarmos onde estavamos, onde queriamos ir e o que deveriamos ajustar do pdf enviado.
+ Feita essa interpretacao do caso, mandamos as nossas observacoes para elas, que aceitaram e comecamos a pensar sobre como iriamos fazer cada tela, cada informacao e a autentificacao. A parte mais ligada a API e a integracao dos materiais entregues pelas alunas ao banco de dados e a forma que esse material iria estar no aplicativo foi mais a parte do Gabriel, a parte de modelagem, requisicoes, depuracoes e o deploy ficou mais para o Joao.
+ Uma parte muito impactante no trabalho foi que, muitas coisas que sempre dao errado nos nossos trabalhos tambem deram nesse como: dificuldades com deploy, bugs com o vscode e github, dificuldades com o banco de dados; porem, dessa vez a gente resolveu muito mais rapidamente, e nao foi por causa da IA (por que nas outras tambem tinhamos usado e demorou horrores) mas sim por que sabiamos qual era o erro e aonde tinhamos que ir para consertar.
+ O codigo em si nao tinha muito misterio, a unica coisa mais complexo que tinhamos que trabalhar era a autentificacao e a relacao entre as respostas dos perfis com os diagnosticos do sistema.
 
 ### Trechos de código
 
@@ -50,10 +49,13 @@ Substitua este texto por uma indicação de pelo menos 3 trechos de código que 
 
 ### Linguagens e afins
 
-Substitua este texto por uma lista detalhada de tecnologias utilizadas:
-- ...
-- ...
-- 
+- Docker
+- PostgreSQL
+- pgAdmin
+- Psycopg (link do postgres com python)
+- FastAPI (criação da api)
+- Pytantic
+- Pwdlib (pro hash das senhas)
 
 ### Autenticação e autorização
 

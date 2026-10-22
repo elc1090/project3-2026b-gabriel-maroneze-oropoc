@@ -125,12 +125,35 @@ function renderProgress() {
     .map((dimension, index) => {
       const completed = countAnswersInDimension(index);
       const isCurrent = index === currentDimension;
+      const questionTotal = dimension.questions.length;
+      const isComplete = completed === questionTotal;
+      const dimensionPercentage =
+        questionTotal === 0 ? 0 : (completed / questionTotal) * 100;
+      const status = isCurrent ? "Em andamento" : isComplete ? "Concluída" : "Pendente";
 
       return `
-        <li class="dimension-item ${isCurrent ? "is-current" : ""}">
-          <span class="dimension-item__dot" aria-hidden="true"></span>
-          <span>${dimension.name}</span>
-          <strong>${completed}/${dimension.questions.length}</strong>
+        <li>
+          <button
+            class="dimension-item ${isCurrent ? "is-current" : ""} ${isComplete ? "is-complete" : ""}"
+            type="button"
+            data-dimension-index="${index}"
+            aria-label="${dimension.name}: ${completed} de ${questionTotal} perguntas, ${Math.round(dimensionPercentage)} por cento concluído. ${status}."
+            ${isCurrent ? 'aria-current="step"' : ""}
+            ${isConcluding ? "disabled" : ""}
+          >
+            <span class="dimension-item__heading">
+              <span class="dimension-item__dot" aria-hidden="true"></span>
+              <span class="dimension-item__name">${dimension.name}</span>
+              <span class="dimension-item__status">${status}</span>
+            </span>
+            <span class="dimension-item__details">
+              <span>${completed} de ${questionTotal} perguntas</span>
+              <span>${Math.round(dimensionPercentage)}%</span>
+            </span>
+            <span class="dimension-item__track" aria-hidden="true">
+              <span style="width: ${dimensionPercentage}%"></span>
+            </span>
+          </button>
         </li>
       `;
     })
@@ -238,6 +261,16 @@ function moveQuestion(direction) {
       diagnosticDimensions[currentDimension].questions.length - 1;
   }
 
+  render();
+}
+
+function navigateToDimension(index) {
+  if (isConcluding) {
+    return;
+  }
+
+  currentDimension = index;
+  currentQuestion = 0;
   render();
 }
 
@@ -440,6 +473,15 @@ elements.answerOptions.addEventListener("change", (event) => {
   const question = currentQuestionData();
 
   saveAnswer(question.id, selectedValue);
+});
+
+elements.dimensionList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-dimension-index]");
+  if (!button || button.disabled) {
+    return;
+  }
+
+  navigateToDimension(Number(button.dataset.dimensionIndex));
 });
 
 elements.previousButton.addEventListener("click", () => {

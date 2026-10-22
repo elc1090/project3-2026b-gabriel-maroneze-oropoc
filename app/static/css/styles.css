@@ -2497,3 +2497,12 @@ html[data-theme="dark"] .plan-storage-message {
     grid-row: 1;
   }
 }
+
+/* Correção do cartão de progresso da página de Diagnóstico */
+
+.diagnostic-grid > .diagnostic-progress {
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  overflow: visible;
+}

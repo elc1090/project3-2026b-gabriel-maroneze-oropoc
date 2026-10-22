@@ -1,36 +1,36 @@
 const answerOptions = [
   {
     value: 0,
-    title: "Não é realizado",
-    description: "A prática ainda não faz parte da rotina da empresa.",
+    title: "No se realiza",
+    description: "Esta práctica aún no forma parte de la rutina de la empresa.",
   },
   {
     value: 1,
-    title: "É realizado ocasionalmente",
-    description: "Acontece em situações pontuais, sem regularidade.",
+    title: "Se realiza ocasionalmente",
+    description: "Se lleva a cabo en situaciones puntuales, sin regularidad.",
   },
   {
     value: 2,
-    title: "É realizado frequentemente",
-    description: "A prática ocorre com frequência, mas pode ser aprimorada.",
+    title: "Se realiza con frecuencia",
+    description: "La práctica se lleva a cabo con frecuencia, pero puede mejorarse.",
   },
   {
     value: 3,
-    title: "É realizado sistematicamente",
+    title: "Se realiza sistemáticamente",
     description:
-      "É uma prática contínua, acompanhada e integrada à gestão.",
+      "Es una práctica continua, supervisada e integrada en la gestión.",
   },
 ];
 
 const importanceByDimension = {
   Ambiental:
-    "Ajuda a identificar como a empresa utiliza recursos naturais e reduz impactos ambientais.",
+    "Ayuda a identificar cómo utiliza la empresa los recursos naturales y reduce los impactos ambientales.",
   Social:
-    "Avalia como as práticas da empresa impactam as pessoas que trabalham e se relacionam com ela.",
-  Econômica:
-    "Mostra como a sustentabilidade é incorporada ao planejamento e ao uso dos recursos econômicos.",
-  Governança:
-    "Ajuda a verificar como a empresa organiza responsabilidades, políticas e decisões sustentáveis.",
+    "Evalúa cómo las prácticas de la empresa afectan a las personas que trabajan y se relacionan con ella.",
+  Económica:
+    "Muestra cómo se incorpora la sostenibilidad a la planificación y al uso de los recursos económicos.",
+  Gobernanza:
+    "Ayuda a comprobar cómo organiza la empresa las responsabilidades, políticas y decisiones sostenibles.",
 };
 
 let diagnosticDimensions = [];
@@ -132,7 +132,7 @@ function renderProgress() {
             class="dimension-item ${isCurrent ? "is-current" : ""}"
             type="button"
             data-dimension-index="${index}"
-            aria-label="${dimension.name}: ${completed} de ${questionTotal} perguntas respondidas."
+            aria-label="${dimension.name}: ${completed} de ${questionTotal} preguntas respondidas."
             ${isCurrent ? 'aria-current="step"' : ""}
             ${isBusy ? "disabled" : ""}
           >
@@ -156,20 +156,20 @@ function renderQuestion() {
 
   elements.currentDimension.textContent = dimension.name;
   elements.questionCounter.textContent =
-    `Pergunta ${currentQuestion + 1} de ${dimension.questions.length}`;
+    `Pregunta ${currentQuestion + 1} de ${dimension.questions.length}`;
 
   elements.questionText.textContent = question.text;
 
   elements.questionGuidance.textContent = isConcluded
-    ? "Este diagnóstico foi concluído. As respostas estão disponíveis apenas para consulta."
-    : "Selecione a alternativa que representa melhor a realidade atual da empresa.";
+    ? "Este diagnóstico ha finalizado. Las respuestas están disponibles solo para consulta."
+    : "Selecciona la opción que mejor represente la situación actual de la empresa.";
 
   elements.supportImportance.textContent =
     importanceByDimension[dimension.name] ??
-    "Ajuda a identificar oportunidades de melhoria para uma gestão mais sustentável.";
+    "Ayuda a identificar oportunidades de mejora para una gestión más sostenible.";
 
   elements.answerOptions.innerHTML = `
-    <legend>Escolha uma alternativa</legend>
+    <legend>Elige una opción</legend>
 
     ${answerOptions
       .map((option) => {
@@ -210,7 +210,7 @@ function renderQuestion() {
   elements.restartButton.disabled = isBusy;
   elements.restartButton.textContent = isRestarting
     ? "Iniciando..."
-    : "Realizar novo diagnóstico";
+    : "Realizar un nuevo diagnóstico";
 
   elements.nextButton.disabled =
     isBusy || (isConcluded && isLastQuestion);
@@ -218,13 +218,13 @@ function renderQuestion() {
   if (isRestarting) {
     elements.nextButton.textContent = "Iniciando...";
   } else if (isConcluding) {
-    elements.nextButton.textContent = "Concluindo...";
+    elements.nextButton.textContent = "Finalizando...";
   } else if (isConcluded && isLastQuestion) {
-    elements.nextButton.textContent = "Diagnóstico concluído";
+    elements.nextButton.textContent = "Diagnóstico completado";
   } else if (isLastQuestion) {
-    elements.nextButton.textContent = "Concluir";
+    elements.nextButton.textContent = "Finalizar";
   } else {
-    elements.nextButton.textContent = "Próxima pergunta";
+    elements.nextButton.textContent = "Siguiente pregunta";
   }
 }
 
@@ -297,10 +297,10 @@ async function responseErrorMessage(response) {
       return data.detail;
     }
   } catch {
-    // A resposta não possui JSON.
+    // La respuesta no contiene JSON.
   }
 
-  return "Não foi possível concluir a operação. Tente novamente.";
+  return "No se pudo completar la operación. Inténtalo de nuevo.";
 }
 
 async function saveAnswer(questionId, value) {
@@ -350,7 +350,7 @@ async function saveAnswer(questionId, value) {
 
     window.alert(
       error.message ??
-        "Não foi possível salvar a resposta. Verifique sua conexão e tente novamente.",
+        "No se pudo guardar la respuesta. Comprueba tu conexión e inténtalo de nuevo.",
     );
   } finally {
     savingQuestions.delete(questionId);
@@ -367,7 +367,7 @@ async function concludeDiagnostic() {
     goToFirstUnansweredQuestion();
 
     window.alert(
-      "Ainda há perguntas sem resposta. Você foi direcionado à próxima pergunta pendente.",
+      "Aún hay preguntas sin responder. Te hemos llevado a la siguiente pregunta pendiente.",
     );
 
     return;
@@ -396,12 +396,12 @@ async function concludeDiagnostic() {
     diagnosticStatus = data.diagnostico.status;
 
     window.alert(
-      "Diagnóstico concluído com sucesso. As respostas foram salvas e não poderão mais ser alteradas.",
+      "El diagnóstico ha finalizado correctamente. Las respuestas se guardaron y ya no se podrán modificar.",
     );
   } catch (error) {
     window.alert(
       error.message ??
-        "Não foi possível concluir o diagnóstico. Tente novamente.",
+        "No se pudo finalizar el diagnóstico. Inténtalo de nuevo.",
     );
   } finally {
     isConcluding = false;
@@ -411,7 +411,7 @@ async function concludeDiagnostic() {
 
 async function restartDiagnostic() {
   const shouldRestart = window.confirm(
-    "Deseja iniciar um novo diagnóstico? O diagnóstico concluído e todas as respostas anteriores serão apagados permanentemente.",
+    "¿Quieres iniciar un nuevo diagnóstico? El diagnóstico completado y todas las respuestas anteriores se eliminarán permanentemente.",
   );
 
   if (!shouldRestart) {
@@ -444,12 +444,12 @@ async function restartDiagnostic() {
     currentQuestion = 0;
 
     window.alert(
-      "Novo diagnóstico iniciado. As respostas anteriores foram removidas.",
+      "Se ha iniciado un nuevo diagnóstico. Se eliminaron las respuestas anteriores.",
     );
   } catch (error) {
     window.alert(
       error.message ??
-        "Não foi possível iniciar um novo diagnóstico. Tente novamente.",
+        "No se pudo iniciar un nuevo diagnóstico. Inténtalo de nuevo.",
     );
   } finally {
     isRestarting = false;
@@ -458,9 +458,9 @@ async function restartDiagnostic() {
 }
 
 async function loadDiagnostic() {
-  elements.questionText.textContent = "Carregando perguntas...";
+  elements.questionText.textContent = "Cargando preguntas...";
   elements.questionGuidance.textContent =
-    "Aguarde enquanto preparamos o diagnóstico da empresa.";
+    "Espera mientras preparamos el diagnóstico de la empresa.";
   elements.previousButton.disabled = true;
   elements.restartButton.disabled = true;
   elements.nextButton.disabled = true;
@@ -476,7 +476,7 @@ async function loadDiagnostic() {
     }
 
     if (!response.ok) {
-      throw new Error("Não foi possível carregar o diagnóstico.");
+      throw new Error("No se pudo cargar el diagnóstico.");
     }
 
     const data = await response.json();
@@ -492,19 +492,19 @@ async function loadDiagnostic() {
 
     if (diagnosticDimensions.length === 0) {
       throw new Error(
-        "Nenhuma pergunta ativa foi encontrada no banco de dados.",
+        "No se encontraron preguntas activas en la base de datos.",
       );
     }
 
     render();
   } catch (error) {
-    elements.currentDimension.textContent = "Indisponível";
+    elements.currentDimension.textContent = "No disponible";
     elements.questionCounter.textContent = "";
     elements.questionText.textContent =
-      "Não foi possível carregar o diagnóstico.";
+      "No se pudo cargar el diagnóstico.";
     elements.questionGuidance.textContent =
       error.message ??
-      "Verifique se o banco de dados está em funcionamento e recarregue a página.";
+      "Comprueba que la base de datos esté funcionando y vuelve a cargar la página.";
 
     elements.answerOptions.innerHTML = "";
     elements.previousButton.disabled = true;

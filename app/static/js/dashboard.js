@@ -26,33 +26,33 @@ const actionCategories = [
     actions: [
       {
         id: "environmental-energy-monitoring",
-        title: "Monitorar o consumo de energia",
+        title: "Supervisar el consumo de energía",
         description:
-          "Registrar mensalmente o consumo, identificar equipamentos de maior gasto e definir metas de redução.",
+          "Registrar el consumo mensualmente, identificar los equipos que más consumen y fijar objetivos de reducción.",
       },
       {
         id: "environmental-waste-management",
-        title: "Organizar a gestão de resíduos",
+        title: "Organizar la gestión de residuos",
         description:
-          "Separar os resíduos, identificar coletores e definir uma destinação adequada para cada material.",
+          "Separar los residuos, identificar los contenedores y definir un destino adecuado para cada material.",
       },
       {
         id: "environmental-water-reduction",
-        title: "Reduzir o consumo de água",
+        title: "Reducir el consumo de agua",
         description:
-          "Verificar vazamentos, acompanhar contas de água e adotar práticas de uso consciente.",
+          "Revisar si hay fugas, controlar las facturas del agua y adoptar prácticas de consumo responsable.",
       },
       {
         id: "environmental-reuse-recycling",
-        title: "Promover reutilização e reciclagem",
+        title: "Promover la reutilización y el reciclaje",
         description:
-          "Priorizar materiais reutilizáveis, reduzir descartáveis e criar rotinas de reciclagem.",
+          "Priorizar los materiales reutilizables, reducir los productos desechables y establecer rutinas de reciclaje.",
       },
       {
         id: "environmental-impact-reduction",
-        title: "Reduzir impactos ambientais",
+        title: "Reducir los impactos ambientales",
         description:
-          "Mapear fontes de poluição ou desperdício e definir medidas para diminuir seus impactos.",
+          "Identificar las fuentes de contaminación o desperdicio y definir medidas para reducir sus impactos.",
       },
     ],
   },
@@ -61,103 +61,103 @@ const actionCategories = [
     actions: [
       {
         id: "social-training",
-        title: "Capacitar a equipe",
+        title: "Capacitar al equipo",
         description:
-          "Planejar treinamentos sobre sustentabilidade, segurança e boas práticas no ambiente de trabalho.",
+          "Planificar formaciones sobre sostenibilidad, seguridad y buenas prácticas en el entorno laboral.",
       },
       {
         id: "social-equality",
-        title: "Fortalecer igualdade e não discriminação",
+        title: "Promover la igualdad y la no discriminación",
         description:
-          "Definir orientações para garantir respeito, oportunidades justas e inclusão na empresa.",
+          "Establecer pautas para garantizar el respeto, la igualdad de oportunidades y la inclusión en la empresa.",
       },
       {
         id: "social-health-safety",
-        title: "Melhorar saúde e segurança no trabalho",
+        title: "Mejorar la salud y la seguridad en el trabajo",
         description:
-          "Identificar riscos, revisar medidas de proteção e orientar os trabalhadores.",
+          "Identificar riesgos, revisar las medidas de protección y orientar a los trabajadores.",
       },
       {
         id: "social-wellbeing",
-        title: "Promover bem-estar dos trabalhadores",
+        title: "Promover el bienestar de los trabajadores",
         description:
-          "Avaliar condições de trabalho e criar ações para melhorar o clima e a qualidade de vida.",
+          "Evaluar las condiciones laborales y crear acciones para mejorar el ambiente y la calidad de vida.",
       },
       {
         id: "social-participation",
-        title: "Criar canais de escuta da equipe",
+        title: "Crear canales de escucha para el equipo",
         description:
-          "Coletar opiniões dos trabalhadores e considerar suas necessidades nas decisões internas.",
+          "Recoger las opiniones de los trabajadores y tener en cuenta sus necesidades en las decisiones internas.",
       },
     ],
   },
   {
-    name: "Econômica",
+    name: "Económica",
     actions: [
       {
         id: "economic-sustainability-budget",
-        title: "Destinar recursos à sustentabilidade",
+        title: "Destinar recursos a la sostenibilidad",
         description:
-          "Reservar parte do orçamento para iniciativas ambientais, sociais e de melhoria da gestão.",
+          "Reservar parte del presupuesto para iniciativas ambientales, sociales y de mejora de la gestión.",
       },
       {
         id: "economic-cost-control",
-        title: "Controlar custos e uso de recursos",
+        title: "Controlar los costos y el uso de los recursos",
         description:
-          "Acompanhar gastos com energia, água, materiais e resíduos para reduzir desperdícios.",
+          "Controlar los gastos de energía, agua, materiales y residuos para reducir el desperdicio.",
       },
       {
         id: "economic-benefit-analysis",
-        title: "Avaliar benefícios econômicos das iniciativas",
+        title: "Evaluar los beneficios económicos de las iniciativas",
         description:
-          "Comparar custos, economia esperada e benefícios de cada ação sustentável planejada.",
+          "Comparar los costos, el ahorro previsto y los beneficios de cada acción sostenible planificada.",
       },
       {
         id: "economic-sustainable-suppliers",
-        title: "Adotar critérios para fornecedores",
+        title: "Adoptar criterios para los proveedores",
         description:
-          "Avaliar fornecedores considerando preço, qualidade e práticas sociais e ambientais.",
+          "Evaluar a los proveedores teniendo en cuenta el precio, la calidad y las prácticas sociales y ambientales.",
       },
       {
         id: "economic-long-term-investments",
-        title: "Planejar investimentos sustentáveis",
+        title: "Planificar inversiones sostenibles",
         description:
-          "Priorizar investimentos que reduzam custos e aumentem a eficiência no longo prazo.",
+          "Priorizar inversiones que reduzcan los costos y aumenten la eficiencia a largo plazo.",
       },
     ],
   },
   {
-    name: "Governança",
+    name: "Gobernanza",
     actions: [
       {
         id: "governance-code-of-conduct",
-        title: "Criar um código de conduta",
+        title: "Crear un código de conducta",
         description:
-          "Registrar princípios e regras internas sobre ética, respeito e responsabilidade empresarial.",
+          "Registrar los principios y las normas internas sobre ética, respeto y responsabilidad empresarial.",
       },
       {
         id: "governance-transparency",
-        title: "Aumentar a transparência nas decisões",
+        title: "Aumentar la transparencia en las decisiones",
         description:
-          "Definir como decisões, recursos e responsabilidades serão comunicados internamente.",
+          "Definir cómo se comunicarán internamente las decisiones, los recursos y las responsabilidades.",
       },
       {
         id: "governance-legal-compliance",
-        title: "Revisar obrigações legais",
+        title: "Revisar las obligaciones legales",
         description:
-          "Criar uma rotina para verificar licenças, documentos e exigências aplicáveis à empresa.",
+          "Establecer una rutina para revisar las licencias, los documentos y los requisitos aplicables a la empresa.",
       },
       {
         id: "governance-responsibilities",
-        title: "Definir responsáveis pelas ações sustentáveis",
+        title: "Asignar responsables de las acciones sostenibles",
         description:
-          "Indicar pessoas responsáveis por acompanhar e revisar cada iniciativa do plano.",
+          "Designar a las personas responsables de supervisar y revisar cada iniciativa del plan.",
       },
       {
         id: "governance-conflict-prevention",
-        title: "Prevenir conflitos de interesse",
+        title: "Prevenir conflictos de intereses",
         description:
-          "Estabelecer orientações para identificar condutas inadequadas e agir de forma ética.",
+          "Establecer pautas para identificar conductas inadecuadas y actuar de forma ética.",
       },
     ],
   },
@@ -169,8 +169,8 @@ const actionById = new Map(
   ),
 );
 const statusLabels = {
-  awaiting: "Aguardando agendamento",
-  in_progress: "Em processo de aplicação",
+  awaiting: "Pendiente de programación",
+  in_progress: "En proceso de implementación",
   implemented: "Implementada",
 };
 let planActions = [];
@@ -192,14 +192,14 @@ function getTodayString() {
 
 function formatProfileDate(dateString) {
   if (!dateString) {
-    return "Não informado";
+    return "No informado";
   }
 
   const [year, month, day] = dateString.split("-").map(Number);
   if (!year || !month || !day) {
-    return "Não informado";
+    return "No informado";
   }
-  return new Intl.DateTimeFormat("pt-BR").format(
+  return new Intl.DateTimeFormat("es-ES").format(
     new Date(year, month - 1, day),
   );
 }
@@ -211,14 +211,14 @@ function renderCompanyOverview(profile = {}) {
   companyDisplayName.textContent = companyName;
 
   const displayValues = {
-    company_name: profile.company_name?.trim() || "Não informado",
-    owner: profile.owner?.trim() || "Não informado",
-    sector: profile.sector?.trim() || "Não informado",
+    company_name: profile.company_name?.trim() || "No informado",
+    owner: profile.owner?.trim() || "No informado",
+    sector: profile.sector?.trim() || "No informado",
     employees:
       profile.employees !== undefined && profile.employees !== ""
-        ? `${Number(profile.employees).toLocaleString("pt-BR")} ${Number(profile.employees) === 1 ? "funcionário" : "funcionários"}`
-        : "Não informado",
-    founded_year: profile.founded_year || "Não informado",
+        ? `${Number(profile.employees).toLocaleString("es-ES")} ${Number(profile.employees) === 1 ? "empleado" : "empleados"}`
+        : "No informado",
+    founded_year: profile.founded_year || "No informado",
     profile_created_at: formatProfileDate(profile.profile_created_at),
   };
 
@@ -240,7 +240,7 @@ async function loadCompanyProfile() {
       return;
     }
     if (!response.ok) {
-      throw new Error("Não foi possível carregar o perfil da empresa.");
+      throw new Error("No se pudo cargar el perfil de la empresa.");
     }
     const data = await response.json();
     const profile = data.perfil ?? {};
@@ -261,9 +261,9 @@ async function loadCompanyProfile() {
     }
     renderCompanyOverview(profile);
   } catch (error) {
-    console.error("Não foi possível carregar o perfil da empresa.", error);
+    console.error("No se pudo cargar el perfil de la empresa.", error);
     showProfileMessage(
-      error.message ?? "Não foi possível carregar os dados do servidor.",
+      error.message ?? "No se pudieron cargar los datos del servidor.",
       true,
     );
   }
@@ -289,13 +289,13 @@ async function saveCompanyProfile(event) {
     }
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.detail ?? "Não foi possível salvar o perfil.");
+      throw new Error(data.detail ?? "No se pudo guardar el perfil.");
     }
     renderCompanyOverview(data.perfil);
-    showProfileMessage("Informações da empresa salvas com sucesso.");
+    showProfileMessage("La información de la empresa se guardó correctamente.");
   } catch (error) {
-    console.error("Não foi possível salvar o perfil da empresa.", error);
-    showProfileMessage(error.message ?? "Não foi possível salvar as informações.", true);
+    console.error("No se pudo guardar el perfil de la empresa.", error);
+    showProfileMessage(error.message ?? "No se pudo guardar la información.", true);
   }
 }
 
@@ -328,7 +328,7 @@ function setStorageMessage(message) {
 
 function normalizeSavedPlan(savedPlan) {
   if (!Array.isArray(savedPlan)) {
-    throw new TypeError("O plano salvo não está em um formato válido.");
+    throw new TypeError("El plan guardado no tiene un formato válido.");
   }
 
   const seen = new Set();
@@ -368,13 +368,13 @@ function savePlan() {
       }
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.detail ?? "Não foi possível salvar o plano.");
+        throw new Error(data.detail ?? "No se pudo guardar el plan.");
       }
       setStorageMessage("");
     })
     .catch((error) => {
-      console.error("Não foi possível salvar o plano sustentável.", error);
-      setStorageMessage(error.message ?? "Não foi possível salvar as alterações.");
+      console.error("No se pudo guardar el plan sostenible.", error);
+      setStorageMessage(error.message ?? "No se pudieron guardar los cambios.");
     });
   return planSaveQueue;
 }
@@ -387,13 +387,13 @@ async function loadPlan() {
       return;
     }
     if (!response.ok) {
-      throw new Error("Não foi possível carregar o plano sustentável.");
+      throw new Error("No se pudo cargar el plan sostenible.");
     }
     const data = await response.json();
     planActions = normalizeSavedPlan(data.actions);
   } catch (error) {
-    console.error("Não foi possível carregar o plano sustentável.", error);
-    setStorageMessage(error.message ?? "Não foi possível carregar o plano salvo.");
+    console.error("No se pudo cargar el plan sostenible.", error);
+    setStorageMessage(error.message ?? "No se pudo cargar el plan guardado.");
   }
 }
 
@@ -422,7 +422,7 @@ function updateCounts() {
 
   selectedCount.textContent = String(planActions.length);
   pendingBadge.textContent = String(pendingCount);
-  summary.textContent = `${planActions.length} ${planActions.length === 1 ? "ação selecionada" : "ações selecionadas"}`;
+  summary.textContent = `${planActions.length} ${planActions.length === 1 ? "acción seleccionada" : "acciones seleccionadas"}`;
   return { pendingCount, scheduledCount, doneCount };
 }
 
@@ -446,10 +446,10 @@ function renderActionCatalog() {
       checkbox.type = "checkbox";
       checkbox.checked = Boolean(selectedAction);
       checkbox.disabled = Boolean(selectedAction && selectedAction.status !== "awaiting");
-      checkbox.setAttribute("aria-label", `Selecionar ação: ${action.title}`);
+      checkbox.setAttribute("aria-label", `Seleccionar acción: ${action.title}`);
       if (checkbox.disabled) {
         card.classList.add("is-locked");
-        checkbox.title = "Ações agendadas ou implementadas não podem ser removidas do plano.";
+        checkbox.title = "Las acciones programadas o implementadas no se pueden quitar del plan.";
       }
 
       content.append(title, description);
@@ -481,7 +481,7 @@ function renderAgenda() {
       createElement(
         "p",
         "plan-empty",
-        "Você ainda não selecionou ações. Volte à etapa 1 para montar seu plano.",
+        "Aún no has seleccionado acciones. Vuelve a la etapa 1 para crear tu plan.",
       ),
     );
     return;
@@ -492,7 +492,7 @@ function renderAgenda() {
       createElement(
         "p",
         "plan-empty",
-        "Todas as ações do seu plano já foram implementadas. Consulte a visão geral para acompanhar o resultado.",
+        "Ya se han implementado todas las acciones de tu plan. Consulta el resumen para ver los resultados.",
       ),
     );
     return;
@@ -500,11 +500,11 @@ function renderAgenda() {
 
   if (pendingActions.length > 0) {
     agendaList.append(
-      createElement("h3", "agenda-section-title", "Aguardando agendamento"),
+      createElement("h3", "agenda-section-title", "Pendientes de programación"),
       createElement(
         "p",
         "agenda-section-description",
-        "Escolha uma data para cada ação que deseja colocar na agenda.",
+        "Elige una fecha para cada acción que quieras añadir a la agenda.",
       ),
     );
 
@@ -516,11 +516,11 @@ function renderAgenda() {
       const title = createElement("h4", "agenda-card__title", action.title);
       const description = createElement("p", "agenda-card__description", action.description);
       const form = document.createElement("form");
-      const dateLabel = createElement("label", "agenda-field__label", "Data da atividade");
+      const dateLabel = createElement("label", "agenda-field__label", "Fecha de la actividad");
       const dateInput = document.createElement("input");
-      const notesLabel = createElement("label", "agenda-field__label", "Observações (opcional)");
+      const notesLabel = createElement("label", "agenda-field__label", "Notas (opcional)");
       const notesInput = document.createElement("input");
-      const submit = createElement("button", "primary-button", "Agendar atividade");
+      const submit = createElement("button", "primary-button", "Programar actividad");
 
       form.className = "agenda-card__form";
       dateLabel.htmlFor = `date-${planAction.id}`;
@@ -535,7 +535,7 @@ function renderAgenda() {
       notesInput.name = "notes";
       notesInput.type = "text";
       notesInput.maxLength = 160;
-      notesInput.placeholder = "Ex.: responsável ou próximos passos";
+      notesInput.placeholder = "Ej.: persona responsable o próximos pasos";
       notesInput.value = planAction.notes;
       submit.type = "submit";
       form.append(dateLabel, dateInput, notesLabel, notesInput, submit);
@@ -555,7 +555,7 @@ function renderAgenda() {
 
   if (scheduledActions.length > 0) {
     agendaList.append(
-      createElement("h3", "agenda-section-title agenda-section-title--spaced", "Atividades na agenda"),
+      createElement("h3", "agenda-section-title agenda-section-title--spaced", "Actividades programadas"),
     );
 
     scheduledActions
@@ -571,7 +571,7 @@ function renderAgenda() {
         const notes = planAction.notes
           ? createElement("p", "agenda-card__description", planAction.notes)
           : null;
-        const completeButton = createElement("button", "secondary-button", "Marcar implementada");
+        const completeButton = createElement("button", "secondary-button", "Marcar como implementada");
 
         completeButton.type = "button";
         completeButton.addEventListener("click", () => {
@@ -591,11 +591,11 @@ function renderAgenda() {
 
 function formatDate(dateString) {
   if (!dateString) {
-    return "Data não definida";
+    return "Fecha no definida";
   }
 
   const [year, month, day] = dateString.split("-").map(Number);
-  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(
+  return new Intl.DateTimeFormat("es-ES", { dateStyle: "long" }).format(
     new Date(year, month - 1, day),
   );
 }
@@ -616,7 +616,7 @@ function renderDiagnosticDimensions(container, dimensions) {
     const summary = createElement(
       "p",
       "plan-empty",
-      `${dimension.resultado}% de aproveitamento · ${dimension.respondidas}/${dimension.total_perguntas} perguntas`,
+      `${dimension.resultado}% de cumplimiento · ${dimension.respondidas}/${dimension.total_perguntas} preguntas`,
     );
     group.append(heading, summary);
     container.append(group);
@@ -645,7 +645,7 @@ async function loadDiagnosticResults() {
     }
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.detail ?? "Não foi possível carregar os resultados.");
+      throw new Error(data.detail ?? "No se pudieron cargar los resultados.");
     }
 
     const countText = `${data.respondidas} de ${data.total_perguntas}`;
@@ -653,32 +653,32 @@ async function loadDiagnosticResults() {
     resultsAnswered.textContent = countText;
     progressBar.style.width = `${data.progresso}%`;
     progressNote.textContent = data.disponivel
-      ? "Diagnóstico concluído"
-      : `Progresso atual: ${data.progresso}%. Conclua o diagnóstico para ver a avaliação.`;
-    status.textContent = data.disponivel ? "Diagnóstico concluído" : "Diagnóstico em andamento";
-    resultsStatus.textContent = data.disponivel ? "Resultado disponível" : "Resultado ainda não disponível";
-    score.textContent = data.disponivel ? `${data.resultado_geral}%` : "Pendente";
-    resultsScore.textContent = data.disponivel ? `${data.resultado_geral}%` : "Pendente";
+      ? "Diagnóstico completado"
+      : `Progreso actual: ${data.progresso}%. Finaliza el diagnóstico para ver la evaluación.`;
+    status.textContent = data.disponivel ? "Diagnóstico completado" : "Diagnóstico en curso";
+    resultsStatus.textContent = data.disponivel ? "Resultado disponible" : "Resultado aún no disponible";
+    score.textContent = data.disponivel ? `${data.resultado_geral}%` : "Pendiente";
+    resultsScore.textContent = data.disponivel ? `${data.resultado_geral}%` : "Pendiente";
     renderDiagnosticDimensions(homeDimensions, data.dimensoes);
     renderDiagnosticDimensions(resultsDimensions, data.dimensoes);
   } catch (error) {
-    console.error("Não foi possível carregar os resultados do diagnóstico.", error);
-    status.textContent = "Resultados indisponíveis";
+    console.error("No se pudieron cargar los resultados del diagnóstico.", error);
+    status.textContent = "Resultados no disponibles";
     answered.textContent = "—";
     score.textContent = "—";
-    resultsStatus.textContent = error.message ?? "Resultados indisponíveis";
+    resultsStatus.textContent = error.message ?? "Resultados no disponibles";
     resultsAnswered.textContent = "—";
     resultsScore.textContent = "—";
-    progressNote.textContent = "Tente recarregar a página.";
+    progressNote.textContent = "Intenta volver a cargar la página.";
   }
 }
 
 function renderOverview() {
   const counts = updateCounts();
   const statuses = [
-    { id: "awaiting", title: "Aguardando agendamento", count: counts.pendingCount },
-    { id: "in_progress", title: "Em processo de aplicação", count: counts.scheduledCount },
-    { id: "implemented", title: "Ações implementadas", count: counts.doneCount },
+    { id: "awaiting", title: "Pendientes de programación", count: counts.pendingCount },
+    { id: "in_progress", title: "En proceso de implementación", count: counts.scheduledCount },
+    { id: "implemented", title: "Acciones implementadas", count: counts.doneCount },
   ];
 
   statusSummary.replaceChildren();
@@ -699,7 +699,7 @@ function renderOverview() {
     const matchingActions = planActions.filter((item) => item.status === status.id);
 
     if (matchingActions.length === 0) {
-      list.append(createElement("p", "plan-empty", "Nenhuma ação nesta etapa."));
+      list.append(createElement("p", "plan-empty", "No hay acciones en esta etapa."));
     } else {
       matchingActions.forEach((planAction) => {
         const action = actionById.get(planAction.id);
@@ -710,7 +710,7 @@ function renderOverview() {
         if (planAction.status === "in_progress") {
           item.append(createElement("p", "overview-action__date", formatDate(planAction.date)));
         } else if (planAction.status === "implemented") {
-          item.append(createElement("span", "overview-action__badge", "Concluída"));
+          item.append(createElement("span", "overview-action__badge", "Completada"));
         }
         list.append(item);
       });

@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Painel inicial da EcoAvanza" />
-    <title>Minha empresa | EcoAvanza</title>
+    <meta name="description" content="Panel de inicio de EcoAvanza" />
+    <title>Mi empresa | EcoAvanza</title>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', path='images/favicon.svg') }}" />
     <script src="{{ url_for('static', path='js/theme.js') }}"></script>
 
@@ -20,11 +20,11 @@
 
   <body class="app-page">
     <div class="app-shell">
-      <aside class="app-sidebar" aria-label="Navegação principal">
+      <aside class="app-sidebar" aria-label="Navegación principal">
         <a
           class="sidebar-brand"
           href="#minha-empresa"
-          aria-label="EcoAvanza — Minha empresa"
+          aria-label="EcoAvanza — Mi empresa"
         >
           <img
             src="{{ url_for('static', path='images/logo-ecoavanza.png') }}"
@@ -32,18 +32,18 @@
           />
         </a>
 
-        <nav class="sidebar-nav" aria-label="Seções da aplicação">
+        <nav class="sidebar-nav" aria-label="Secciones de la aplicación">
           <a
             class="sidebar-link is-active"
             href="#minha-empresa"
-            data-page="Minha empresa"
+            data-page="Mi empresa"
             aria-current="page"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z" />
               <path d="M9 21v-7h6v7" />
             </svg>
-            <span>Minha empresa</span>
+            <span>Mi empresa</span>
           </a>
 
           <a class="sidebar-link" href="/diagnostico" data-page="Diagnóstico">
@@ -64,7 +64,7 @@
           <a
             class="sidebar-link"
             href="#rota-sustentavel"
-            data-page="Rota Sustentável"
+            data-page="Ruta Sostenible"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -72,26 +72,26 @@
               />
               <path d="M10.5 15.5c1.4-.5 2.6-1.5 3.4-3M7 12V8M17 16v4" />
             </svg>
-            <span>Rota Sustentável</span>
+            <span>Ruta Sostenible</span>
           </a>
         </nav>
 
         <div class="sidebar-botanical" aria-hidden="true"></div>
 
-        <a class="sidebar-link sidebar-help" href="#ajuda" data-page="Ajuda">
+        <a class="sidebar-link sidebar-help" href="#ajuda" data-page="Ayuda">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="9" />
             <path
               d="M9.5 9a2.6 2.6 0 1 1 4.1 2.1c-1.2.8-1.6 1.3-1.6 2.4M12 17h.01"
             />
           </svg>
-          <span>Ajuda</span>
+          <span>Ayuda</span>
         </a>
       </aside>
 
-      <main class="app-workspace" aria-label="Área principal da aplicação">
+      <main class="app-workspace" aria-label="Área principal de la aplicación">
         <header class="workspace-header">
-          <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="true" aria-label="Ativar tema claro">
+          <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="true" aria-label="Activar tema claro">
             <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z" />
             </svg>
@@ -105,7 +105,7 @@
             <a
               class="company-menu__trigger company-menu__profile-link"
               href="#perfil-empresa"
-              aria-label="Editar informações da empresa"
+              aria-label="Editar información de la empresa"
             >
               <span class="company-avatar" aria-hidden="true">
                 <svg viewBox="0 0 48 48">
@@ -117,14 +117,14 @@
 
               <span class="company-menu__text">
                 <span class="company-menu__name" data-company-display-name>{{ empresa }}</span>
-                <span class="company-menu__label">Minha empresa</span>
+                <span class="company-menu__label">Mi empresa</span>
               </span>
             </a>
 
             <button
               class="company-menu__menu-trigger"
               type="button"
-              aria-label="Abrir menu da conta"
+              aria-label="Abrir menú de la cuenta"
               aria-expanded="false"
               aria-controls="company-menu-panel"
             >
@@ -140,7 +140,7 @@
             <div class="company-menu__panel" id="company-menu-panel" hidden>
               <form action="/logout" method="post">
                 <button class="company-menu__logout" type="submit">
-                  Sair da sessão
+                  Cerrar sesión
                 </button>
               </form>
             </div>
@@ -154,45 +154,45 @@
           aria-labelledby="company-home-title"
         >
           <div class="company-home-heading">
-            <p class="dashboard-kicker">Visão geral</p>
+            <p class="dashboard-kicker">Resumen</p>
             <h1 id="company-home-title">
               <span data-home-company-name>{{ empresa }}</span>
             </h1>
-            <p>Resumo do perfil e do diagnóstico de sustentabilidade da empresa.</p>
+            <p>Resumen del perfil y del diagnóstico de sostenibilidad de la empresa.</p>
           </div>
 
           <section class="company-overview-card" aria-labelledby="company-overview-title">
             <div class="company-overview-card__heading">
               <div>
-                <p class="quiz-panel__eyebrow">Perfil da empresa</p>
-                <h2 id="company-overview-title">Dados cadastrais</h2>
+                <p class="quiz-panel__eyebrow">Perfil de la empresa</p>
+                <h2 id="company-overview-title">Datos de registro</h2>
               </div>
             </div>
 
             <dl class="company-overview-grid">
               <div class="company-overview-item">
-                <dt>Nome da empresa</dt>
-                <dd data-overview-field="company_name">Não informado</dd>
+                <dt>Nombre de la empresa</dt>
+                <dd data-overview-field="company_name">No informado</dd>
               </div>
               <div class="company-overview-item">
-                <dt>Proprietário(a) ou responsável</dt>
-                <dd data-overview-field="owner">Não informado</dd>
+                <dt>Propietario/a o responsable</dt>
+                <dd data-overview-field="owner">No informado</dd>
               </div>
               <div class="company-overview-item">
-                <dt>Setor</dt>
-                <dd data-overview-field="sector">Não informado</dd>
+                <dt>Sector</dt>
+                <dd data-overview-field="sector">No informado</dd>
               </div>
               <div class="company-overview-item">
-                <dt>Número de funcionários</dt>
-                <dd data-overview-field="employees">Não informado</dd>
+                <dt>Número de empleados</dt>
+                <dd data-overview-field="employees">No informado</dd>
               </div>
               <div class="company-overview-item">
-                <dt>Ano de criação da empresa</dt>
-                <dd data-overview-field="founded_year">Não informado</dd>
+                <dt>Año de creación de la empresa</dt>
+                <dd data-overview-field="founded_year">No informado</dd>
               </div>
               <div class="company-overview-item">
-                <dt>Data de criação do perfil</dt>
-                <dd data-overview-field="profile_created_at">Não informado</dd>
+                <dt>Fecha de creación del perfil</dt>
+                <dd data-overview-field="profile_created_at">No informado</dd>
               </div>
             </dl>
           </section>
@@ -200,42 +200,42 @@
           <section class="diagnostic-overview" aria-labelledby="diagnostic-overview-title">
             <div class="diagnostic-overview__heading">
               <div>
-                <p class="quiz-panel__eyebrow">Sustentabilidade</p>
-                <h2 id="diagnostic-overview-title">Diagnóstico da empresa</h2>
+                <p class="quiz-panel__eyebrow">Sostenibilidad</p>
+                <h2 id="diagnostic-overview-title">Diagnóstico de la empresa</h2>
                 <p>
-                  Acompanhe quantas perguntas foram respondidas e veja o resultado
-                  geral do diagnóstico.
+                  Consulta cuántas preguntas se han respondido y revisa el resultado
+                  general del diagnóstico.
                 </p>
               </div>
-              <span class="diagnostic-overview__status" data-diagnostic-status>Diagnóstico ainda não realizado</span>
+              <span class="diagnostic-overview__status" data-diagnostic-status>Diagnóstico aún no realizado</span>
             </div>
 
             <div class="diagnostic-overview__metrics">
               <article class="diagnostic-metric">
-                <span class="diagnostic-metric__label">Perguntas respondidas</span>
-                <strong class="diagnostic-metric__value" data-diagnostic-answered>Carregando...</strong>
-                <span class="diagnostic-metric__note">Nenhum dado disponível</span>
+                <span class="diagnostic-metric__label">Preguntas respondidas</span>
+                <strong class="diagnostic-metric__value" data-diagnostic-answered>Cargando...</strong>
+                <span class="diagnostic-metric__note">No hay datos disponibles</span>
               </article>
               <article class="diagnostic-metric">
-                <span class="diagnostic-metric__label">Resultado geral</span>
+                <span class="diagnostic-metric__label">Resultado general</span>
                 <strong class="diagnostic-metric__value diagnostic-metric__value--text">
-                  <span data-diagnostic-score>Carregando...</span>
+                  <span data-diagnostic-score>Cargando...</span>
                 </strong>
-                <span class="diagnostic-metric__note">Faça o diagnóstico para ver sua avaliação</span>
+                <span class="diagnostic-metric__note">Completa el diagnóstico para ver tu evaluación</span>
               </article>
               <article class="diagnostic-metric diagnostic-metric--progress">
-                <span class="diagnostic-metric__label">Progresso do diagnóstico</span>
+                <span class="diagnostic-metric__label">Progreso del diagnóstico</span>
                 <div
                   class="diagnostic-progress"
                   role="progressbar"
-                  aria-label="Progresso do diagnóstico"
+                  aria-label="Progreso del diagnóstico"
                   aria-valuemin="0"
                   aria-valuemax="100"
                   aria-valuenow="0"
                 >
                   <span data-diagnostic-progress-bar></span>
                 </div>
-                <span class="diagnostic-metric__note" data-diagnostic-progress-note>Carregando resultados...</span>
+                <span class="diagnostic-metric__note" data-diagnostic-progress-note>Cargando resultados...</span>
               </article>
             </div>
             <div class="overview-groups" data-diagnostic-dimensions></div>
@@ -244,19 +244,19 @@
 
         <section class="company-profile-page" data-view="resultados" aria-labelledby="results-title" hidden>
           <div class="company-profile-heading">
-            <p class="dashboard-kicker">Sustentabilidade</p>
-            <h1 id="results-title">Resultados do diagnóstico</h1>
-            <p>Veja a avaliação por dimensão e acompanhe o progresso da sua empresa.</p>
+            <p class="dashboard-kicker">Sostenibilidad</p>
+            <h1 id="results-title">Resultados del diagnóstico</h1>
+            <p>Consulta la evaluación por dimensión y el progreso de tu empresa.</p>
           </div>
           <div class="diagnostic-overview">
-            <span class="diagnostic-overview__status" data-results-status>Carregando resultados...</span>
+            <span class="diagnostic-overview__status" data-results-status>Cargando resultados...</span>
             <div class="diagnostic-overview__metrics">
               <article class="diagnostic-metric">
-                <span class="diagnostic-metric__label">Perguntas respondidas</span>
+                <span class="diagnostic-metric__label">Preguntas respondidas</span>
                 <strong class="diagnostic-metric__value" data-results-answered>—</strong>
               </article>
               <article class="diagnostic-metric">
-                <span class="diagnostic-metric__label">Resultado geral</span>
+                <span class="diagnostic-metric__label">Resultado general</span>
                 <strong class="diagnostic-metric__value" data-results-score>—</strong>
               </article>
             </div>
@@ -266,25 +266,25 @@
 
         <section class="company-profile-page" data-view="ajuda" aria-labelledby="help-title" hidden>
           <div class="company-profile-heading">
-            <p class="dashboard-kicker">Central de suporte</p>
-            <h1 id="help-title">Ajuda</h1>
-            <p>Orientações para usar o EcoAvanza.</p>
+            <p class="dashboard-kicker">Centro de ayuda</p>
+            <h1 id="help-title">Ayuda</h1>
+            <p>Instrucciones para usar EcoAvanza.</p>
           </div>
           <div class="company-overview-card">
-            <div class="company-overview-card__heading"><h2>Acessar o sistema</h2></div>
-            <p>Use o e-mail e a senha da empresa para entrar. O menu no cabeçalho permite encerrar a sessão.</p>
+            <div class="company-overview-card__heading"><h2>Acceder al sistema</h2></div>
+            <p>Usa el correo electrónico y la contraseña de la empresa para iniciar sesión. El menú del encabezado permite cerrar la sesión.</p>
           </div>
           <div class="company-overview-card">
             <div class="company-overview-card__heading"><h2>Diagnóstico</h2></div>
-            <p>Responda às perguntas por dimensão. Cada resposta é salva automaticamente; ao concluir, as respostas ficam disponíveis para consulta.</p>
+            <p>Responde las preguntas por dimensión. Cada respuesta se guarda automáticamente; al finalizar, podrás consultarlas.</p>
           </div>
           <div class="company-overview-card">
-            <div class="company-overview-card__heading"><h2>Perfil e plano sustentável</h2></div>
-            <p>Salve os dados do perfil e acompanhe as ações escolhidas, agendadas e implementadas. As informações ficam vinculadas à sua empresa.</p>
+            <div class="company-overview-card__heading"><h2>Perfil y plan sostenible</h2></div>
+            <p>Guarda los datos del perfil y consulta las acciones elegidas, programadas e implementadas. La información queda vinculada a tu empresa.</p>
           </div>
           <div class="company-overview-card">
-            <div class="company-overview-card__heading"><h2>Precisa de suporte?</h2></div>
-            <p>Entre em contato com a equipe responsável pela implantação do sistema na sua organização.</p>
+            <div class="company-overview-card__heading"><h2>¿Necesitas ayuda?</h2></div>
+            <p>Contacta con el equipo responsable de implementar el sistema en tu organización.</p>
           </div>
         </section>
 
@@ -298,25 +298,25 @@
           <div class="company-profile-heading">
             <a class="profile-back-link" href="#minha-empresa">
               <span aria-hidden="true">←</span>
-              Voltar ao painel
+              Volver al panel
             </a>
-            <p class="dashboard-kicker">Perfil da empresa</p>
-            <h1 id="company-profile-title">Informações da empresa</h1>
+            <p class="dashboard-kicker">Perfil de la empresa</p>
+            <h1 id="company-profile-title">Información de la empresa</h1>
             <p>
-              Mantenha os dados da empresa atualizados para acompanhar melhor
-              seu planejamento sustentável.
+              Mantén actualizados los datos de la empresa para hacer un mejor seguimiento
+              de tu planificación sostenible.
             </p>
           </div>
 
           <form class="company-profile-form" data-company-profile-form>
             <div class="company-profile-form__heading">
-              <h2>Dados cadastrais</h2>
-              <p>Os campos marcados com * são obrigatórios.</p>
+              <h2>Datos de registro</h2>
+              <p>Los campos marcados con * son obligatorios.</p>
             </div>
 
             <div class="company-profile-fields">
               <div class="profile-field">
-                <label for="profile-created-at">Data de criação do perfil *</label>
+                <label for="profile-created-at">Fecha de creación del perfil *</label>
                 <input
                   id="profile-created-at"
                   name="profile_created_at"
@@ -326,7 +326,7 @@
               </div>
 
               <div class="profile-field">
-                <label for="company-founded-year">Ano de criação da empresa *</label>
+                <label for="company-founded-year">Año de creación de la empresa *</label>
                 <input
                   id="company-founded-year"
                   name="founded_year"
@@ -334,13 +334,13 @@
                   inputmode="numeric"
                   min="1800"
                   max="2100"
-                  placeholder="Ex.: 2018"
+                  placeholder="Ej.: 2018"
                   required
                 />
               </div>
 
               <div class="profile-field">
-                <label for="company-name">Nome da empresa *</label>
+                <label for="company-name">Nombre de la empresa *</label>
                 <input
                   id="company-name"
                   name="company_name"
@@ -348,13 +348,13 @@
                   minlength="2"
                   maxlength="120"
                   autocomplete="organization"
-                  placeholder="Nome da empresa"
+                  placeholder="Nombre de la empresa"
                   required
                 />
               </div>
 
               <div class="profile-field">
-                <label for="company-owner">Proprietário(a) ou responsável *</label>
+                <label for="company-owner">Propietario/a o responsable *</label>
                 <input
                   id="company-owner"
                   name="owner"
@@ -362,13 +362,13 @@
                   minlength="2"
                   maxlength="120"
                   autocomplete="name"
-                  placeholder="Nome do responsável"
+                  placeholder="Nombre de la persona responsable"
                   required
                 />
               </div>
 
               <div class="profile-field">
-                <label for="company-employees">Número de funcionários *</label>
+                <label for="company-employees">Número de empleados *</label>
                 <input
                   id="company-employees"
                   name="employees"
@@ -376,20 +376,20 @@
                   inputmode="numeric"
                   min="0"
                   max="1000000"
-                  placeholder="Ex.: 12"
+                  placeholder="Ej.: 12"
                   required
                 />
               </div>
 
               <div class="profile-field">
-                <label for="company-sector">Setor da empresa *</label>
+                <label for="company-sector">Sector de la empresa *</label>
                 <input
                   id="company-sector"
                   name="sector"
                   type="text"
                   minlength="2"
                   maxlength="100"
-                  placeholder="Ex.: Comércio, tecnologia, agricultura"
+                  placeholder="Ej.: Comercio, tecnología, agricultura"
                   required
                 />
               </div>
@@ -400,7 +400,7 @@
               <a class="secondary-button profile-cancel-button" href="#minha-empresa">
                 Cancelar
               </a>
-              <button class="primary-button" type="submit">Salvar informações</button>
+              <button class="primary-button" type="submit">Guardar información</button>
             </div>
           </form>
         </section>
@@ -412,17 +412,17 @@
           hidden
         >
           <div class="sustainability-heading">
-            <p class="dashboard-kicker">Planejamento da empresa</p>
-            <h1 id="sustainability-title">Rota Sustentável</h1>
+            <p class="dashboard-kicker">Planificación de la empresa</p>
+            <h1 id="sustainability-title">Ruta Sostenible</h1>
             <p>
-              Escolha ações, organize as atividades na agenda e acompanhe a
-              evolução do seu plano de sustentabilidade.
+              Elige acciones, organiza las actividades en la agenda y consulta
+              la evolución de tu plan de sostenibilidad.
             </p>
           </div>
 
           <nav
             class="plan-tabs"
-            aria-label="Etapas do plano sustentável"
+            aria-label="Etapas del plan sostenible"
             role="tablist"
           >
             <button
@@ -436,7 +436,7 @@
               role="tab"
             >
               <span class="plan-tab__number">1</span>
-              <span>Escolher ações</span>
+              <span>Elegir acciones</span>
               <span class="plan-tab__count" data-count-selected>0</span>
             </button>
             <button
@@ -464,7 +464,7 @@
               role="tab"
             >
               <span class="plan-tab__number">3</span>
-              <span>Visão geral</span>
+              <span>Resumen</span>
             </button>
           </nav>
 
@@ -480,15 +480,15 @@
             <div class="plan-step__heading">
               <div>
                 <p class="quiz-panel__eyebrow">Etapa 1</p>
-                <h2>Quais ações fazem sentido para sua empresa?</h2>
-                <p>Selecione as iniciativas que deseja incluir no seu plano.</p>
+                <h2>¿Qué acciones son adecuadas para tu empresa?</h2>
+                <p>Selecciona las iniciativas que quieres incluir en tu plan.</p>
               </div>
-              <span class="plan-step__summary" data-actions-summary>0 ações selecionadas</span>
+              <span class="plan-step__summary" data-actions-summary>0 acciones seleccionadas</span>
             </div>
             <div class="action-catalog" data-action-catalog></div>
             <div class="plan-step__footer">
               <button class="primary-button" type="button" data-go-agenda>
-                Continuar para a agenda
+                Continuar a la agenda
               </button>
             </div>
           </section>
@@ -504,10 +504,10 @@
             <div class="plan-step__heading">
               <div>
                 <p class="quiz-panel__eyebrow">Etapa 2</p>
-                <h2>Organize as atividades</h2>
+                <h2>Organiza las actividades</h2>
                 <p>
-                  Defina uma data para cada ação selecionada. Ao agendar, ela
-                  aparecerá como em processo de aplicação.
+                  Define una fecha para cada acción seleccionada. Al programarla,
+                  aparecerá como en proceso de implementación.
                 </p>
               </div>
             </div>
@@ -525,8 +525,8 @@
             <div class="plan-step__heading">
               <div>
                 <p class="quiz-panel__eyebrow">Etapa 3</p>
-                <h2>Visão geral do plano</h2>
-                <p>Acompanhe o estado de cada ação da sua empresa.</p>
+                <h2>Resumen del plan</h2>
+                <p>Consulta el estado de cada acción de tu empresa.</p>
               </div>
             </div>
             <div class="plan-status-summary" data-status-summary></div>

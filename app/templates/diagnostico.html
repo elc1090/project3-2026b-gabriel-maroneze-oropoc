@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Diagnóstico de sustentabilidade da EcoAvanza"
+      content="Diagnóstico de sostenibilidad de EcoAvanza"
     />
     <title>Diagnóstico | EcoAvanza</title>
     <link
@@ -27,11 +27,11 @@
 
   <body class="app-page diagnostic-page">
     <div class="app-shell">
-      <aside class="app-sidebar" aria-label="Navegação principal">
+      <aside class="app-sidebar" aria-label="Navegación principal">
         <a
           class="sidebar-brand"
           href="/painel"
-          aria-label="EcoAvanza — Minha empresa"
+          aria-label="EcoAvanza — Mi empresa"
         >
           <img
             src="{{ url_for('static', path='images/logo-ecoavanza.png') }}"
@@ -39,13 +39,13 @@
           />
         </a>
 
-        <nav class="sidebar-nav" aria-label="Seções da aplicação">
+        <nav class="sidebar-nav" aria-label="Secciones de la aplicación">
           <a class="sidebar-link" href="/painel">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z" />
               <path d="M9 21v-7h6v7" />
             </svg>
-            <span>Minha empresa</span>
+            <span>Mi empresa</span>
           </a>
 
           <a
@@ -74,7 +74,7 @@
               />
               <path d="M10.5 15.5c1.4-.5 2.6-1.5 3.4-3M7 12V8M17 16v4" />
             </svg>
-            <span>Rota Sustentável</span>
+            <span>Ruta Sostenible</span>
           </a>
         </nav>
 
@@ -87,13 +87,13 @@
               d="M9.5 9a2.6 2.6 0 1 1 4.1 2.1c-1.2.8-1.6 1.3-1.6 2.4M12 17h.01"
             />
           </svg>
-          <span>Ajuda</span>
+          <span>Ayuda</span>
         </a>
       </aside>
 
       <main
         class="app-workspace diagnostic-workspace"
-        aria-label="DIAGNÓSTICO DE SUSTENTABILIDADE"
+        aria-label="DIAGNÓSTICO DE SOSTENIBILIDAD"
       >
         <header class="workspace-header">
           <button
@@ -101,7 +101,7 @@
             type="button"
             data-theme-toggle
             aria-pressed="true"
-            aria-label="Ativar tema claro"
+            aria-label="Activar tema claro"
           >
             <svg
               class="theme-toggle__moon"
@@ -136,7 +136,7 @@
 
               <span class="company-menu__text">
                 <span class="company-menu__name">{{ usuario }}</span>
-                <span class="company-menu__label">Minha empresa</span>
+                <span class="company-menu__label">Mi empresa</span>
               </span>
             </button>
 
@@ -145,12 +145,12 @@
                 class="company-menu__profile-action"
                 href="/painel#perfil-empresa"
               >
-                Editar perfil da empresa
+                Editar perfil de la empresa
               </a>
 
               <form action="/logout" method="post">
                 <button class="company-menu__logout" type="submit">
-                  Sair da sessão
+                  Cerrar sesión
                 </button>
               </form>
             </div>
@@ -158,18 +158,18 @@
         </header>
 
         <section class="diagnostic-content" aria-labelledby="diagnostic-title">
-          <p class="diagnostic-overline">Diagnóstico de sustentabilidade</p>
+          <p class="diagnostic-overline">Diagnóstico de sostenibilidad</p>
           <h1 id="diagnostic-title">Diagnóstico</h1>
           <p class="diagnostic-intro">
-            Responda às perguntas para conhecer a situação atual da sua empresa.
+            Responde las preguntas para conocer la situación actual de tu empresa.
           </p>
 
           <div class="diagnostic-grid">
             <aside
               class="diagnostic-progress"
-              aria-label="Progresso do diagnóstico"
+              aria-label="Progreso del diagnóstico"
             >
-              <h2>Progresso do diagnóstico</h2>
+              <h2>Progreso del diagnóstico</h2>
 
               <div class="progress-summary">
                 <strong id="overall-progress-text">0 de 20</strong>
@@ -184,7 +184,7 @@
                   Ambiental
                 </span>
 
-                <span id="question-counter">Pergunta 1 de 5</span>
+                <span id="question-counter">Pregunta 1 de 5</span>
               </div>
 
               <h2 id="question-text"></h2>
@@ -192,7 +192,7 @@
               <p id="question-guidance"></p>
 
               <fieldset class="answer-options" id="answer-options">
-                <legend>Escolha uma alternativa</legend>
+                <legend>Elige una opción</legend>
               </fieldset>
 
               <div class="question-actions">
@@ -210,7 +210,7 @@
                   type="button"
                   hidden
                 >
-                  Realizar novo diagnóstico
+                  Realizar un nuevo diagnóstico
                 </button>
 
                 <button
@@ -218,7 +218,7 @@
                   id="next-button"
                   type="button"
                 >
-                  Próxima pergunta
+                  Siguiente pregunta
                 </button>
               </div>
             </section>
@@ -226,20 +226,20 @@
             <aside class="diagnostic-support">
               <img
                 src="{{ url_for('static', path='images/tela.png') }}"
-                alt="Ilustração de natureza e sustentabilidade"
+                alt="Ilustración de naturaleza y sostenibilidad"
               />
 
               <section>
-                <h2>Por que é importante?</h2>
+                <h2>¿Por qué es importante?</h2>
                 <p id="support-importance"></p>
               </section>
 
               <section>
-                <h2>Como interpretar?</h2>
+                <h2>¿Cómo interpretarlo?</h2>
                 <p>
-                  Escolha a opção que melhor representa a prática atual da
-                  empresa. Não há resposta certa: o objetivo é reconhecer
-                  oportunidades de melhoria.
+                  Elige la opción que mejor represente la práctica actual de la
+                  empresa. No hay respuestas correctas: el objetivo es reconocer
+                  oportunidades de mejora.
                 </p>
               </section>
             </aside>

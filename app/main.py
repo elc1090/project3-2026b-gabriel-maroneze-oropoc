@@ -169,60 +169,62 @@ def inicializar_banco() -> None:
 
             dimensoes = [
                 ("Ambiental", 1, [
-                    "A empresa monitora o consumo de água?",
-                    "A empresa acompanha o consumo de energia?",
-                    "Os resíduos são separados para reciclagem?",
-                    "A empresa reduz o uso de materiais descartáveis?",
-                    "Há ações para prevenir impactos ambientais?",
+                    "¿La empresa supervisa el consumo de agua?",
+                    "¿La empresa controla el consumo de energía?",
+                    "¿Se separan los residuos para reciclarlos?",
+                    "¿La empresa reduce el uso de materiales desechables?",
+                    "¿Se llevan a cabo acciones para prevenir los impactos ambientales?",
                 ]),
                 ("Social", 2, [
-                    "A empresa promove saúde e segurança no trabalho?",
-                    "A equipe recebe orientação sobre sustentabilidade?",
-                    "A empresa combate discriminação e assédio?",
-                    "Há diálogo com clientes e comunidade?",
-                    "A empresa incentiva condições de trabalho justas?",
+                    "¿La empresa promueve la salud y la seguridad en el trabajo?",
+                    "¿El equipo recibe orientación sobre sostenibilidad?",
+                    "¿La empresa combate la discriminación y el acoso?",
+                    "¿Existe diálogo con los clientes y la comunidad?",
+                    "¿La empresa promueve condiciones laborales justas?",
                 ]),
-                ("Econômica", 3, [
-                    "A empresa planeja o uso eficiente de recursos?",
-                    "As compras consideram durabilidade e desperdício?",
-                    "A empresa acompanha custos relacionados a recursos?",
-                    "Há planejamento para manter as ações sustentáveis?",
-                    "A empresa avalia oportunidades de eficiência?",
+                ("Económica", 3, [
+                    "¿La empresa planifica el uso eficiente de los recursos?",
+                    "¿Las compras tienen en cuenta la durabilidad y el desperdicio?",
+                    "¿La empresa controla los costos relacionados con los recursos?",
+                    "¿Existe una planificación para mantener las acciones sostenibles?",
+                    "¿La empresa evalúa oportunidades de eficiencia?",
                 ]),
-                ("Governança", 4, [
-                    "Há responsáveis definidos pelas ações sustentáveis?",
-                    "A empresa registra suas políticas e práticas?",
-                    "As decisões consideram impactos de longo prazo?",
-                    "A empresa acompanha metas e resultados?",
-                    "A comunicação sobre práticas é transparente?",
+                ("Gobernanza", 4, [
+                    "¿Hay responsables definidos para las acciones sostenibles?",
+                    "¿La empresa documenta sus políticas y prácticas?",
+                    "¿Las decisiones tienen en cuenta los impactos a largo plazo?",
+                    "¿La empresa controla los objetivos y los resultados?",
+                    "¿La comunicación sobre las prácticas es transparente?",
                 ]),
             ]
-            cursor.execute("SELECT COUNT(*) FROM perguntas")
-            if cursor.fetchone()[0] == 0:
-                for nome_dimensao, ordem, perguntas in dimensoes:
-                    cursor.execute(
-                        """
-                        INSERT INTO dimensoes (nome, ordem)
-                        VALUES (%s, %s)
-                        RETURNING id
-                        """,
-                        (nome_dimensao, ordem),
-                    )
-                    dimensao_id = cursor.fetchone()[0]
-                    cursor.executemany(
-                        """
-                        INSERT INTO perguntas (dimensao_id, texto, ordem)
-                        VALUES (%s, %s, %s)
-                        """,
-                        [
-                            (dimensao_id, texto, ordem_pergunta)
-                            for ordem_pergunta, texto in enumerate(perguntas, 1)
-                        ],
-                    )
+            for nome_dimensao, ordem, perguntas in dimensoes:
+                cursor.execute(
+                    """
+                    INSERT INTO dimensoes (nome, ordem)
+                    VALUES (%s, %s)
+                    ON CONFLICT (ordem)
+                    DO UPDATE SET nome = EXCLUDED.nome
+                    RETURNING id
+                    """,
+                    (nome_dimensao, ordem),
+                )
+                dimensao_id = cursor.fetchone()[0]
+                cursor.executemany(
+                    """
+                    INSERT INTO perguntas (dimensao_id, texto, ordem)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (dimensao_id, ordem)
+                    DO UPDATE SET texto = EXCLUDED.texto
+                    """,
+                    [
+                        (dimensao_id, texto, ordem_pergunta)
+                        for ordem_pergunta, texto in enumerate(perguntas, 1)
+                    ],
+                )
 
     nome_empresa = (
         os.getenv("INITIAL_COMPANY_NAME")
-        or "Minha Empresa"
+        or "Mi Empresa"
     ).strip()
     email_empresa = (
         os.getenv("INITIAL_COMPANY_EMAIL")
@@ -239,7 +241,7 @@ def inicializar_banco() -> None:
         return
     if not email_empresa or not senha_empresa:
         raise RuntimeError(
-            "Defina usuário/e-mail e senha inicial juntos para criar o acesso."
+            "Define conjuntamente el usuario/correo electrónico y la contraseña inicial para crear el acceso."
         )
 
     with abrir_conexao() as conexao:
@@ -482,12 +484,12 @@ def definir_nivel(pontuacao: int) -> str:
         return "Inicial"
 
     if pontuacao <= 49:
-        return "Em desenvolvimento"
+        return "En desarrollo"
 
     if pontuacao <= 74:
-        return "Intermediário"
+        return "Intermedio"
 
-    return "Avançado"
+    return "Avanzado"
 
 
 def carregar_resultados_diagnostico(diagnostico_id: int) -> dict:
@@ -604,7 +606,7 @@ app = FastAPI(
 
 session_secret = os.getenv("SESSION_SECRET")
 if not session_secret:
-    raise RuntimeError("Defina SESSION_SECRET no arquivo .env.")
+    raise RuntimeError("Define SESSION_SECRET en el archivo .env.")
 
 app.add_middleware(
     SessionMiddleware,
@@ -656,7 +658,7 @@ def cadastrar_empresa(
         return templates.TemplateResponse(
             request=request,
             name="cadastro.html",
-            context={"erro": "Informe um endereço de e-mail válido.", "email": email_original},
+            context={"erro": "Introduce una dirección de correo electrónico válida.", "email": email_original},
             status_code=422,
         )
 
@@ -665,7 +667,7 @@ def cadastrar_empresa(
             request=request,
             name="cadastro.html",
             context={
-                "erro": "A senha precisa ter pelo menos 8 caracteres.",
+                "erro": "La contraseña debe tener al menos 8 caracteres.",
                 "email": email_original,
             },
             status_code=422,
@@ -680,7 +682,7 @@ def cadastrar_empresa(
                 ON CONFLICT (LOWER(email_acesso)) DO NOTHING
                 RETURNING id, nome
                 """,
-                ("Minha Empresa", email_validado, password_hash.hash(senha)),
+                ("Mi Empresa", email_validado, password_hash.hash(senha)),
             )
             empresa = cursor.fetchone()
 
@@ -698,7 +700,7 @@ def cadastrar_empresa(
             request=request,
             name="cadastro.html",
             context={
-                "erro": "Já existe uma conta cadastrada com esse e-mail.",
+                "erro": "Ya existe una cuenta registrada con este correo electrónico.",
                 "email": email_original,
             },
             status_code=409,
@@ -723,7 +725,7 @@ def realizar_login(
             request=request,
             name="login.html",
             context={
-                "erro": "E-mail ou senha inválidos.",
+                "erro": "Correo electrónico o contraseña incorrectos.",
                 "email": email.strip(),
             },
             status_code=401,
@@ -770,7 +772,7 @@ def verificar_saude():
 def cadastrar_residuo(residuo: ResiduoCreate, request: Request):
     empresa_id = request.session.get("empresa_id")
     if not empresa_id:
-        raise HTTPException(status_code=401, detail="Inicie uma sessão para registrar resíduos.")
+        raise HTTPException(status_code=401, detail="Inicia sesión para registrar residuos.")
 
     with abrir_conexao() as conexao:
         with conexao.cursor() as cursor:
@@ -785,7 +787,7 @@ def cadastrar_residuo(residuo: ResiduoCreate, request: Request):
             registro = cursor.fetchone()
 
     return {
-        "mensagem": "Resíduo registrado com sucesso.",
+        "mensagem": "Residuo registrado correctamente.",
         "id": registro[0],
         "criado_em": registro[1],
         "residuo": residuo.model_dump(),
@@ -796,7 +798,7 @@ def cadastrar_residuo(residuo: ResiduoCreate, request: Request):
 def listar_residuos(request: Request):
     empresa_id = request.session.get("empresa_id")
     if not empresa_id:
-        raise HTTPException(status_code=401, detail="Inicie uma sessão para consultar resíduos.")
+        raise HTTPException(status_code=401, detail="Inicia sesión para consultar residuos.")
 
     with abrir_conexao() as conexao:
         with conexao.cursor() as cursor:
@@ -829,7 +831,7 @@ def listar_residuos(request: Request):
 def obter_perfil(request: Request):
     empresa_id = request.session.get("empresa_id")
     if not empresa_id:
-        raise HTTPException(status_code=401, detail="Inicie uma sessão para acessar o perfil.")
+        raise HTTPException(status_code=401, detail="Inicia sesión para acceder al perfil.")
 
     with abrir_conexao() as conexao:
         with conexao.cursor() as cursor:
@@ -848,7 +850,7 @@ def obter_perfil(request: Request):
 def salvar_perfil(perfil: PerfilEmpresaUpdate, request: Request):
     empresa_id = request.session.get("empresa_id")
     if not empresa_id:
-        raise HTTPException(status_code=401, detail="Inicie uma sessão para salvar o perfil.")
+        raise HTTPException(status_code=401, detail="Inicia sesión para guardar el perfil.")
 
     dados = perfil.model_dump(mode="json")
     dados["company_name"] = dados["company_name"].strip()
@@ -871,14 +873,14 @@ def salvar_perfil(perfil: PerfilEmpresaUpdate, request: Request):
                 (dados["company_name"], empresa_id),
             )
     request.session["empresa_nome"] = dados["company_name"]
-    return {"mensagem": "Perfil salvo com sucesso.", "perfil": dados}
+    return {"mensagem": "Perfil guardado correctamente.", "perfil": dados}
 
 
 @app.get("/api/plano", include_in_schema=False)
 def obter_plano(request: Request):
     empresa_id = request.session.get("empresa_id")
     if not empresa_id:
-        raise HTTPException(status_code=401, detail="Inicie uma sessão para acessar o plano.")
+        raise HTTPException(status_code=401, detail="Inicia sesión para acceder al plan.")
 
     with abrir_conexao() as conexao:
         with conexao.cursor() as cursor:
@@ -905,21 +907,21 @@ def obter_plano(request: Request):
 def salvar_plano(plano: PlanoSustentavelUpdate, request: Request):
     empresa_id = request.session.get("empresa_id")
     if not empresa_id:
-        raise HTTPException(status_code=401, detail="Inicie uma sessão para salvar o plano.")
+        raise HTTPException(status_code=401, detail="Inicia sesión para guardar el plan.")
 
     acoes = [acao.model_dump() for acao in plano.actions]
     if len({acao["id"] for acao in acoes}) != len(acoes):
-        raise HTTPException(status_code=422, detail="O plano contém ações duplicadas.")
+        raise HTTPException(status_code=422, detail="El plan contiene acciones duplicadas.")
     for acao in acoes:
         if acao["id"] not in PLANO_ACTION_IDS:
-            raise HTTPException(status_code=422, detail="O plano contém uma ação desconhecida.")
+            raise HTTPException(status_code=422, detail="El plan contiene una acción desconocida.")
         if acao["status"] == "in_progress" and not acao["date"]:
-            raise HTTPException(status_code=422, detail="Agende uma data para cada ação em andamento.")
+            raise HTTPException(status_code=422, detail="Programa una fecha para cada acción en curso.")
         if acao["date"]:
             try:
                 date.fromisoformat(acao["date"])
             except ValueError as error:
-                raise HTTPException(status_code=422, detail="Use uma data válida no formato AAAA-MM-DD.") from error
+                raise HTTPException(status_code=422, detail="Usa una fecha válida con el formato AAAA-MM-DD.") from error
 
     with abrir_conexao() as conexao:
         with conexao.cursor() as cursor:
@@ -935,14 +937,14 @@ def salvar_plano(plano: PlanoSustentavelUpdate, request: Request):
                 (empresa_id, psycopg.types.json.Jsonb(acoes)),
             )
 
-    return {"mensagem": "Plano salvo com sucesso.", "actions": acoes}
+    return {"mensagem": "Plan guardado correctamente.", "actions": acoes}
 
 
 @app.get("/api/diagnostico/resultados", include_in_schema=False)
 def obter_resultados_diagnostico(request: Request):
     empresa_id = request.session.get("empresa_id")
     if not empresa_id:
-        raise HTTPException(status_code=401, detail="Inicie uma sessão para consultar os resultados.")
+        raise HTTPException(status_code=401, detail="Inicia sesión para consultar los resultados.")
 
     with abrir_conexao() as conexao:
         with conexao.cursor() as cursor:
@@ -1049,7 +1051,7 @@ def obter_diagnostico_atual(request: Request):
     if not empresa_id:
         raise HTTPException(
             status_code=401,
-            detail="É necessário iniciar uma sessão para acessar o diagnóstico.",
+            detail="Debes iniciar sesión para acceder al diagnóstico.",
         )
 
     diagnostico_id, status_diagnostico = obter_diagnostico_para_exibicao(
@@ -1082,13 +1084,13 @@ def salvar_resposta_diagnostico(
     if not empresa_id:
         raise HTTPException(
             status_code=401,
-            detail="É necessário iniciar uma sessão para salvar respostas.",
+            detail="Debes iniciar sesión para guardar respuestas.",
         )
 
     if not pergunta_ativa_existe(pergunta_id):
         raise HTTPException(
             status_code=404,
-            detail="Pergunta não encontrada ou inativa.",
+            detail="Pregunta no encontrada o inactiva.",
         )
 
     diagnostico = buscar_diagnostico_em_andamento(empresa_id)
@@ -1097,8 +1099,8 @@ def salvar_resposta_diagnostico(
         raise HTTPException(
             status_code=409,
             detail=(
-                "Este diagnóstico já foi concluído e não pode mais "
-                "receber alterações."
+                "Este diagnóstico ya ha finalizado y no se puede "
+                "modificar."
             ),
         )
 
@@ -1127,7 +1129,7 @@ def salvar_resposta_diagnostico(
             )
 
     return {
-        "mensagem": "Resposta salva com sucesso.",
+        "mensagem": "Respuesta guardada correctamente.",
         "diagnostico_id": diagnostico_id,
         "pergunta_id": pergunta_id,
         "valor": resposta.valor,
@@ -1141,7 +1143,7 @@ def concluir_diagnostico(request: Request):
     if not empresa_id:
         raise HTTPException(
             status_code=401,
-            detail="É necessário iniciar uma sessão para concluir o diagnóstico.",
+            detail="Debes iniciar sesión para finalizar el diagnóstico.",
         )
 
     diagnostico = buscar_diagnostico_em_andamento(empresa_id)
@@ -1149,7 +1151,7 @@ def concluir_diagnostico(request: Request):
     if diagnostico is None:
         raise HTTPException(
             status_code=409,
-            detail="Não existe um diagnóstico em andamento para concluir.",
+            detail="No hay ningún diagnóstico en curso para finalizar.",
         )
 
     diagnostico_id, _ = diagnostico
@@ -1185,8 +1187,8 @@ def concluir_diagnostico(request: Request):
                 raise HTTPException(
                     status_code=400,
                     detail=(
-                        "Ainda existem "
-                        f"{faltantes} pergunta(s) sem resposta."
+                        "Aún hay "
+                        f"{faltantes} pregunta(s) sin responder."
                     ),
                 )
 
@@ -1209,11 +1211,11 @@ def concluir_diagnostico(request: Request):
     if diagnostico_concluido is None:
         raise HTTPException(
             status_code=409,
-            detail="O diagnóstico não pôde ser concluído.",
+            detail="No se pudo finalizar el diagnóstico.",
         )
 
     return {
-        "mensagem": "Diagnóstico concluído com sucesso.",
+        "mensagem": "Diagnóstico finalizado correctamente.",
         "diagnostico": {
             "id": diagnostico_concluido[0],
             "status": diagnostico_concluido[1],
@@ -1229,7 +1231,7 @@ def obter_resultados_atuais(request: Request):
     if not empresa_id:
         raise HTTPException(
             status_code=401,
-            detail="É necessário iniciar uma sessão para acessar os resultados.",
+            detail="Debes iniciar sesión para acceder a los resultados.",
         )
 
     diagnostico = buscar_ultimo_diagnostico_concluido(empresa_id)
@@ -1237,7 +1239,7 @@ def obter_resultados_atuais(request: Request):
     if diagnostico is None:
         raise HTTPException(
             status_code=404,
-            detail="Ainda não existe um diagnóstico concluído para esta empresa.",
+            detail="Esta empresa aún no tiene un diagnóstico completado.",
         )
 
     diagnostico_id, _ = diagnostico
@@ -1251,7 +1253,7 @@ def reiniciar_diagnostico(request: Request):
     if not empresa_id:
         raise HTTPException(
             status_code=401,
-            detail="É necessário iniciar uma sessão para reiniciar o diagnóstico.",
+            detail="Debes iniciar sesión para reiniciar el diagnóstico.",
         )
 
     diagnostico_em_andamento = buscar_diagnostico_em_andamento(empresa_id)
@@ -1259,7 +1261,7 @@ def reiniciar_diagnostico(request: Request):
     if diagnostico_em_andamento is not None:
         raise HTTPException(
             status_code=409,
-            detail="Já existe um diagnóstico em andamento para esta empresa.",
+            detail="Esta empresa ya tiene un diagnóstico en curso.",
         )
 
     diagnostico_concluido = buscar_ultimo_diagnostico_concluido(empresa_id)
@@ -1267,7 +1269,7 @@ def reiniciar_diagnostico(request: Request):
     if diagnostico_concluido is None:
         raise HTTPException(
             status_code=404,
-            detail="Não existe um diagnóstico concluído para reiniciar.",
+            detail="No hay ningún diagnóstico completado para reiniciar.",
         )
 
     diagnostico_anterior_id, _ = diagnostico_concluido
@@ -1304,7 +1306,7 @@ def reiniciar_diagnostico(request: Request):
             novo_diagnostico = cursor.fetchone()
 
     return {
-        "mensagem": "Novo diagnóstico iniciado com sucesso.",
+        "mensagem": "Nuevo diagnóstico iniciado correctamente.",
         "diagnostico": {
             "id": novo_diagnostico[0],
             "status": novo_diagnostico[1],

@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Acesso ao sistema EcoAvanza" />
-    <title>Entrar | EcoAvanza</title>
+    <meta name="description" content="Acceso al sistema EcoAvanza" />
+    <title>Iniciar sesión | EcoAvanza</title>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', path='images/favicon.svg') }}" />
     <script src="{{ url_for('static', path='js/theme.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}?v=3" />
     <script src="{{ url_for('static', path='js/login.js') }}" defer></script>
   </head>
   <body class="login-page">
-    <button class="theme-toggle theme-toggle--floating" type="button" data-theme-toggle aria-pressed="true" aria-label="Ativar tema claro">
+    <button class="theme-toggle theme-toggle--floating" type="button" data-theme-toggle aria-pressed="true" aria-label="Activar tema claro">
       <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z" />
       </svg>
@@ -32,18 +32,18 @@
             <img
               class="brand__logo"
               src="{{ url_for('static', path='images/logo-ecoavanza.png') }}"
-              alt="EcoAvanza — Pequenas ações, grandes cambios"
+              alt="EcoAvanza — Pequeñas acciones, grandes cambios"
             />
           </header>
 
           <div class="login-heading">
             <h1 id="login-title">Accede a tu cuenta</h1>
-            <p>Inicie sesión para continuar en el panel de administración.</p>
+            <p>Inicia sesión para continuar en el panel de control.</p>
           </div>
 
           <form class="login-form" action="/login" method="post" novalidate>
             <div class="field">
-              <label for="email">E-mail</label>
+              <label for="email">Correo electrónico</label>
               <div class="field__control">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0" />
@@ -80,7 +80,7 @@
                 <button
                   class="password-toggle"
                   type="button"
-                  aria-label="Mostrar senha"
+                  aria-label="Mostrar contraseña"
                   aria-controls="senha"
                   aria-pressed="false"
                 >
@@ -97,8 +97,8 @@
             <button class="primary-button" type="submit">Entrar</button>
           </form>
           <p class="account-link">
-            Ainda não tem uma conta?
-            <a href="/cadastro">Criar conta</a>
+            ¿Aún no tienes una cuenta?
+            <a href="/cadastro">Crear cuenta</a>
           </p>
         </div>
       </section>

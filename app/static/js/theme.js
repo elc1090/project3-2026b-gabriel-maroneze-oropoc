@@ -8,11 +8,11 @@ function updateThemeControls() {
     button.setAttribute("aria-pressed", String(isDark));
     button.setAttribute(
       "aria-label",
-      isDark ? "Ativar tema claro" : "Ativar tema escuro",
+      isDark ? "Activar tema claro" : "Activar tema oscuro",
     );
     button.querySelector("[data-theme-toggle-label]").textContent = isDark
       ? "Tema claro"
-      : "Tema escuro";
+      : "Tema oscuro";
   });
 }
 

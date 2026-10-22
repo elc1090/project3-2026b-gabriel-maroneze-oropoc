@@ -27,13 +27,13 @@ const dimensionIcons = {
       <path d="M3.5 20a5.5 5.5 0 0 1 11 0M14 20a4 4 0 0 1 7-2.6" />
     </svg>
   `,
-  Econômica: `
+  Económica: `
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <ellipse cx="12" cy="6" rx="7" ry="3" />
       <path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" />
     </svg>
   `,
-  Governança: `
+  Gobernanza: `
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="m3 9 9-5 9 5" />
       <path d="M5 10h14M6 10v8M10 10v8M14 10v8M18 10v8M3 20h18" />
@@ -55,7 +55,7 @@ function formatDate(dateString) {
     return "";
   }
 
-  return new Intl.DateTimeFormat("pt-BR", {
+  return new Intl.DateTimeFormat("es-ES", {
     dateStyle: "long",
   }).format(new Date(dateString));
 }
@@ -63,13 +63,13 @@ function formatDate(dateString) {
 function levelDescription(level) {
   const descriptions = {
     Inicial:
-      "A empresa está começando sua jornada de sustentabilidade e possui boas oportunidades para evoluir.",
-    "Em desenvolvimento":
-      "A empresa já apresenta iniciativas positivas, mas ainda pode fortalecer práticas importantes.",
-    Intermediário:
-      "A empresa apresenta boas práticas, porém existem oportunidades de melhoria em algumas áreas.",
-    Avançado:
-      "A empresa demonstra práticas sustentáveis consolidadas e integradas à sua gestão.",
+      "La empresa está comenzando su camino hacia la sostenibilidad y tiene buenas oportunidades para avanzar.",
+    "En desarrollo":
+      "La empresa ya cuenta con iniciativas positivas, pero aún puede fortalecer prácticas importantes.",
+    Intermedio:
+      "La empresa cuenta con buenas prácticas, pero existen oportunidades de mejora en algunas áreas.",
+    Avanzado:
+      "La empresa demuestra prácticas sostenibles consolidadas e integradas en su gestión.",
   };
 
   return descriptions[level] ?? "";
@@ -92,7 +92,7 @@ function renderDimensions(dimensions) {
           <div
             class="dimension-result__track"
             role="progressbar"
-            aria-label="Pontuação da dimensão ${escapeHtml(dimension.nome)}"
+            aria-label="Puntuación de la dimensión ${escapeHtml(dimension.nome)}"
             aria-valuemin="0"
             aria-valuemax="100"
             aria-valuenow="${score}"
@@ -137,7 +137,7 @@ function renderResults(data) {
   elements.scoreRing.style.setProperty("--score", `${score}%`);
   elements.scoreRing.setAttribute(
     "aria-label",
-    `Pontuação geral: ${score} de 100`,
+    `Puntuación general: ${score} de 100`,
   );
 
   elements.overallScore.textContent = String(score);
@@ -145,7 +145,7 @@ function renderResults(data) {
   elements.overallDescription.textContent = levelDescription(data.nivel);
 
   elements.completedAt.textContent = data.finalizado_em
-    ? `Diagnóstico concluído em ${formatDate(data.finalizado_em)}.`
+    ? `Diagnóstico completado el ${formatDate(data.finalizado_em)}.`
     : "";
 
   renderDimensions(data.dimensoes);
@@ -153,13 +153,13 @@ function renderResults(data) {
   renderInsightList(
     elements.strengths,
     data.fortalezas,
-    "Nenhuma fortaleza foi destacada neste diagnóstico.",
+    "No se han destacado fortalezas en este diagnóstico.",
   );
 
   renderInsightList(
     elements.opportunities,
     data.oportunidades,
-    "Nenhuma oportunidade prioritária foi identificada.",
+    "No se han identificado oportunidades prioritarias.",
   );
 }
 
@@ -186,7 +186,7 @@ async function loadResults() {
 
       throw new Error(
         data?.detail ??
-          "Não foi possível carregar os resultados do diagnóstico.",
+          "No se pudieron cargar los resultados del diagnóstico.",
       );
     }
 
@@ -199,7 +199,7 @@ async function loadResults() {
   } catch (error) {
     showError(
       error.message ??
-        "Não foi possível carregar os resultados do diagnóstico.",
+        "No se pudieron cargar los resultados del diagnóstico.",
     );
   }
 }

@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Resultados do diagnóstico de sustentabilidade da EcoAvanza"
+      content="Resultados del diagnóstico de sostenibilidad de EcoAvanza"
     />
     <title>Resultados | EcoAvanza</title>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', path='images/favicon.svg') }}" />
@@ -23,11 +23,11 @@
 
   <body class="app-page results-page">
     <div class="app-shell">
-      <aside class="app-sidebar" aria-label="Navegação principal">
+      <aside class="app-sidebar" aria-label="Navegación principal">
         <a
           class="sidebar-brand"
           href="/painel"
-          aria-label="EcoAvanza — Minha empresa"
+          aria-label="EcoAvanza — Mi empresa"
         >
           <img
             src="{{ url_for('static', path='images/logo-ecoavanza.png') }}"
@@ -35,13 +35,13 @@
           />
         </a>
 
-        <nav class="sidebar-nav" aria-label="Seções da aplicação">
+        <nav class="sidebar-nav" aria-label="Secciones de la aplicación">
           <a class="sidebar-link" href="/painel">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z" />
               <path d="M9 21v-7h6v7" />
             </svg>
-            <span>Minha empresa</span>
+            <span>Mi empresa</span>
           </a>
 
           <a class="sidebar-link" href="/diagnostico">
@@ -70,7 +70,7 @@
               />
               <path d="M10.5 15.5c1.4-.5 2.6-1.5 3.4-3M7 12V8M17 16v4" />
             </svg>
-            <span>Rota Sustentável</span>
+            <span>Ruta Sostenible</span>
           </a>
         </nav>
 
@@ -83,16 +83,16 @@
               d="M9.5 9a2.6 2.6 0 1 1 4.1 2.1c-1.2.8-1.6 1.3-1.6 2.4M12 17h.01"
             />
           </svg>
-          <span>Ajuda</span>
+          <span>Ayuda</span>
         </a>
       </aside>
 
       <main
         class="app-workspace results-workspace"
-        aria-label="RESULTADOS DO DIAGNÓSTICO"
+        aria-label="RESULTADOS DEL DIAGNÓSTICO"
       >
         <header class="workspace-header">
-          <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="true" aria-label="Ativar tema claro">
+          <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="true" aria-label="Activar tema claro">
             <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z" />
             </svg>
@@ -113,17 +113,17 @@
 
               <span class="company-menu__text">
                 <span class="company-menu__name">{{ empresa }}</span>
-                <span class="company-menu__label">Minha empresa</span>
+                <span class="company-menu__label">Mi empresa</span>
               </span>
             </button>
 
             <div class="company-menu__panel" id="company-menu-panel" hidden>
               <a class="company-menu__profile-action" href="/painel#perfil-empresa">
-                Editar perfil da empresa
+                Editar perfil de la empresa
               </a>
               <form action="/logout" method="post">
                 <button class="company-menu__logout" type="submit">
-                  Sair da sessão
+                  Cerrar sesión
                 </button>
               </form>
             </div>
@@ -131,36 +131,36 @@
         </header>
 
         <section class="results-content" aria-labelledby="results-title">
-          <p class="results-overline">Resultados do diagnóstico</p>
+          <p class="results-overline">Resultados del diagnóstico</p>
           <h1 id="results-title">Resultados</h1>
           <p class="results-intro">
-            Conheça o nível de sustentabilidade da sua empresa e as principais
-            oportunidades de melhoria.
+            Conoce el nivel de sostenibilidad de tu empresa y las principales
+            oportunidades de mejora.
           </p>
 
           <p class="results-loading" id="results-loading" role="status">
-            Carregando resultados...
+            Cargando resultados...
           </p>
 
           <section class="results-error" id="results-error" hidden>
-            <h2>Resultados indisponíveis</h2>
+            <h2>Resultados no disponibles</h2>
             <p id="results-error-message"></p>
             <a class="primary-button" href="/diagnostico">
-              Ir para o diagnóstico
+              Ir al diagnóstico
             </a>
           </section>
 
           <div id="results-dashboard" hidden>
             <div class="results-summary-grid">
               <article class="results-card results-score-card">
-                <h2>Pontuação geral</h2>
+                <h2>Puntuación general</h2>
 
                 <div class="results-score-card__body">
                   <div
                     class="score-ring"
                     id="score-ring"
                     role="img"
-                    aria-label="Pontuação geral"
+                    aria-label="Puntuación general"
                   >
                     <div class="score-ring__center">
                       <strong id="overall-score">0</strong>
@@ -187,7 +187,7 @@
               </article>
 
               <article class="results-card results-dimensions-card">
-                <h2>Resultados por dimensão</h2>
+                <h2>Resultados por dimensión</h2>
                 <div
                   class="dimension-results-list"
                   id="dimension-results-list"
@@ -208,7 +208,7 @@
                 </div>
 
                 <p class="results-insight-card__intro">
-                  Práticas que já contribuem para a sustentabilidade da empresa.
+                  Prácticas que ya contribuyen a la sostenibilidad de la empresa.
                 </p>
 
                 <ul
@@ -226,17 +226,17 @@
                   >
                     💡
                   </span>
-                  <h2>Oportunidades de melhoria</h2>
+                  <h2>Oportunidades de mejora</h2>
                 </div>
 
                 <p class="results-insight-card__intro">
-                  Pontos que merecem atenção no planejamento sustentável.
+                  Aspectos que merecen atención en la planificación sostenible.
                 </p>
 
                 <ul
                   class="results-insight-list"
                   id="opportunities-list"
-                  aria-label="Oportunidades de melhoria identificadas"
+                  aria-label="Oportunidades de mejora identificadas"
                 ></ul>
               </article>
             </div>

@@ -6,10 +6,21 @@
     <meta name="description" content="Acesso ao sistema EcoAvanza" />
     <title>Entrar | EcoAvanza</title>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', path='images/favicon.svg') }}" />
+    <script src="{{ url_for('static', path='js/theme.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}" />
     <script src="{{ url_for('static', path='js/login.js') }}" defer></script>
   </head>
   <body class="login-page">
+    <button class="theme-toggle theme-toggle--floating" type="button" data-theme-toggle aria-pressed="true" aria-label="Ativar tema claro">
+      <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z" />
+      </svg>
+      <svg class="theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+      </svg>
+      <span data-theme-toggle-label>Tema claro</span>
+    </button>
     <main class="login-shell">
       <section class="login-visual" aria-hidden="true">
         <div class="login-visual__shade"></div>

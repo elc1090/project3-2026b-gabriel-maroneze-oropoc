@@ -36,11 +36,17 @@ __Joao Daniel:__ Sobre a proposta sugerida, gostei da ideia e da oportunidade ú
 
 ### Trechos de código
 
+## primeiro trecho
+
 <img width="848" height="632" alt="Captura de tela 2026-10-22 090414" src="https://github.com/user-attachments/assets/44511fb6-b738-4afd-8375-d918ac6b871c" />
 
 
+## segundo trecho 
+
 <img width="811" height="287" alt="Captura de tela 2026-10-22 090541" src="https://github.com/user-attachments/assets/5ccad83a-5c55-48b5-8727-23f7fb96ea4c" />
 
+
+## terceiro trecho
 
 <img width="390" height="243" alt="Captura de tela 2026-10-22 090613" src="https://github.com/user-attachments/assets/7954d8f2-9067-4536-86a6-2d372908c283" />
 

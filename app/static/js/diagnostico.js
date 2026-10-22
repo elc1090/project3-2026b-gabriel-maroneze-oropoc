@@ -38,6 +38,7 @@ let currentDimension = 0;
 let currentQuestion = 0;
 let diagnosticStatus = "em_andamento";
 let isConcluding = false;
+let isRestarting = false;
 
 const answers = new Map();
 const savingQuestions = new Set();
@@ -51,6 +52,7 @@ const elements = {
   answerOptions: document.querySelector("#answer-options"),
   overallProgressText: document.querySelector("#overall-progress-text"),
   previousButton: document.querySelector("#previous-button"),
+  restartButton: document.querySelector("#restart-button"),
   nextButton: document.querySelector("#next-button"),
   supportImportance: document.querySelector("#support-importance"),
 };
@@ -122,6 +124,7 @@ function renderProgress() {
       const completed = countAnswersInDimension(index);
       const isCurrent = index === currentDimension;
       const questionTotal = dimension.questions.length;
+      const isBusy = isConcluding || isRestarting;
 
       return `
         <li>
@@ -131,7 +134,7 @@ function renderProgress() {
             data-dimension-index="${index}"
             aria-label="${dimension.name}: ${completed} de ${questionTotal} perguntas respondidas."
             ${isCurrent ? 'aria-current="step"' : ""}
-            ${isConcluding ? "disabled" : ""}
+            ${isBusy ? "disabled" : ""}
           >
             <span class="dimension-item__dot" aria-hidden="true"></span>
             <span class="dimension-item__name">${dimension.name}</span>
@@ -149,6 +152,7 @@ function renderQuestion() {
   const selectedAnswer = answers.get(question.id);
   const isSaving = savingQuestions.has(question.id);
   const isConcluded = diagnosticStatus === "concluido";
+  const isBusy = isSaving || isConcluding || isRestarting;
 
   elements.currentDimension.textContent = dimension.name;
   elements.questionCounter.textContent =
@@ -178,7 +182,7 @@ function renderQuestion() {
               name="diagnostic-answer-${question.id}"
               value="${option.value}"
               ${isSelected ? "checked" : ""}
-              ${isSaving || isConcluded || isConcluding ? "disabled" : ""}
+              ${isBusy || isConcluded ? "disabled" : ""}
             />
 
             <span class="answer-option__radio" aria-hidden="true"></span>
@@ -200,13 +204,20 @@ function renderQuestion() {
     currentDimension === diagnosticDimensions.length - 1 &&
     currentQuestion === dimension.questions.length - 1;
 
-  elements.previousButton.disabled =
-    isFirstQuestion || isSaving || isConcluding;
+  elements.previousButton.disabled = isFirstQuestion || isBusy;
+
+  elements.restartButton.hidden = !isConcluded;
+  elements.restartButton.disabled = isBusy;
+  elements.restartButton.textContent = isRestarting
+    ? "Iniciando..."
+    : "Realizar novo diagnóstico";
 
   elements.nextButton.disabled =
-    isSaving || isConcluding || (isConcluded && isLastQuestion);
+    isBusy || (isConcluded && isLastQuestion);
 
-  if (isConcluding) {
+  if (isRestarting) {
+    elements.nextButton.textContent = "Iniciando...";
+  } else if (isConcluding) {
     elements.nextButton.textContent = "Concluindo...";
   } else if (isConcluded && isLastQuestion) {
     elements.nextButton.textContent = "Diagnóstico concluído";
@@ -248,7 +259,7 @@ function moveQuestion(direction) {
 }
 
 function navigateToDimension(index) {
-  if (isConcluding) {
+  if (isConcluding || isRestarting) {
     return;
   }
 
@@ -296,7 +307,8 @@ async function saveAnswer(questionId, value) {
   if (
     savingQuestions.has(questionId) ||
     diagnosticStatus === "concluido" ||
-    isConcluding
+    isConcluding ||
+    isRestarting
   ) {
     return;
   }
@@ -397,11 +409,60 @@ async function concludeDiagnostic() {
   }
 }
 
+async function restartDiagnostic() {
+  const shouldRestart = window.confirm(
+    "Deseja iniciar um novo diagnóstico? O diagnóstico concluído e todas as respostas anteriores serão apagados permanentemente.",
+  );
+
+  if (!shouldRestart) {
+    return;
+  }
+
+  isRestarting = true;
+  render();
+
+  try {
+    const response = await fetch("/api/diagnostico/reiniciar", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+
+    if (response.status === 401) {
+      window.location.assign("/");
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error(await responseErrorMessage(response));
+    }
+
+    const data = await response.json();
+
+    answers.clear();
+    diagnosticStatus = data.diagnostico.status;
+    currentDimension = 0;
+    currentQuestion = 0;
+
+    window.alert(
+      "Novo diagnóstico iniciado. As respostas anteriores foram removidas.",
+    );
+  } catch (error) {
+    window.alert(
+      error.message ??
+        "Não foi possível iniciar um novo diagnóstico. Tente novamente.",
+    );
+  } finally {
+    isRestarting = false;
+    render();
+  }
+}
+
 async function loadDiagnostic() {
   elements.questionText.textContent = "Carregando perguntas...";
   elements.questionGuidance.textContent =
     "Aguarde enquanto preparamos o diagnóstico da empresa.";
   elements.previousButton.disabled = true;
+  elements.restartButton.disabled = true;
   elements.nextButton.disabled = true;
 
   try {
@@ -447,6 +508,7 @@ async function loadDiagnostic() {
 
     elements.answerOptions.innerHTML = "";
     elements.previousButton.disabled = true;
+    elements.restartButton.disabled = true;
     elements.nextButton.disabled = true;
   }
 }
@@ -460,6 +522,7 @@ elements.answerOptions.addEventListener("change", (event) => {
 
 elements.dimensionList.addEventListener("click", (event) => {
   const button = event.target.closest("[data-dimension-index]");
+
   if (!button || button.disabled) {
     return;
   }
@@ -469,6 +532,10 @@ elements.dimensionList.addEventListener("click", (event) => {
 
 elements.previousButton.addEventListener("click", () => {
   moveQuestion(-1);
+});
+
+elements.restartButton.addEventListener("click", () => {
+  restartDiagnostic();
 });
 
 elements.nextButton.addEventListener("click", () => {

@@ -1,12 +1,6 @@
 
 # Projeto: Aplicação com cadastro e autenticação de usuários integrando frontend, backend e persistência
 
-<img width="1600" height="872" alt="WhatsApp Image 2026-10-21 at 23 12 52" src="https://github.com/user-attachments/assets/0e58a4b2-422b-45b0-8bc2-6440eba89840" />
-
-
-
-
-
 
 
 
@@ -42,7 +36,13 @@ __Joao Daniel:__ Sobre a proposta sugerida, gostei da ideia e da oportunidade ú
 
 ### Trechos de código
 
-Substitua este texto por uma indicação de pelo menos 3 trechos de código que você(s) queira(m) destacar para a turma (por exemplo, para explicar algo que aprendeu, para alertar sobre alguma dificuldade de compreensão, para mostrar uma curiosidade, etc).
+<img width="848" height="632" alt="Captura de tela 2026-10-22 090414" src="https://github.com/user-attachments/assets/44511fb6-b738-4afd-8375-d918ac6b871c" />
+
+
+<img width="811" height="287" alt="Captura de tela 2026-10-22 090541" src="https://github.com/user-attachments/assets/5ccad83a-5c55-48b5-8727-23f7fb96ea4c" />
+
+
+<img width="390" height="243" alt="Captura de tela 2026-10-22 090613" src="https://github.com/user-attachments/assets/7954d8f2-9067-4536-86a6-2d372908c283" />
 
 
 ## Tecnologias
@@ -69,16 +69,19 @@ Substitua este texto por uma indicação de pelo menos 3 trechos de código que 
 ### Ambiente de desenvolvimento
 
 
-- VSCODE
+- VSCODE:
 - GITHUB
 - RENDER
 - DOCKER DESKTOP
+- pgAdmin Web Service
 
 ## Referências e créditos
 
 - Materiais de IHC e Engenharia de Software
-- Gemini
+- Gemini (Geração de Imagens)
 - Copilot VSCode
+- ChatGPT (Configurações do Docker)
+- Materiais de Segurança e Defesa em Ambientes Digitais (hash)
 
 
 

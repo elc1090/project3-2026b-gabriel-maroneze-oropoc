@@ -8,7 +8,11 @@
       content="Diagnóstico de sustentabilidade da EcoAvanza"
     />
     <title>Diagnóstico | EcoAvanza</title>
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', path='images/favicon.svg') }}" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="{{ url_for('static', path='images/favicon.svg') }}"
+    />
     <script src="{{ url_for('static', path='js/theme.js') }}"></script>
 
     <link
@@ -92,16 +96,35 @@
         aria-label="DIAGNÓSTICO DE SUSTENTABILIDADE"
       >
         <header class="workspace-header">
-          <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="true" aria-label="Ativar tema claro">
-            <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z" />
+          <button
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-pressed="true"
+            aria-label="Ativar tema claro"
+          >
+            <svg
+              class="theme-toggle__moon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z"
+              />
             </svg>
-            <svg class="theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              class="theme-toggle__sun"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <circle cx="12" cy="12" r="4" />
-              <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+              <path
+                d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"
+              />
             </svg>
             <span data-theme-toggle-label>Tema claro</span>
           </button>
+
           <div class="company-menu">
             <button
               class="company-menu__trigger"
@@ -118,9 +141,13 @@
             </button>
 
             <div class="company-menu__panel" id="company-menu-panel" hidden>
-              <a class="company-menu__profile-action" href="/painel#perfil-empresa">
+              <a
+                class="company-menu__profile-action"
+                href="/painel#perfil-empresa"
+              >
                 Editar perfil da empresa
               </a>
+
               <form action="/logout" method="post">
                 <button class="company-menu__logout" type="submit">
                   Sair da sessão
@@ -175,6 +202,15 @@
                   type="button"
                 >
                   Anterior
+                </button>
+
+                <button
+                  class="question-button question-button--secondary"
+                  id="restart-button"
+                  type="button"
+                  hidden
+                >
+                  Realizar novo diagnóstico
                 </button>
 
                 <button

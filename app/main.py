@@ -1243,3 +1243,70 @@ def obter_resultados_atuais(request: Request):
     diagnostico_id, _ = diagnostico
 
     return carregar_resultados_diagnostico(diagnostico_id)
+
+@app.post("/api/diagnostico/reiniciar", include_in_schema=False)
+def reiniciar_diagnostico(request: Request):
+    empresa_id = request.session.get("empresa_id")
+
+    if not empresa_id:
+        raise HTTPException(
+            status_code=401,
+            detail="É necessário iniciar uma sessão para reiniciar o diagnóstico.",
+        )
+
+    diagnostico_em_andamento = buscar_diagnostico_em_andamento(empresa_id)
+
+    if diagnostico_em_andamento is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="Já existe um diagnóstico em andamento para esta empresa.",
+        )
+
+    diagnostico_concluido = buscar_ultimo_diagnostico_concluido(empresa_id)
+
+    if diagnostico_concluido is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Não existe um diagnóstico concluído para reiniciar.",
+        )
+
+    diagnostico_anterior_id, _ = diagnostico_concluido
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                DELETE FROM respostas_diagnostico
+                WHERE diagnostico_id = %s
+                """,
+                (diagnostico_anterior_id,),
+            )
+
+            cursor.execute(
+                """
+                DELETE FROM diagnosticos
+                WHERE id = %s
+                  AND empresa_id = %s
+                  AND status = 'concluido'
+                """,
+                (diagnostico_anterior_id, empresa_id),
+            )
+
+            cursor.execute(
+                """
+                INSERT INTO diagnosticos (empresa_id)
+                VALUES (%s)
+                RETURNING id, status
+                """,
+                (empresa_id,),
+            )
+
+            novo_diagnostico = cursor.fetchone()
+
+    return {
+        "mensagem": "Novo diagnóstico iniciado com sucesso.",
+        "diagnostico": {
+            "id": novo_diagnostico[0],
+            "status": novo_diagnostico[1],
+        },
+    }

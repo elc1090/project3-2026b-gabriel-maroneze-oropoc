@@ -2637,6 +2637,7 @@ html[data-theme="dark"] .plan-storage-message {
   font-size: var(--text-xs);
   font-weight: 750;
   line-height: 1.4;
+  text-transform: uppercase;
 }
 
 .company-home-heading > p:last-child,

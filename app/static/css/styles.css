@@ -1552,7 +1552,7 @@ input {
 
 .dimension-list {
   display: grid;
-  gap: 6px;
+  gap: 9px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1560,38 +1560,141 @@ input {
 
 .dimension-item {
   display: grid;
-  grid-template-columns: 12px minmax(0, 1fr) auto;
-  gap: 9px;
-  align-items: center;
-  min-height: 47px;
-  padding: 0 10px;
+  width: 100%;
+  gap: 10px;
+  min-width: 0;
+  padding: 13px 14px;
   color: var(--ink-700);
+  font: inherit;
   font-size: 0.82rem;
-  border-radius: 9px;
+  text-align: left;
+  background: #fff;
+  border: 1px solid #dfe7dc;
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.dimension-item:hover:not(:disabled) {
+  background: #f9fbf7;
+  border-color: var(--line-strong);
+}
+
+.dimension-item:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.dimension-item:disabled {
+  cursor: wait;
+  opacity: 0.76;
 }
 
 .dimension-item.is-current {
   color: var(--forest-950);
-  font-weight: 750;
   background: var(--sage-100);
+  border-color: var(--forest-700);
+  box-shadow: 0 0 0 2px var(--focus);
 }
 
-.dimension-item strong {
-  font-size: 0.74rem;
+.dimension-item__heading,
+.dimension-item__details {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.dimension-item__heading {
+  gap: 9px;
+}
+
+.dimension-item__name {
+  min-width: 0;
+  color: var(--ink-950);
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.dimension-item__status {
+  flex: none;
+  margin-left: auto;
+  padding: 4px 7px;
+  color: var(--ink-500);
+  font-size: 0.64rem;
+  font-weight: 750;
+  background: #f4f6f3;
+  border-radius: 999px;
+}
+
+.dimension-item.is-current .dimension-item__status {
+  color: var(--forest-800);
+  background: #dcebd7;
+}
+
+.dimension-item.is-complete:not(.is-current) .dimension-item__status {
+  color: #376a50;
+  background: #e7f2e9;
+}
+
+.dimension-item__details {
+  justify-content: space-between;
+  color: var(--ink-500);
+  font-size: 0.72rem;
+  font-weight: 650;
 }
 
 .dimension-item__dot {
-  width: 9px;
-  height: 9px;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  place-items: center;
   background: #d6dfd1;
   border: 2px solid #fff;
   border-radius: 50%;
   box-shadow: 0 0 0 1px #bdcbbb;
 }
 
+.dimension-item__dot::after {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  content: "";
+}
+
 .dimension-item.is-current .dimension-item__dot {
   background: var(--forest-700);
   box-shadow: 0 0 0 1px var(--forest-700);
+}
+
+.dimension-item.is-complete .dimension-item__dot::after {
+  width: auto;
+  height: auto;
+  color: #fff;
+  background: transparent;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  content: "✓";
+}
+
+.dimension-item__track {
+  height: 6px;
+  overflow: hidden;
+  background: #e7ede4;
+  border-radius: 999px;
+}
+
+.dimension-item__track span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #4d8848, #7dad70);
+  border-radius: inherit;
+  transition: width 220ms ease;
 }
 
 .question-card {
@@ -2381,6 +2484,39 @@ html[data-theme="dark"] .dimension-item__dot {
   background: #536354;
   border-color: var(--surface-raised);
   box-shadow: 0 0 0 1px #687a68;
+}
+
+html[data-theme="dark"] .dimension-item {
+  background: var(--surface-raised);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .dimension-item:hover:not(:disabled) {
+  background: var(--surface-muted);
+}
+
+html[data-theme="dark"] .dimension-item.is-current {
+  background: #293b2e;
+  border-color: var(--forest-700);
+}
+
+html[data-theme="dark"] .dimension-item__status {
+  color: var(--ink-700);
+  background: var(--surface-muted);
+}
+
+html[data-theme="dark"] .dimension-item.is-current .dimension-item__status {
+  color: #d4ebc9;
+  background: #344d38;
+}
+
+html[data-theme="dark"] .dimension-item.is-complete:not(.is-current) .dimension-item__status {
+  color: #c7e4c3;
+  background: #263a2a;
+}
+
+html[data-theme="dark"] .dimension-item__track {
+  background: #3b4a3d;
 }
 
 html[data-theme="dark"] .answer-option.is-selected {

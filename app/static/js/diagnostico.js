@@ -49,7 +49,6 @@ const elements = {
   questionText: document.querySelector("#question-text"),
   questionGuidance: document.querySelector("#question-guidance"),
   answerOptions: document.querySelector("#answer-options"),
-  overallProgressBar: document.querySelector("#overall-progress-bar"),
   overallProgressText: document.querySelector("#overall-progress-text"),
   previousButton: document.querySelector("#previous-button"),
   nextButton: document.querySelector("#next-button"),
@@ -114,45 +113,29 @@ function buildDimensions(questions) {
 function renderProgress() {
   const answeredQuestions = totalAnswers();
   const questionCount = totalQuestions();
-  const percentage =
-    questionCount === 0 ? 0 : (answeredQuestions / questionCount) * 100;
 
   elements.overallProgressText.textContent =
     `${answeredQuestions} de ${questionCount}`;
-  elements.overallProgressBar.style.width = `${percentage}%`;
 
   elements.dimensionList.innerHTML = diagnosticDimensions
     .map((dimension, index) => {
       const completed = countAnswersInDimension(index);
       const isCurrent = index === currentDimension;
       const questionTotal = dimension.questions.length;
-      const isComplete = completed === questionTotal;
-      const dimensionPercentage =
-        questionTotal === 0 ? 0 : (completed / questionTotal) * 100;
-      const status = isCurrent ? "Em andamento" : isComplete ? "Concluída" : "Pendente";
 
       return `
         <li>
           <button
-            class="dimension-item ${isCurrent ? "is-current" : ""} ${isComplete ? "is-complete" : ""}"
+            class="dimension-item ${isCurrent ? "is-current" : ""}"
             type="button"
             data-dimension-index="${index}"
-            aria-label="${dimension.name}: ${completed} de ${questionTotal} perguntas, ${Math.round(dimensionPercentage)} por cento concluído. ${status}."
+            aria-label="${dimension.name}: ${completed} de ${questionTotal} perguntas respondidas."
             ${isCurrent ? 'aria-current="step"' : ""}
             ${isConcluding ? "disabled" : ""}
           >
-            <span class="dimension-item__heading">
-              <span class="dimension-item__dot" aria-hidden="true"></span>
-              <span class="dimension-item__name">${dimension.name}</span>
-              <span class="dimension-item__status">${status}</span>
-            </span>
-            <span class="dimension-item__details">
-              <span>${completed} de ${questionTotal} perguntas</span>
-              <span>${Math.round(dimensionPercentage)}%</span>
-            </span>
-            <span class="dimension-item__track" aria-hidden="true">
-              <span style="width: ${dimensionPercentage}%"></span>
-            </span>
+            <span class="dimension-item__dot" aria-hidden="true"></span>
+            <span class="dimension-item__name">${dimension.name}</span>
+            <span class="dimension-item__count">${completed}/${questionTotal}</span>
           </button>
         </li>
       `;

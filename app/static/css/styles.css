@@ -823,7 +823,7 @@ input {
   line-height: 1.45;
 }
 
-.diagnostic-progress {
+.diagnostic-metric .diagnostic-progress {
   height: 9px;
   margin: 7px 0 2px;
   overflow: hidden;
@@ -831,7 +831,7 @@ input {
   border-radius: 999px;
 }
 
-.diagnostic-progress span {
+.diagnostic-metric .diagnostic-progress span {
   display: block;
   width: 0;
   height: 100%;
@@ -1513,6 +1513,10 @@ input {
 }
 
 .diagnostic-progress {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  min-width: 0;
   padding: 22px 18px;
   background: #fff;
 }
@@ -1521,17 +1525,17 @@ input {
 .diagnostic-support h2 {
   margin: 0;
   color: var(--ink-950);
-  font-size: 0.95rem;
+  font-size: 1.12rem;
+  line-height: 1.3;
 }
 
 .progress-summary {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  align-items: center;
-  margin: 16px 0 24px;
+  display: flex;
+  justify-content: flex-end;
+  margin: 18px 0 27px;
   color: var(--ink-700);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .progress-track {
@@ -1552,22 +1556,33 @@ input {
 
 .dimension-list {
   display: grid;
-  gap: 9px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.dimension-list > li {
+  min-width: 0;
+}
+
 .dimension-item {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   width: 100%;
+  min-height: 104px;
+  align-items: flex-start;
   gap: 10px;
   min-width: 0;
-  padding: 13px 14px;
+  padding: 14px 17px;
   color: var(--ink-700);
   font: inherit;
   font-size: 0.82rem;
   text-align: left;
+  appearance: none;
   background: #fff;
   border: 1px solid #dfe7dc;
   border-radius: 12px;
@@ -1600,101 +1615,33 @@ input {
   box-shadow: 0 0 0 2px var(--focus);
 }
 
-.dimension-item__heading,
-.dimension-item__details {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-}
-
-.dimension-item__heading {
-  gap: 9px;
-}
-
 .dimension-item__name {
   min-width: 0;
+  overflow-wrap: anywhere;
   color: var(--ink-950);
-  font-size: 0.86rem;
+  font-size: 0.92rem;
   font-weight: 750;
 }
 
-.dimension-item__status {
-  flex: none;
-  margin-left: auto;
-  padding: 4px 7px;
-  color: var(--ink-500);
-  font-size: 0.64rem;
+.dimension-item__count {
+  color: var(--ink-950);
+  font-size: 0.88rem;
   font-weight: 750;
-  background: #f4f6f3;
-  border-radius: 999px;
-}
-
-.dimension-item.is-current .dimension-item__status {
-  color: var(--forest-800);
-  background: #dcebd7;
-}
-
-.dimension-item.is-complete:not(.is-current) .dimension-item__status {
-  color: #376a50;
-  background: #e7f2e9;
-}
-
-.dimension-item__details {
-  justify-content: space-between;
-  color: var(--ink-500);
-  font-size: 0.72rem;
-  font-weight: 650;
+  font-variant-numeric: tabular-nums;
 }
 
 .dimension-item__dot {
-  display: grid;
-  width: 20px;
-  height: 20px;
+  display: block;
+  width: 7px;
+  height: 7px;
   flex: none;
-  place-items: center;
-  background: #d6dfd1;
-  border: 2px solid #fff;
+  background: transparent;
+  border: 1px solid #8a9a89;
   border-radius: 50%;
-  box-shadow: 0 0 0 1px #bdcbbb;
-}
-
-.dimension-item__dot::after {
-  width: 6px;
-  height: 6px;
-  background: #fff;
-  border-radius: 50%;
-  content: "";
 }
 
 .dimension-item.is-current .dimension-item__dot {
-  background: var(--forest-700);
-  box-shadow: 0 0 0 1px var(--forest-700);
-}
-
-.dimension-item.is-complete .dimension-item__dot::after {
-  width: auto;
-  height: auto;
-  color: #fff;
-  background: transparent;
-  font-size: 0.68rem;
-  font-weight: 800;
-  line-height: 1;
-  content: "✓";
-}
-
-.dimension-item__track {
-  height: 6px;
-  overflow: hidden;
-  background: #e7ede4;
-  border-radius: 999px;
-}
-
-.dimension-item__track span {
-  display: block;
-  height: 100%;
-  background: linear-gradient(90deg, #4d8848, #7dad70);
-  border-radius: inherit;
-  transition: width 220ms ease;
+  border-color: #a7d494;
 }
 
 .question-card {
@@ -1879,7 +1826,7 @@ input {
 
 @media (max-width: 1120px) {
   .diagnostic-grid {
-    grid-template-columns: 220px minmax(0, 1fr);
+    grid-template-columns: minmax(356px, 0.78fr) minmax(390px, 1.22fr);
   }
 
   .diagnostic-support {
@@ -1893,7 +1840,7 @@ input {
   }
 }
 
-@media (max-width: 820px) {
+@media (max-width: 860px) {
   .diagnostic-content {
     width: min(100% - 36px, 680px);
   }
@@ -2476,14 +2423,14 @@ html[data-theme="dark"] .answer-option {
 }
 
 html[data-theme="dark"] .progress-track,
-html[data-theme="dark"] .diagnostic-progress {
+html[data-theme="dark"] .diagnostic-metric .diagnostic-progress {
   background-color: var(--surface-raised);
 }
 
 html[data-theme="dark"] .dimension-item__dot {
-  background: #536354;
-  border-color: var(--surface-raised);
-  box-shadow: 0 0 0 1px #687a68;
+  background: transparent;
+  border-color: #788b78;
+  box-shadow: none;
 }
 
 html[data-theme="dark"] .dimension-item {
@@ -2497,26 +2444,8 @@ html[data-theme="dark"] .dimension-item:hover:not(:disabled) {
 
 html[data-theme="dark"] .dimension-item.is-current {
   background: #293b2e;
-  border-color: var(--forest-700);
-}
-
-html[data-theme="dark"] .dimension-item__status {
-  color: var(--ink-700);
-  background: var(--surface-muted);
-}
-
-html[data-theme="dark"] .dimension-item.is-current .dimension-item__status {
-  color: #d4ebc9;
-  background: #344d38;
-}
-
-html[data-theme="dark"] .dimension-item.is-complete:not(.is-current) .dimension-item__status {
-  color: #c7e4c3;
-  background: #263a2a;
-}
-
-html[data-theme="dark"] .dimension-item__track {
-  background: #3b4a3d;
+  border-color: #9bd181;
+  box-shadow: 0 0 0 2px rgba(155, 209, 129, 0.28);
 }
 
 html[data-theme="dark"] .answer-option.is-selected {

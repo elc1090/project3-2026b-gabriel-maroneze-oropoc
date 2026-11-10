@@ -17,12 +17,18 @@ from google.auth import exceptions as google_exceptions
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
 
+import json
+from google import genai
+
 
 password_hash = PasswordHash.recommended()
 DUMMY_HASH = password_hash.hash("senha-invalida-para-comparacao")
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "").strip()
 
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
+GEMINI_PROMPT_VERSION = 1
 
 class ResiduoCreate(BaseModel):
     nome: str = Field(min_length=2, max_length=120)
@@ -71,6 +77,21 @@ PLANO_ACTION_IDS = frozenset(
         "purchase-planning",
     }
 )
+
+
+class TarefaPersonalizada(BaseModel):
+    titulo: str = Field(min_length=5, max_length=100)
+    descricao: str = Field(min_length=20, max_length=500)
+    dimensao: Literal["Ambiental", "Social", "Económica", "Gobernanza"]
+    prioridade: Literal["alta", "media", "baixa"]
+    prazo_sugerido_dias: int = Field(ge=7, le=365)
+    justificativa: str = Field(min_length=20, max_length=500)
+
+
+class RecomendacoesPersonalizadas(BaseModel):
+    resumo_geral: str = Field(min_length=20, max_length=700)
+    tarefas: list[TarefaPersonalizada] = Field(min_length=4, max_length=8)
+    aviso: str = Field(min_length=20, max_length=400)
 
 
 class RespostaDiagnosticoUpdate(BaseModel):
@@ -163,6 +184,23 @@ def inicializar_banco() -> None:
                     empresa_id BIGINT PRIMARY KEY REFERENCES empresas(id) ON DELETE CASCADE,
                     acoes JSONB NOT NULL DEFAULT '[]'::jsonb,
                     atualizado_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS recomendacoes_ia (
+                    id BIGSERIAL PRIMARY KEY,
+                    empresa_id BIGINT NOT NULL
+                        REFERENCES empresas(id)
+                        ON DELETE CASCADE,
+                    diagnostico_id BIGINT NOT NULL UNIQUE
+                        REFERENCES diagnosticos(id)
+                        ON DELETE CASCADE,
+                    conteudo JSONB NOT NULL,
+                    modelo VARCHAR(100) NOT NULL,
+                    versao_prompt SMALLINT NOT NULL DEFAULT 1,
+                    gerado_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CHECK (jsonb_typeof(conteudo) = 'object')
                 )
                 """,
                 """
@@ -715,6 +753,143 @@ def carregar_resultados_diagnostico(diagnostico_id: int) -> dict:
         "fortalezas": fortalezas,
         "oportunidades": oportunidades,
     }
+
+
+
+def carregar_respostas_para_recomendacoes(
+    diagnostico_id: int,
+) -> list[dict]:
+    niveis_resposta = {
+        0: "No es realizado",
+        1: "Es realizado ocasionalmente",
+        2: "Es realizado frecuentemente",
+        3: "Es realizado sistemáticamente",
+    }
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    d.nome,
+                    p.texto,
+                    r.valor
+                FROM respostas_diagnostico r
+                JOIN perguntas p ON p.id = r.pergunta_id
+                JOIN dimensoes d ON d.id = p.dimensao_id
+                WHERE r.diagnostico_id = %s
+                  AND p.ativa = TRUE
+                ORDER BY d.ordem, p.ordem
+                """,
+                (diagnostico_id,),
+            )
+
+            return [
+                {
+                    "dimensao": linha[0],
+                    "pergunta": linha[1],
+                    "resposta": niveis_resposta[linha[2]],
+                    "valor": linha[2],
+                }
+                for linha in cursor.fetchall()
+            ]
+
+
+def buscar_recomendacoes_ia(
+    empresa_id: int,
+    diagnostico_id: int,
+) -> dict | None:
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    conteudo,
+                    modelo,
+                    gerado_em,
+                    atualizado_em
+                FROM recomendacoes_ia
+                WHERE empresa_id = %s
+                  AND diagnostico_id = %s
+                """,
+                (empresa_id, diagnostico_id),
+            )
+
+            registro = cursor.fetchone()
+
+    if registro is None:
+        return None
+
+    recomendacoes = RecomendacoesPersonalizadas.model_validate(registro[0])
+
+    return {
+        "recomendacoes": recomendacoes.model_dump(),
+        "modelo": registro[1],
+        "gerado_em": registro[2],
+        "atualizado_em": registro[3],
+    }
+
+
+def montar_prompt_recomendacoes(
+    respostas: list[dict],
+) -> str:
+    respostas_json = json.dumps(
+        respostas,
+        ensure_ascii=False,
+        indent=2,
+    )
+
+    return f"""
+Eres un consultor de sostenibilidad para pequeñas empresas.
+
+Analiza exclusivamente las respuestas del diagnóstico proporcionadas abajo.
+Genera recomendaciones prácticas, realistas, de bajo o medio costo y adaptadas
+a la situación identificada.
+
+Reglas:
+- Responde en español.
+- Genera entre 4 y 8 tareas.
+- Incluye al menos una tarea para cada dimensión: Ambiental, Social,
+  Económica y Gobernanza.
+- Da prioridad a las respuestas con valor 0 o 1.
+- No inventes datos, normas, certificaciones ni obligaciones legales.
+- No des asesoramiento médico, jurídico o financiero profesional.
+- Las tareas deben ser concretas, ejecutables y comprensibles.
+- El campo "aviso" debe indicar que las recomendaciones son orientativas y
+  deben ser adaptadas por la empresa a su contexto.
+- Devuelve únicamente contenido compatible con el esquema JSON solicitado.
+
+Respuestas del diagnóstico:
+{respostas_json}
+""".strip()
+
+
+def gerar_recomendacoes_com_gemini(
+    respostas: list[dict],
+) -> RecomendacoesPersonalizadas:
+    if not GEMINI_API_KEY:
+        raise RuntimeError("GEMINI_API_KEY não foi definida.")
+
+    cliente = genai.Client(api_key=GEMINI_API_KEY)
+
+    interacao = cliente.interactions.create(
+        model=GEMINI_MODEL,
+        input=montar_prompt_recomendacoes(respostas),
+        response_format={
+            "type": "text",
+            "mime_type": "application/json",
+            "schema": RecomendacoesPersonalizadas.model_json_schema(),
+        },
+        store=False,
+    )
+
+    if not interacao.output_text:
+        raise ValueError("O Gemini não retornou recomendações.")
+
+    return RecomendacoesPersonalizadas.model_validate_json(
+        interacao.output_text,
+    )
+
 
 
 @asynccontextmanager
@@ -1497,4 +1672,135 @@ def reiniciar_diagnostico(request: Request):
             "id": novo_diagnostico[0],
             "status": novo_diagnostico[1],
         },
+    }
+    
+    
+    
+@app.get(
+    "/api/rota-sustentavel/recomendacoes",
+    include_in_schema=False,
+)
+def obter_recomendacoes_ia(request: Request):
+    empresa_id = request.session.get("empresa_id")
+
+    if not empresa_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Inicia sesión para acceder a las recomendaciones.",
+        )
+
+    diagnostico = buscar_ultimo_diagnostico_concluido(empresa_id)
+
+    if diagnostico is None:
+        return {
+            "disponivel": False,
+            "motivo": "Aún no hay un diagnóstico completado.",
+            "recomendacoes": None,
+        }
+
+    diagnostico_id, _ = diagnostico
+
+    recomendacoes = buscar_recomendacoes_ia(
+        empresa_id,
+        diagnostico_id,
+    )
+
+    return {
+        "disponivel": recomendacoes is not None,
+        "diagnostico_id": diagnostico_id,
+        **(recomendacoes or {"recomendacoes": None}),
+    }
+
+
+@app.post(
+    "/api/rota-sustentavel/gerar",
+    include_in_schema=False,
+)
+def gerar_recomendacoes_ia(request: Request):
+    empresa_id = request.session.get("empresa_id")
+
+    if not empresa_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Inicia sesión para generar recomendaciones.",
+        )
+
+    diagnostico = buscar_ultimo_diagnostico_concluido(empresa_id)
+
+    if diagnostico is None:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "Completa el diagnóstico antes de generar "
+                "recomendaciones personalizadas."
+            ),
+        )
+
+    diagnostico_id, _ = diagnostico
+
+    recomendacoes_existentes = buscar_recomendacoes_ia(
+        empresa_id,
+        diagnostico_id,
+    )
+
+    if recomendacoes_existentes is not None:
+        return {
+            "geradas_agora": False,
+            "diagnostico_id": diagnostico_id,
+            **recomendacoes_existentes,
+        }
+
+    respostas = carregar_respostas_para_recomendacoes(diagnostico_id)
+
+    try:
+        recomendacoes = gerar_recomendacoes_com_gemini(respostas)
+    except Exception as erro:
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "No se pudieron generar las recomendaciones en este momento. "
+                "Inténtalo nuevamente."
+            ),
+        ) from erro
+
+    conteudo = recomendacoes.model_dump(mode="json")
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO recomendacoes_ia (
+                    empresa_id,
+                    diagnostico_id,
+                    conteudo,
+                    modelo,
+                    versao_prompt
+                )
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (diagnostico_id)
+                DO UPDATE SET
+                    conteudo = EXCLUDED.conteudo,
+                    modelo = EXCLUDED.modelo,
+                    versao_prompt = EXCLUDED.versao_prompt,
+                    atualizado_em = CURRENT_TIMESTAMP
+                RETURNING gerado_em, atualizado_em
+                """,
+                (
+                    empresa_id,
+                    diagnostico_id,
+                    psycopg.types.json.Jsonb(conteudo),
+                    GEMINI_MODEL,
+                    GEMINI_PROMPT_VERSION,
+                ),
+            )
+
+            datas = cursor.fetchone()
+
+    return {
+        "geradas_agora": True,
+        "diagnostico_id": diagnostico_id,
+        "recomendacoes": conteudo,
+        "modelo": GEMINI_MODEL,
+        "gerado_em": datas[0],
+        "atualizado_em": datas[1],
     }

@@ -420,7 +420,7 @@ input {
   background: var(--forest-950);
 }
 
-/* Logo sem caixa branca */
+
 .sidebar-brand {
   display: flex;
   width: 100%;
@@ -436,10 +436,6 @@ input {
   height: 150px;
   object-fit: contain;
 
-  /*
-    Deixa o fundo branco da imagem invisível e converte a marca
-    em uma versão clara adequada para o fundo verde.
-  */
   filter: grayscale(1) invert(1);
   mix-blend-mode: screen;
 }
@@ -2682,4 +2678,31 @@ html[data-theme="dark"] .plan-storage-message {
     position: static;
     margin: 0 0 16px;
   }
+}
+
+
+.login-google {
+  margin-top: 1.2rem;
+}
+
+.login-google__divider {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+}
+
+.login-google__divider::before,
+.login-google__divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.login-google__button {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
 }

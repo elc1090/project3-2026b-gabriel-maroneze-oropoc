@@ -3,24 +3,71 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Acceso al sistema EcoAvanza" />
+    <meta
+      name="description"
+      content="Acceso al sistema EcoAvanza"
+    />
+    <meta
+      name="referrer"
+      content="no-referrer-when-downgrade"
+    />
     <title>Iniciar sesión | EcoAvanza</title>
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', path='images/favicon.svg') }}" />
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="{{ url_for('static', path='images/favicon.svg') }}"
+    />
+
     <script src="{{ url_for('static', path='js/theme.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}?v=3" />
-    <script src="{{ url_for('static', path='js/login.js') }}" defer></script>
+    <script
+      src="https://accounts.google.com/gsi/client"
+      async
+      defer
+    ></script>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/styles.css') }}?v=3"
+    />
+    <script
+      src="{{ url_for('static', path='js/login.js') }}"
+      defer
+    ></script>
   </head>
+
   <body class="login-page">
-    <button class="theme-toggle theme-toggle--floating" type="button" data-theme-toggle aria-pressed="true" aria-label="Activar tema claro">
-      <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z" />
+    <button
+      class="theme-toggle theme-toggle--floating"
+      type="button"
+      data-theme-toggle
+      aria-pressed="true"
+      aria-label="Activar tema claro"
+    >
+      <svg
+        class="theme-toggle__moon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z"
+        />
       </svg>
-      <svg class="theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true">
+
+      <svg
+        class="theme-toggle__sun"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
         <circle cx="12" cy="12" r="4" />
-        <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+        <path
+          d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"
+        />
       </svg>
+
       <span data-theme-toggle-label>Tema claro</span>
     </button>
+
     <main class="login-shell">
       <section class="login-visual" aria-hidden="true">
         <div class="login-visual__shade"></div>
@@ -44,10 +91,14 @@
           <form class="login-form" action="/login" method="post" novalidate>
             <div class="field">
               <label for="email">Correo electrónico</label>
+
               <div class="field__control">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0" />
+                  <path
+                    d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0"
+                  />
                 </svg>
+
                 <input
                   id="email"
                   name="email"
@@ -65,11 +116,13 @@
 
             <div class="field">
               <label for="senha">Contraseña</label>
+
               <div class="field__control">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <rect x="5" y="10" width="14" height="10" rx="2" />
                   <path d="M8 10V7a4 4 0 0 1 8 0v3" />
                 </svg>
+
                 <input
                   id="senha"
                   name="senha"
@@ -77,6 +130,7 @@
                   autocomplete="current-password"
                   required
                 />
+
                 <button
                   class="password-toggle"
                   type="button"
@@ -85,7 +139,9 @@
                   aria-pressed="false"
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                    <path
+                      d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+                    />
                     <circle cx="12" cy="12" r="2.5" />
                   </svg>
                 </button>
@@ -94,8 +150,40 @@
 
             <p class="form-error" role="alert">{{ erro or "" }}</p>
 
-            <button class="primary-button" type="submit">Entrar</button>
+            <button class="primary-button" type="submit">
+              Entrar
+            </button>
           </form>
+
+          {% if google_client_id %}
+          <section class="login-google" aria-label="Acceso con Google">
+            <div class="login-google__divider" aria-hidden="true">
+              <span>o</span>
+            </div>
+
+            <div
+              id="g_id_onload"
+              data-client_id="{{ google_client_id }}"
+              data-login_uri="{{ request.url_for('realizar_login_google') }}"
+              data-ux_mode="redirect"
+              data-auto_prompt="false"
+            ></div>
+
+            <div class="login-google__button">
+              <div
+                class="g_id_signin"
+                data-type="standard"
+                data-theme="outline"
+                data-size="large"
+                data-text="signin_with"
+                data-shape="rectangular"
+                data-logo_alignment="left"
+                data-width="250"
+              ></div>
+            </div>
+          </section>
+          {% endif %}
+
           <p class="account-link">
             ¿Aún no tienes una cuenta?
             <a href="/cadastro">Crear cuenta</a>

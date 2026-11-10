@@ -13,3 +13,5 @@ INITIAL_ADMIN_PASSWORD=troque-por-uma-senha-forte
 
 PGADMIN_DEFAULT_EMAIL=admin@local.dev
 PGADMIN_DEFAULT_PASSWORD=troque-por-outra-senha-forte
+
+GOOGLE_CLIENT_ID=

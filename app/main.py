@@ -1,4 +1,5 @@
 import os
+import secrets
 from contextlib import asynccontextmanager
 from datetime import date
 from typing import Annotated, Literal
@@ -12,9 +13,15 @@ from pwdlib import PasswordHash
 from pydantic import BaseModel, EmailStr, Field, TypeAdapter, ValidationError
 from starlette.middleware.sessions import SessionMiddleware
 
+from google.auth import exceptions as google_exceptions
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token as google_id_token
+
 
 password_hash = PasswordHash.recommended()
 DUMMY_HASH = password_hash.hash("senha-invalida-para-comparacao")
+
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "").strip()
 
 
 class ResiduoCreate(BaseModel):
@@ -97,6 +104,17 @@ def inicializar_banco() -> None:
                     nome VARCHAR(120) NOT NULL,
                     email_acesso VARCHAR(254) NOT NULL UNIQUE,
                     senha_hash TEXT NOT NULL
+                )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS logins_google (
+                    id BIGSERIAL PRIMARY KEY,
+                    empresa_id BIGINT NOT NULL
+                        REFERENCES empresas(id)
+                        ON DELETE CASCADE,
+                    google_sub TEXT NOT NULL UNIQUE,
+                    email_google VARCHAR(254) NOT NULL,
+                    criado_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
                 )
                 """,
                 """
@@ -324,6 +342,113 @@ def autenticar_empresa(email: str, senha: str) -> tuple[int, str] | None:
 def validar_email(email: str) -> str:
     email_validado = TypeAdapter(EmailStr).validate_python(email.strip())
     return str(email_validado).lower()
+
+
+def autenticar_empresa_google(credential: str) -> tuple[int, str] | None:
+    if not GOOGLE_CLIENT_ID:
+        raise RuntimeError("Define GOOGLE_CLIENT_ID no arquivo .env.")
+
+    try:
+        dados_google = google_id_token.verify_oauth2_token(
+            credential,
+            google_requests.Request(),
+            GOOGLE_CLIENT_ID,
+        )
+    except (ValueError, google_exceptions.GoogleAuthError):
+        return None
+
+    if dados_google.get("iss") not in {
+        "accounts.google.com",
+        "https://accounts.google.com",
+    }:
+        return None
+
+    google_sub = dados_google.get("sub")
+
+    if not isinstance(google_sub, str) or not google_sub:
+        return None
+
+    # Primeiro, procura um vínculo Google já existente.
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT e.id, e.nome
+                FROM logins_google lg
+                JOIN empresas e ON e.id = lg.empresa_id
+                WHERE lg.google_sub = %s
+                """,
+                (google_sub,),
+            )
+            empresa_vinculada = cursor.fetchone()
+
+    if empresa_vinculada is not None:
+        return empresa_vinculada[0], empresa_vinculada[1]
+
+    # No primeiro login, vincula a conta à empresa que possui o mesmo e-mail.
+    email_google = dados_google.get("email")
+    email_verificado = dados_google.get("email_verified") is True
+    dominio_workspace = dados_google.get("hd")
+
+    if not isinstance(email_google, str) or not email_verificado:
+        return None
+
+    try:
+        email_normalizado = validar_email(email_google)
+    except ValidationError:
+        return None
+
+    # Para o primeiro vínculo automático, aceita Gmail ou Google Workspace.
+    email_confiavel = email_normalizado.endswith("@gmail.com") or (
+        isinstance(dominio_workspace, str) and bool(dominio_workspace)
+    )
+
+    if not email_confiavel:
+        return None
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, nome
+                FROM empresas
+                WHERE LOWER(email_acesso) = %s
+                """,
+                (email_normalizado,),
+            )
+            empresa = cursor.fetchone()
+
+            if empresa is None:
+                return None
+
+            cursor.execute(
+                """
+                INSERT INTO logins_google (
+                    empresa_id,
+                    google_sub,
+                    email_google
+                )
+                VALUES (%s, %s, %s)
+                ON CONFLICT (google_sub) DO NOTHING
+                """,
+                (empresa[0], google_sub, email_normalizado),
+            )
+
+            cursor.execute(
+                """
+                SELECT e.id, e.nome
+                FROM logins_google lg
+                JOIN empresas e ON e.id = lg.empresa_id
+                WHERE lg.google_sub = %s
+                """,
+                (google_sub,),
+            )
+            empresa_vinculada = cursor.fetchone()
+
+    if empresa_vinculada is None:
+        return None
+
+    return empresa_vinculada[0], empresa_vinculada[1]
 
 
 def buscar_diagnostico_em_andamento(
@@ -620,6 +745,22 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
+def renderizar_erro_login(
+    request: Request,
+    erro: str,
+    status_code: int,
+):
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html",
+        context={
+            "erro": erro,
+            "email": "",
+            "google_client_id": GOOGLE_CLIENT_ID,
+        },
+        status_code=status_code,
+    )
+
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 def pagina_login(request: Request):
@@ -629,7 +770,11 @@ def pagina_login(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="login.html",
-        context={"erro": None, "email": ""},
+        context={
+            "erro": None, 
+            "email": "",
+            "google_client_id": GOOGLE_CLIENT_ID,
+            },
     )
 
 
@@ -727,8 +872,49 @@ def realizar_login(
             context={
                 "erro": "Correo electrónico o contraseña incorrectos.",
                 "email": email.strip(),
+                "google_client_id": GOOGLE_CLIENT_ID, 
             },
             status_code=401,
+        )
+
+    empresa_id, nome_empresa = autenticado
+
+    request.session.clear()
+    request.session["empresa_id"] = empresa_id
+    request.session["empresa_nome"] = nome_empresa
+
+    return RedirectResponse(url="/painel", status_code=303)
+
+@app.post(
+    "/auth/google",
+    response_class=HTMLResponse,
+    include_in_schema=False,
+)
+def realizar_login_google(
+    request: Request,
+    credential: Annotated[str, Form()],
+    g_csrf_token: Annotated[str | None, Form()] = None,
+):
+    csrf_cookie = request.cookies.get("g_csrf_token")
+
+    if (
+        not csrf_cookie
+        or not g_csrf_token
+        or not secrets.compare_digest(csrf_cookie, g_csrf_token)
+    ):
+        return renderizar_erro_login(
+            request,
+            "No se pudo validar la solicitud de Google. Inténtalo nuevamente.",
+            400,
+        )
+
+    autenticado = autenticar_empresa_google(credential)
+
+    if autenticado is None:
+        return renderizar_erro_login(
+            request,
+            "No fue posible iniciar sesión con esta cuenta de Google.",
+            401,
         )
 
     empresa_id, nome_empresa = autenticado

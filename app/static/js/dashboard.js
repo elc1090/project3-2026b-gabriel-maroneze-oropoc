@@ -179,6 +179,9 @@ let planActions = [];
 let activeTab = "actions";
 let planSaveQueue = Promise.resolve();
 
+let aiRecommendations = null;
+let aiRecommendationDiagnosticId = null;
+
 function showProfileMessage(message, isError = false) {
   profileMessage.textContent = message;
   profileMessage.classList.toggle("is-error", isError);
@@ -328,31 +331,59 @@ function setStorageMessage(message) {
   storageMessage.hidden = !message;
 }
 
+
 function normalizeSavedPlan(savedPlan) {
   if (!Array.isArray(savedPlan)) {
     throw new TypeError("El plan guardado no tiene un formato válido.");
   }
 
   const seen = new Set();
-  return savedPlan.filter((item) => {
-    if (
-      !item ||
-      !actionById.has(item.id) ||
-      seen.has(item.id) ||
-      !Object.hasOwn(statusLabels, item.status)
-    ) {
-      return false;
-    }
 
-    seen.add(item.id);
-    return true;
-  }).map((item) => ({
-    id: item.id,
-    status: item.status,
-    date: typeof item.date === "string" ? item.date : "",
-    notes: typeof item.notes === "string" ? item.notes : "",
-  }));
+  return savedPlan
+    .filter((item) => {
+      const isCatalogAction = actionById.has(item?.id);
+
+      const isAiAction =
+        item?.source === "ai" &&
+        /^ai-\d+-\d+$/.test(item.id) &&
+        typeof item.title === "string" &&
+        item.title.trim() &&
+        typeof item.description === "string" &&
+        item.description.trim() &&
+        typeof item.category === "string" &&
+        item.category.trim();
+
+      if (
+        !item ||
+        (!isCatalogAction && !isAiAction) ||
+        seen.has(item.id) ||
+        !Object.hasOwn(statusLabels, item.status)
+      ) {
+        return false;
+      }
+
+      seen.add(item.id);
+      return true;
+    })
+    .map((item) => {
+      const action = {
+        id: item.id,
+        status: item.status,
+        date: typeof item.date === "string" ? item.date : "",
+        notes: typeof item.notes === "string" ? item.notes : "",
+        source: item.source === "ai" ? "ai" : "catalog",
+      };
+
+      if (action.source === "ai") {
+        action.title = item.title;
+        action.description = item.description;
+        action.category = item.category;
+      }
+
+      return action;
+    });
 }
+
 
 function savePlan() {
   const actions = planActions.map((action) => ({ ...action }));
@@ -402,6 +433,20 @@ async function loadPlan() {
 function getPlanAction(actionId) {
   return planActions.find((item) => item.id === actionId);
 }
+
+
+function getActionDetails(planAction) {
+  if (planAction.source === "ai") {
+    return {
+      title: planAction.title,
+      description: planAction.description,
+      category: planAction.category,
+    };
+  }
+
+  return actionById.get(planAction.id);
+}
+
 
 function createElement(tagName, className, text) {
   const element = document.createElement(tagName);
@@ -518,12 +563,35 @@ function renderAiRecommendations(recommendations) {
       task.justificativa,
     );
 
+    const taskFooter = createElement("div", "ai-task__footer");
+    const taskId = `ai-${aiRecommendationDiagnosticId}-${index + 1}`;
+    const isAlreadyAdded = Boolean(getPlanAction(taskId));
+
+    const addToPlanButton = createElement(
+      "button",
+      "secondary-button ai-task__add",
+      isAlreadyAdded ? "Añadida al plan" : "Añadir al plan",
+    );
+
+    addToPlanButton.type = "button";
+    addToPlanButton.disabled =
+      isAlreadyAdded || !aiRecommendationDiagnosticId;
+
+    if (!isAlreadyAdded) {
+      addToPlanButton.addEventListener("click", () => {
+        void addAiTaskToPlan(index);
+      });
+    }
+
+    taskFooter.append(addToPlanButton);
+
     taskCard.append(
       taskHeader,
       metadata,
       description,
       reasonTitle,
       reason,
+      taskFooter,
     );
 
     taskList.append(taskCard);
@@ -566,6 +634,8 @@ async function loadAiRecommendations() {
     }
 
     if (data.recomendacoes) {
+      aiRecommendationDiagnosticId = data.diagnostico_id ?? null;
+      aiRecommendations = data.recomendacoes;
       renderAiRecommendations(data.recomendacoes);
 
       setAiRecommendationsButtonState({
@@ -580,6 +650,8 @@ async function loadAiRecommendations() {
       return;
     }
 
+    aiRecommendationDiagnosticId = null;
+    aiRecommendations = null;
     renderAiRecommendations(null);
 
     if (!data.diagnostico_id) {
@@ -657,6 +729,8 @@ async function generateAiRecommendations() {
       );
     }
 
+    aiRecommendationDiagnosticId = data.diagnostico_id ?? null;
+    aiRecommendations = data.recomendacoes;
     renderAiRecommendations(data.recomendacoes);
 
     setAiRecommendationsButtonState({
@@ -684,6 +758,59 @@ async function generateAiRecommendations() {
     );
   }
 }
+
+
+async function addAiTaskToPlan(taskIndex) {
+  try {
+    const response = await fetch(
+      "/api/rota-sustentavel/recomendacoes/adicionar-ao-plano",
+      {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          indice: taskIndex,
+        }),
+      },
+    );
+
+    if (response.status === 401) {
+      window.location.assign("/");
+      return;
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail ?? "No se pudo añadir la tarea al plan.",
+      );
+    }
+
+    planActions = normalizeSavedPlan(data.actions);
+    renderPlan();
+
+    if (aiRecommendations) {
+      renderAiRecommendations(aiRecommendations);
+    }
+
+    setAiRecommendationsStatus(
+      data.adicionada
+        ? "La tarea se añadió al plan. Ahora puedes programarla en la agenda."
+        : "Esta tarea ya estaba añadida al plan.",
+    );
+  } catch (error) {
+    console.error("No se pudo añadir la tarea al plan.", error);
+
+    setAiRecommendationsStatus(
+      error.message ?? "No se pudo añadir la tarea al plan.",
+      true,
+    );
+  }
+}
+
 
 function updateCounts() {
   const pendingCount = planActions.filter((item) => item.status === "awaiting").length;
@@ -782,7 +909,7 @@ function renderAgenda() {
     );
 
     pendingActions.forEach((planAction) => {
-      const action = actionById.get(planAction.id);
+      const action = getActionDetails(planAction);
       const card = createElement("article", "agenda-card");
       const details = createElement("div", "agenda-card__details");
       const category = createElement("p", "agenda-card__category", action.category);
@@ -835,7 +962,7 @@ function renderAgenda() {
       .slice()
       .sort((first, second) => first.date.localeCompare(second.date))
       .forEach((planAction) => {
-        const action = actionById.get(planAction.id);
+        const action = getActionDetails(planAction);
         const card = createElement("article", "agenda-card agenda-card--scheduled");
         const details = createElement("div", "agenda-card__details");
         const category = createElement("p", "agenda-card__category", action.category);
@@ -975,7 +1102,7 @@ function renderOverview() {
       list.append(createElement("p", "plan-empty", "No hay acciones en esta etapa."));
     } else {
       matchingActions.forEach((planAction) => {
-        const action = actionById.get(planAction.id);
+        const action = getActionDetails(planAction);
         const item = createElement("article", "overview-action");
         const title = createElement("h4", "overview-action__title", action.title);
         const category = createElement("p", "overview-action__category", action.category);
@@ -1068,10 +1195,14 @@ if (companyProfileForm) {
 if (sustainabilityPage && actionCatalog) {
   void loadPlan().then(() => {
     renderPlan();
+
+    if (aiRecommendations) {
+      renderAiRecommendations(aiRecommendations);
+    }
+
     showTab(activeTab);
   });
 }
-
 
 
 if (aiRecommendationsButton) {

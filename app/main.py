@@ -50,15 +50,25 @@ class PerfilEmpresaUpdate(BaseModel):
     sector: str = Field(min_length=2, max_length=100)
 
 
+
 class PlanoAcao(BaseModel):
     id: str = Field(min_length=1, max_length=80)
     status: Literal["awaiting", "in_progress", "implemented"]
     date: str = Field(default="", max_length=10)
     notes: str = Field(default="", max_length=160)
 
+    source: Literal["catalog", "ai"] = "catalog"
+    title: str | None = Field(default=None, max_length=100)
+    description: str | None = Field(default=None, max_length=500)
+    category: str | None = Field(default=None, max_length=30)
+
 
 class PlanoSustentavelUpdate(BaseModel):
     actions: list[PlanoAcao] = Field(max_length=100)
+
+
+class AdicionarTarefaIAAoPlano(BaseModel):
+    indice: int = Field(ge=0, le=7)
 
 
 PLANO_ACTION_IDS = frozenset(
@@ -77,6 +87,47 @@ PLANO_ACTION_IDS = frozenset(
         "purchase-planning",
     }
 )
+
+
+def validar_acao_plano(acao: dict) -> None:
+    if acao["source"] == "catalog":
+        if acao["id"] not in PLANO_ACTION_IDS:
+            raise HTTPException(
+                status_code=422,
+                detail="El plan contiene una acción desconocida.",
+            )
+    else:
+        if not acao["id"].startswith("ai-"):
+            raise HTTPException(
+                status_code=422,
+                detail="La tarea personalizada tiene un identificador inválido.",
+            )
+
+        campos_obrigatorios = ("title", "description", "category")
+
+        if not all(
+            isinstance(acao.get(campo), str) and acao[campo].strip()
+            for campo in campos_obrigatorios
+        ):
+            raise HTTPException(
+                status_code=422,
+                detail="La tarea personalizada está incompleta.",
+            )
+
+    if acao["status"] == "in_progress" and not acao["date"]:
+        raise HTTPException(
+            status_code=422,
+            detail="Programa una fecha para cada acción en curso.",
+        )
+
+    if acao["date"]:
+        try:
+            date.fromisoformat(acao["date"])
+        except ValueError as error:
+            raise HTTPException(
+                status_code=422,
+                detail="Usa una fecha válida con el formato AAAA-MM-DD.",
+            ) from error
 
 
 class TarefaPersonalizada(BaseModel):
@@ -1273,17 +1324,10 @@ def salvar_plano(plano: PlanoSustentavelUpdate, request: Request):
     acoes = [acao.model_dump() for acao in plano.actions]
     if len({acao["id"] for acao in acoes}) != len(acoes):
         raise HTTPException(status_code=422, detail="El plan contiene acciones duplicadas.")
+    
     for acao in acoes:
-        if acao["id"] not in PLANO_ACTION_IDS:
-            raise HTTPException(status_code=422, detail="El plan contiene una acción desconocida.")
-        if acao["status"] == "in_progress" and not acao["date"]:
-            raise HTTPException(status_code=422, detail="Programa una fecha para cada acción en curso.")
-        if acao["date"]:
-            try:
-                date.fromisoformat(acao["date"])
-            except ValueError as error:
-                raise HTTPException(status_code=422, detail="Usa una fecha válida con el formato AAAA-MM-DD.") from error
-
+        validar_acao_plano(acao)
+    
     with abrir_conexao() as conexao:
         with conexao.cursor() as cursor:
             cursor.execute(
@@ -1803,4 +1847,123 @@ def gerar_recomendacoes_ia(request: Request):
         "modelo": GEMINI_MODEL,
         "gerado_em": datas[0],
         "atualizado_em": datas[1],
+    }
+    
+@app.post(
+    "/api/rota-sustentavel/recomendacoes/adicionar-ao-plano",
+    include_in_schema=False,
+)
+def adicionar_tarefa_ia_ao_plano(
+    dados: AdicionarTarefaIAAoPlano,
+    request: Request,
+):
+    empresa_id = request.session.get("empresa_id")
+
+    if not empresa_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Inicia sesión para actualizar el plan.",
+        )
+
+    diagnostico = buscar_ultimo_diagnostico_concluido(empresa_id)
+
+    if diagnostico is None:
+        raise HTTPException(
+            status_code=409,
+            detail="Completa el diagnóstico antes de añadir tareas al plan.",
+        )
+
+    diagnostico_id, _ = diagnostico
+
+    recomendacoes_salvas = buscar_recomendacoes_ia(
+        empresa_id,
+        diagnostico_id,
+    )
+
+    if recomendacoes_salvas is None:
+        raise HTTPException(
+            status_code=409,
+            detail="Genera las recomendaciones personalizadas antes de añadirlas al plan.",
+        )
+
+    tarefas = recomendacoes_salvas["recomendacoes"]["tarefas"]
+
+    if dados.indice >= len(tarefas):
+        raise HTTPException(
+            status_code=422,
+            detail="La tarea seleccionada no existe.",
+        )
+
+    tarefa = tarefas[dados.indice]
+    tarefa_id = f"ai-{diagnostico_id}-{dados.indice + 1}"
+
+    nova_acao = {
+        "id": tarefa_id,
+        "status": "awaiting",
+        "date": "",
+        "notes": "",
+        "source": "ai",
+        "title": tarefa["titulo"],
+        "description": tarefa["descricao"],
+        "category": tarefa["dimensao"],
+    }
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT acoes
+                FROM planos_sustentaveis
+                WHERE empresa_id = %s
+                FOR UPDATE
+                """,
+                (empresa_id,),
+            )
+
+            registro = cursor.fetchone()
+            acoes = (
+                registro[0]
+                if registro is not None and isinstance(registro[0], list)
+                else []
+            )
+
+            acao_existente = next(
+                (
+                    acao
+                    for acao in acoes
+                    if isinstance(acao, dict) and acao.get("id") == tarefa_id
+                ),
+                None,
+            )
+
+            if acao_existente is not None:
+                return {
+                    "adicionada": False,
+                    "mensagem": "Esta tarea ya está en el plan.",
+                    "action": acao_existente,
+                    "actions": acoes,
+                }
+
+            acoes.append(nova_acao)
+
+            cursor.execute(
+                """
+                INSERT INTO planos_sustentaveis (empresa_id, acoes)
+                VALUES (%s, %s)
+                ON CONFLICT (empresa_id)
+                DO UPDATE SET
+                    acoes = EXCLUDED.acoes,
+                    atualizado_em = CURRENT_TIMESTAMP
+                """,
+                (
+                    empresa_id,
+                    psycopg.types.json.Jsonb(acoes),
+                ),
+            )
+
+    return {
+        "adicionada": True,
+        "mensagem": "La tarea se añadió al plan correctamente.",
+        "action": nova_acao,
+        "actions": acoes,
     }

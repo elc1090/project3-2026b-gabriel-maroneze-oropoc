@@ -2930,3 +2930,28 @@ html[data-theme="dark"] .plan-storage-message {
   justify-content: center;
   margin-top: 1rem;
 }
+
+
+.ai-task__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e5ece1;
+}
+
+.ai-task__add {
+  min-height: 38px;
+  padding: 8px 13px;
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.ai-task__add:disabled {
+  cursor: default;
+  opacity: 0.68;
+}
+
+html[data-theme="dark"] .ai-task__footer {
+  border-color: var(--line);
+}

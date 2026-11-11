@@ -1193,6 +1193,230 @@ input {
   line-height: 1.5;
 }
 
+
+.ai-recommendations {
+  margin: 0 0 26px;
+  padding: clamp(18px, 2.5vw, 26px);
+  background: #f5f9f2;
+  border: 1px solid #d9e6d3;
+  border-radius: 14px;
+}
+
+.ai-recommendations__top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.ai-recommendations__top h3 {
+  margin: 0;
+  color: var(--forest-950);
+  font-size: 1.2rem;
+  letter-spacing: -0.025em;
+}
+
+.ai-recommendations__top > div > p:last-child {
+  max-width: 650px;
+  margin: 8px 0 0;
+  color: var(--ink-700);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.ai-recommendations__generate {
+  min-height: 46px;
+  flex: none;
+  white-space: nowrap;
+}
+
+.ai-recommendations__generate:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.ai-recommendations__status {
+  margin: 18px 0 0;
+  padding: 11px 13px;
+  color: #315f31;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  background: #e8f2e4;
+  border: 1px solid #cde1c5;
+  border-radius: 10px;
+}
+
+.ai-recommendations__status.is-error {
+  color: #8d2019;
+  background: #fff1f0;
+  border-color: #f0c3bf;
+}
+
+.ai-recommendations__results {
+  display: grid;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.ai-recommendations__summary {
+  margin: 0;
+  color: var(--ink-700);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.ai-task-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ai-task {
+  padding: 17px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--forest-700);
+  border-radius: 12px;
+}
+
+.ai-task--media {
+  border-left-color: #be8b27;
+}
+
+.ai-task--baixa {
+  border-left-color: #6c9a66;
+}
+
+.ai-task__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-task__number {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  place-items: center;
+  color: var(--forest-800);
+  font-size: 0.78rem;
+  font-weight: 800;
+  background: var(--sage-100);
+  border-radius: 50%;
+}
+
+.ai-task__title {
+  margin: 0;
+  color: var(--forest-950);
+  font-size: 0.98rem;
+  line-height: 1.35;
+}
+
+.ai-task__metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 13px 0;
+}
+
+.ai-task__tag,
+.ai-task__priority,
+.ai-task__deadline {
+  padding: 5px 8px;
+  color: var(--ink-700);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  background: #f3f6f1;
+  border-radius: 999px;
+}
+
+.ai-task__priority--alta {
+  color: #842820;
+  background: #fff0ef;
+}
+
+.ai-task__priority--media {
+  color: #76530b;
+  background: #fff7df;
+}
+
+.ai-task__priority--baixa {
+  color: #356b37;
+  background: #eaf4e6;
+}
+
+.ai-task__description,
+.ai-task__reason {
+  margin: 0;
+  color: var(--ink-700);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.ai-task__reason-title {
+  display: block;
+  margin: 14px 0 4px;
+  color: var(--forest-900);
+  font-size: 0.82rem;
+}
+
+.ai-recommendations__notice {
+  margin: 0;
+  padding-top: 15px;
+  color: var(--ink-500);
+  font-size: 0.8rem;
+  font-style: italic;
+  line-height: 1.5;
+  border-top: 1px solid #dce7d8;
+}
+
+html[data-theme="dark"] .ai-recommendations {
+  background: #202d22;
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .ai-task {
+  background: var(--surface-raised);
+  border-color: var(--line);
+  border-left-color: #82b375;
+}
+
+html[data-theme="dark"] .ai-recommendations__status {
+  color: #c7e4c3;
+  background: #263a2a;
+  border-color: #405d45;
+}
+
+html[data-theme="dark"] .ai-recommendations__status.is-error {
+  color: #ffc1bb;
+  background: #422521;
+  border-color: #6e3932;
+}
+
+html[data-theme="dark"] .ai-task__tag,
+html[data-theme="dark"] .ai-task__priority,
+html[data-theme="dark"] .ai-task__deadline {
+  background: var(--surface-muted);
+}
+
+@media (max-width: 760px) {
+  .ai-recommendations__top {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ai-recommendations__generate {
+    width: 100%;
+  }
+
+  .ai-task-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 .plan-step__footer {
   display: flex;
   justify-content: flex-end;

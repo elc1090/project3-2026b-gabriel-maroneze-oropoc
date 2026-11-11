@@ -17,7 +17,9 @@ const agendaList = document.querySelector("[data-agenda-list]");
 const overviewGroups = document.querySelector("[data-overview-groups]");
 const statusSummary = document.querySelector("[data-status-summary]");
 const storageMessage = document.querySelector("[data-storage-message]");
-
+const aiRecommendationsButton = document.querySelector("[data-generate-ai-recommendations]",);
+const aiRecommendationsStatus = document.querySelector("[data-ai-recommendations-status]",);
+const aiRecommendationsResults = document.querySelector( "[data-ai-recommendations-results]",);
 
 
 const actionCategories = [
@@ -412,6 +414,277 @@ function createElement(tagName, className, text) {
   return element;
 }
 
+function setAiRecommendationsStatus(message, isError = false) {
+  if (!aiRecommendationsStatus) {
+    return;
+  }
+
+  aiRecommendationsStatus.textContent = message;
+  aiRecommendationsStatus.classList.toggle("is-error", isError);
+  aiRecommendationsStatus.hidden = !message;
+}
+
+function setAiRecommendationsButtonState({
+  disabled,
+  label,
+} = {}) {
+  if (!aiRecommendationsButton) {
+    return;
+  }
+
+  aiRecommendationsButton.disabled = Boolean(disabled);
+
+  if (label) {
+    aiRecommendationsButton.textContent = label;
+  }
+}
+
+function formatPriority(priority) {
+  const labels = {
+    alta: "Prioridad alta",
+    media: "Prioridad media",
+    baixa: "Prioridad baja",
+  };
+
+  return labels[priority] ?? "Prioridad no definida";
+}
+
+function renderAiRecommendations(recommendations) {
+  if (!aiRecommendationsResults) {
+    return;
+  }
+
+  aiRecommendationsResults.replaceChildren();
+
+  if (!recommendations) {
+    aiRecommendationsResults.hidden = true;
+    return;
+  }
+
+  const summary = createElement(
+    "p",
+    "ai-recommendations__summary",
+    recommendations.resumo_geral,
+  );
+
+  const taskList = createElement("div", "ai-task-list");
+
+  recommendations.tarefas.forEach((task, index) => {
+    const taskCard = createElement(
+      "article",
+      `ai-task ai-task--${task.prioridade}`,
+    );
+
+    const taskHeader = createElement("div", "ai-task__header");
+    const taskNumber = createElement(
+      "span",
+      "ai-task__number",
+      String(index + 1),
+    );
+    const taskTitle = createElement("h4", "ai-task__title", task.titulo);
+
+    taskHeader.append(taskNumber, taskTitle);
+
+    const metadata = createElement("div", "ai-task__metadata");
+    metadata.append(
+      createElement("span", "ai-task__tag", task.dimensao),
+      createElement(
+        "span",
+        `ai-task__priority ai-task__priority--${task.prioridade}`,
+        formatPriority(task.prioridade),
+      ),
+      createElement(
+        "span",
+        "ai-task__deadline",
+        `${task.prazo_sugerido_dias} días sugeridos`,
+      ),
+    );
+
+    const description = createElement(
+      "p",
+      "ai-task__description",
+      task.descricao,
+    );
+
+    const reasonTitle = createElement(
+      "strong",
+      "ai-task__reason-title",
+      "¿Por qué esta tarea?",
+    );
+
+    const reason = createElement(
+      "p",
+      "ai-task__reason",
+      task.justificativa,
+    );
+
+    taskCard.append(
+      taskHeader,
+      metadata,
+      description,
+      reasonTitle,
+      reason,
+    );
+
+    taskList.append(taskCard);
+  });
+
+  const notice = createElement(
+    "p",
+    "ai-recommendations__notice",
+    recommendations.aviso,
+  );
+
+  aiRecommendationsResults.append(summary, taskList, notice);
+  aiRecommendationsResults.hidden = false;
+}
+
+async function loadAiRecommendations() {
+  if (!aiRecommendationsButton) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "/api/rota-sustentavel/recomendacoes",
+      {
+        credentials: "same-origin",
+      },
+    );
+
+    if (response.status === 401) {
+      window.location.assign("/");
+      return;
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail ?? "No se pudieron cargar las recomendaciones.",
+      );
+    }
+
+    if (data.recomendacoes) {
+      renderAiRecommendations(data.recomendacoes);
+
+      setAiRecommendationsButtonState({
+        disabled: true,
+        label: "Tareas personalizadas generadas",
+      });
+
+      setAiRecommendationsStatus(
+        "Estas recomendaciones se guardaron para el diagnóstico actual.",
+      );
+
+      return;
+    }
+
+    renderAiRecommendations(null);
+
+    if (!data.diagnostico_id) {
+      setAiRecommendationsButtonState({
+        disabled: true,
+        label: "Completa el diagnóstico primero",
+      });
+
+      setAiRecommendationsStatus(
+        data.motivo ??
+          "Completa el diagnóstico antes de generar tareas personalizadas.",
+        true,
+      );
+
+      return;
+    }
+
+    setAiRecommendationsButtonState({
+      disabled: false,
+      label: "Generar tareas personalizadas",
+    });
+
+    setAiRecommendationsStatus(
+      "Tu diagnóstico está listo. Genera tareas adaptadas a las respuestas de tu empresa.",
+    );
+  } catch (error) {
+    console.error("No se pudieron cargar las recomendaciones.", error);
+
+    setAiRecommendationsButtonState({
+      disabled: true,
+      label: "No disponible temporalmente",
+    });
+
+    setAiRecommendationsStatus(
+      error.message ??
+        "No se pudieron cargar las tareas personalizadas.",
+      true,
+    );
+  }
+}
+
+async function generateAiRecommendations() {
+  if (!aiRecommendationsButton) {
+    return;
+  }
+
+  setAiRecommendationsButtonState({
+    disabled: true,
+    label: "Generando tareas...",
+  });
+
+  setAiRecommendationsStatus(
+    "Analizando las respuestas del diagnóstico. Esto puede tardar unos segundos.",
+  );
+
+  try {
+    const response = await fetch(
+      "/api/rota-sustentavel/gerar",
+      {
+        method: "POST",
+        credentials: "same-origin",
+      },
+    );
+
+    if (response.status === 401) {
+      window.location.assign("/");
+      return;
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail ?? "No se pudieron generar las tareas.",
+      );
+    }
+
+    renderAiRecommendations(data.recomendacoes);
+
+    setAiRecommendationsButtonState({
+      disabled: true,
+      label: "Tareas personalizadas generadas",
+    });
+
+    setAiRecommendationsStatus(
+      data.geradas_agora
+        ? "Las tareas personalizadas se generaron y se guardaron correctamente."
+        : "Ya existían tareas personalizadas para este diagnóstico.",
+    );
+  } catch (error) {
+    console.error("No se pudieron generar las tareas.", error);
+
+    setAiRecommendationsButtonState({
+      disabled: false,
+      label: "Intentar nuevamente",
+    });
+
+    setAiRecommendationsStatus(
+      error.message ??
+        "No se pudieron generar las tareas en este momento.",
+      true,
+    );
+  }
+}
+
 function updateCounts() {
   const pendingCount = planActions.filter((item) => item.status === "awaiting").length;
   const scheduledCount = planActions.filter((item) => item.status === "in_progress").length;
@@ -798,6 +1071,18 @@ if (sustainabilityPage && actionCatalog) {
     showTab(activeTab);
   });
 }
+
+
+
+if (aiRecommendationsButton) {
+  aiRecommendationsButton.addEventListener(
+    "click",
+    generateAiRecommendations,
+  );
+
+  void loadAiRecommendations();
+}
+
 
 void loadDiagnosticResults();
 window.addEventListener("hashchange", updateActiveNavigation);

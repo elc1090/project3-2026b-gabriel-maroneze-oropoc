@@ -21,6 +21,9 @@ import json
 from google import genai
 
 
+
+
+
 password_hash = PasswordHash.recommended()
 DUMMY_HASH = password_hash.hash("senha-invalida-para-comparacao")
 

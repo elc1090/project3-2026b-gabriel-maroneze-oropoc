@@ -1,7 +1,7 @@
 import os
 import secrets
 from contextlib import asynccontextmanager
-from datetime import date
+from datetime import date, time
 from typing import Annotated, Literal
 
 import psycopg
@@ -1969,4 +1969,305 @@ def adicionar_tarefa_ia_ao_plano(
         "mensagem": "La tarea se añadió al plan correctamente.",
         "action": nova_acao,
         "actions": acoes,
+    }
+    
+    
+    
+class PontoColetaCreate(BaseModel):
+    nome: str = Field(min_length=2, max_length=150)
+    endereco: str = Field(min_length=5, max_length=255)
+
+    latitude: float = Field(ge=-90, le=90)
+    longitude: float = Field(ge=-180, le=180)
+    
+    horario_abertura: time | None = None
+    horario_fechamento: time | None = None
+    horario_descripcion: str | None = Field(default=None, max_length=255)
+
+    numero_contato: str | None = Field(default=None, max_length=30)
+    operador: str | None = Field(default=None, max_length=150)
+    descricao: str | None = Field(default=None, max_length=1000)
+
+    materiais_ids: list[int] = Field(min_length=1, max_length=20)
+    
+    
+class MaterialPontoRead(BaseModel):
+    id: int
+    nome: str
+
+
+class PontoColetaRead(BaseModel):
+    id: int
+    nome: str
+    endereco: str
+    latitude: float
+    longitude: float
+    horario_abertura: time | None
+    horario_fechamento: time | None
+    horario_descripcion: str | None
+    numero_contato: str | None
+    operador: str | None
+    descricao: str | None
+    materiais: list[MaterialPontoRead] = Field(default_factory=list)
+
+
+class ListaPontosColetaRead(BaseModel):
+    pontos: list[PontoColetaRead]
+    
+@app.get("/pontos", response_class=HTMLResponse, include_in_schema=False)
+def pagina_pontos(request: Request):
+    # 🛡️ Apenas empresas com sessão ativa podem acessar o mapa.
+    if not request.session.get("empresa_id"):
+        return RedirectResponse(url="/", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="pontos.html",
+        context={
+            "empresa": request.session.get("empresa_nome"),
+        },
+    )
+
+
+@app.get("/api/materiais", include_in_schema=False)
+def listar_materiais(request: Request):
+
+    if not request.session.get("empresa_id"):
+        raise HTTPException(
+            status_code=401,
+            detail="Inicia sesión para consultar los materiales.",
+        )
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, nome
+                FROM materiais
+                ORDER BY nome;
+                """
+            )
+
+            materiais = cursor.fetchall()
+
+    return {
+        "materiais": [
+            {
+                "id": material[0],
+                "nome": material[1],
+            }
+            for material in materiais
+        ]
+    }
+    
+    
+@app.get("/api/pontos", response_model=ListaPontosColetaRead, include_in_schema=False)
+def listar_pontos_coleta(request: Request):
+    if not request.session.get("empresa_id"):
+        raise HTTPException(
+            status_code=401,
+            detail="Inicia sesión para consultar los puntos de recogida.",
+        )
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    p.id,
+                    p.nome,
+                    p.endereco,
+                    p.latitude,
+                    p.longitude,
+                    p.horario_abertura,
+                    p.horario_fechamento,
+                    p.horario_descripcion,
+                    p.numero_contato,
+                    p.operador,
+                    p.descricao,
+                    COALESCE(
+                        jsonb_agg(
+                            jsonb_build_object(
+                                'id', m.id,
+                                'nome', m.nome
+                            )
+                            ORDER BY m.nome
+                        ) FILTER (WHERE m.id IS NOT NULL),
+                        '[]'::jsonb
+                    ) AS materiais
+                FROM pontos_coleta AS p
+                LEFT JOIN ponto_material AS pm
+                    ON pm.ponto_id = p.id
+                LEFT JOIN materiais AS m
+                    ON m.id = pm.material_id
+                GROUP BY
+                    p.id,
+                    p.nome,
+                    p.endereco,
+                    p.latitude,
+                    p.longitude,
+                    p.horario_abertura,
+                    p.horario_fechamento,
+                    p.horario_descripcion,
+                    p.numero_contato,
+                    p.operador,
+                    p.descricao
+                ORDER BY p.nome;
+                """
+            )
+
+            registros = cursor.fetchall()
+
+    pontos = [
+        {
+            "id": registro[0],
+            "nome": registro[1],
+            "endereco": registro[2],
+            "latitude": registro[3],
+            "longitude": registro[4],
+            "horario_abertura": registro[5],
+            "horario_fechamento": registro[6],
+            "horario_descripcion": registro[7],
+            "numero_contato": registro[8],
+            "operador": registro[9],
+            "descricao": registro[10],
+            "materiais": registro[11],
+        }
+        for registro in registros
+    ]
+
+    return {"pontos": pontos}
+
+@app.post("/api/pontos", status_code=201, include_in_schema=False)
+def cadastrar_ponto_coleta(
+    dados: PontoColetaCreate,
+    request: Request,
+):
+    if not request.session.get("empresa_id"):
+        raise HTTPException(
+            status_code=401,
+            detail="Inicia sesión para registrar un punto de recogida.",
+        )
+
+    materiais_ids = sorted(set(dados.materiais_ids))
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id
+                FROM materiais
+                WHERE id = ANY(%s);
+                """,
+                (materiais_ids,),
+            )
+
+            materiais_encontrados = {
+                registro[0]
+                for registro in cursor.fetchall()
+            }
+
+            materiais_invalidos = sorted(
+                set(materiais_ids) - materiais_encontrados
+            )
+
+            if materiais_invalidos:
+                raise HTTPException(
+                    status_code=422,
+                    detail={
+                        "mensagem": "Hay materiales no válidos.",
+                        "materiais_ids": materiais_invalidos,
+                    },
+                )
+
+            cursor.execute(
+                """
+                INSERT INTO pontos_coleta (
+                    nome,
+                    endereco,
+                    latitude,
+                    longitude,
+                    horario_abertura,
+                    horario_fechamento,
+                    horario_descripcion,
+                    numero_contato,
+                    operador,
+                    descricao
+                )
+                VALUES (
+                    %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s
+                )
+                RETURNING id;
+                """,
+                (
+                    dados.nome.strip(),
+                    dados.endereco.strip(),
+                    dados.latitude,
+                    dados.longitude,
+                    dados.horario_abertura,
+                    dados.horario_fechamento,
+                    dados.horario_descripcion,
+                    dados.numero_contato,
+                    dados.operador,
+                    dados.descricao,
+                ),
+            )
+
+            ponto_id = cursor.fetchone()[0]
+
+            cursor.executemany(
+                """
+                INSERT INTO ponto_material (ponto_id, material_id)
+                VALUES (%s, %s);
+                """,
+                [
+                    (ponto_id, material_id)
+                    for material_id in materiais_ids
+                ],
+            )
+
+    return {
+        "mensagem": "Punto de recogida registrado correctamente.",
+        "ponto_id": ponto_id,
+    }
+    
+    
+@app.delete("/api/pontos/{ponto_id}", include_in_schema=False)
+def excluir_ponto_coleta(
+    ponto_id: int,
+    request: Request,
+):
+    if not request.session.get("empresa_id"):
+        raise HTTPException(
+            status_code=401,
+            detail="Inicia sesión para eliminar un punto de recogida.",
+        )
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                DELETE FROM pontos_coleta
+                WHERE id = %s
+                RETURNING id, nome;
+                """,
+                (ponto_id,),
+            )
+
+            ponto_excluido = cursor.fetchone()
+
+    if ponto_excluido is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Punto de recogida no encontrado.",
+        )
+
+
+    return {
+        "mensagem": "Punto de recogida eliminado correctamente.",
+        "ponto": {
+            "id": ponto_excluido[0],
+            "nome": ponto_excluido[1],
+        },
     }

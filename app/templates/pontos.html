@@ -495,6 +495,76 @@
             </form>
           </section>
 
+                    <section
+            class="collection-filter-section"
+            aria-label="Controles de filtrado del listado"
+          >
+            <div class="collection-filter-dropdown" data-filter-dropdown>
+              <div class="collection-filter-dropdown__header">
+                <p class="quiz-panel__eyebrow">Filtro de búsqueda</p>
+                <h2 class="collection-filter-dropdown__title">
+                  Filtrar por materiales
+                </h2>
+              </div>
+              <button
+                id="btn-open-filter"
+                class="collection-filter__trigger"
+                type="button"
+                data-open-filter
+                aria-expanded="false"
+                aria-controls="collection-filter-panel"
+              >
+                <span data-filter-summary>Seleccionar materiales</span>
+                <svg
+                  class="collection-filter__chevron"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path d="m7 10 5 5 5-5" />
+                </svg>
+              </button>
+              <div
+                id="collection-filter-panel"
+                class="collection-filter__panel"
+                data-filter-panel
+              >
+                <div
+                  class="collection-filter__options"
+                  data-filter-options
+                  role="group"
+                  aria-label="Materiales disponibles"
+                >
+                  <p class="collection-materials__loading">
+                    Cargando materiales disponibles...
+                  </p>
+                </div>
+                <div class="collection-filter__actions">
+                  <button
+                    class="secondary-button"
+                    type="button"
+                    data-clear-filter
+                  >
+                    Limpiar
+                  </button>
+                  <button
+                    class="primary-button"
+                    type="button"
+                    data-apply-filter
+                  >
+                    Aplicar
+                  </button>
+                </div>
+              </div>
+            </div>
+            <button
+              class="secondary-button collection-filter__refresh"
+              type="button"
+              data-refresh-points
+            >
+              Actualizar puntos
+            </button>
+          </section>
+
           <section
             class="collection-map-section"
             aria-labelledby="collection-map-title"

@@ -159,6 +159,7 @@ class RespostaDiagnosticoUpdate(BaseModel):
     valor: int = Field(ge=0, le=3)
 
 
+#Nova função para abrir conexão
 def abrir_conexao():
     database_url = os.getenv("DATABASE_URL", "").strip()
 

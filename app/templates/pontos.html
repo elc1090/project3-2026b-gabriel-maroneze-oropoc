@@ -21,8 +21,6 @@
       href="{{ url_for('static', path='images/favicon.svg') }}"
     />
 
-    <!-- 🎨 O tema entra em cena antes da página aparecer,
-         evitando aquela piscada entre claro e escuro. -->
     <script src="{{ url_for('static', path='js/theme.js') }}"></script>
 
     <link
@@ -30,7 +28,18 @@
       href="{{ url_for('static', path='css/styles.css') }}?v=3"
     />
 
-    <!-- 🧠 Pequeno cérebro exclusivo desta nova página. -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      crossorigin=""
+    />
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      crossorigin=""
+      defer
+    ></script>
+
     <script
       src="{{ url_for('static', path='js/pontos.js') }}"
       defer
@@ -43,7 +52,6 @@
         class="app-sidebar"
         aria-label="Navegación principal"
       >
-        <!-- 🌱 A logo também funciona como caminho de volta para casa. -->
         <a
           class="sidebar-brand"
           href="/painel#minha-empresa"
@@ -247,51 +255,297 @@
           </div>
         </header>
 
-
         <section
-          class="company-profile-page"
+          class="company-profile-page collection-points-page"
           aria-labelledby="collection-points-title"
         >
           <div class="company-profile-heading">
-            <p class="dashboard-kicker">
-              Gestión de residuos
-            </p>
+            <p class="dashboard-kicker">Gestión de residuos</p>
 
-            <h1 id="collection-points-title">
-              Puntos de Recogida
-            </h1>
+            <h1 id="collection-points-title">Puntos de Recogida</h1>
 
             <p>
-              Encuentra lugares adecuados para entregar residuos
-              reciclables y otros materiales.
+              Encuentra lugares adecuados para entregar residuos reciclables y
+              otros materiales.
             </p>
           </div>
 
           <section
-            class="company-overview-card"
-            aria-labelledby="collection-points-content-title"
+            class="collection-points-intro"
+            aria-labelledby="registration-title"
           >
-            <div class="company-overview-card__heading">
-              <div>
-                <p class="quiz-panel__eyebrow">
-                  Localización
-                </p>
+            <div>
+              <p class="quiz-panel__eyebrow">Registro de puntos</p>
 
-                <h2 id="collection-points-content-title">
-                  Puntos disponibles
-                </h2>
-              </div>
+              <h2 id="registration-title">
+                ¿Deseas registrar un nuevo punto?
+              </h2>
+
+              <p>
+                Completa la información del lugar, su ubicación y los
+                materiales que recibe para incorporarlo al catálogo de
+                EcoAvanza.
+              </p>
             </div>
 
-            <p>
+            <button
+              class="primary-button"
+              type="button"
+              data-open-point-form
+              aria-expanded="false"
+              aria-controls="point-registration-panel"
+            >
+              Registrar punto de recogida
+            </button>
+          </section>
 
-            </p>
- 
+          <section
+            class="collection-registration"
+            id="point-registration-panel"
+            data-point-form-panel
+            aria-labelledby="point-form-title"
+            hidden
+          >
+            <form class="company-profile-form" data-point-form novalidate>
+              <div class="company-profile-form__heading">
+                <h2 id="point-form-title">Nuevo punto de recogida</h2>
+
+                <p>
+                  Los campos marcados con * son obligatorios. Las coordenadas
+                  se usarán para ubicar el punto en el mapa.
+                </p>
+              </div>
+
+              <div class="company-profile-fields">
+                <div class="profile-field">
+                  <label for="point-name">Nombre del punto *</label>
+
+                  <input
+                    id="point-name"
+                    name="nome"
+                    type="text"
+                    minlength="2"
+                    maxlength="150"
+                    placeholder="Ej.: Punto Limpio Central"
+                    required
+                  />
+                </div>
+
+                <div class="profile-field">
+                  <label for="point-operator">Operador</label>
+
+                  <input
+                    id="point-operator"
+                    name="operador"
+                    type="text"
+                    maxlength="150"
+                    placeholder="Ej.: Municipalidad o empresa responsable"
+                  />
+                </div>
+
+                <div class="profile-field collection-field--full">
+                  <label for="point-address">Dirección *</label>
+
+                  <input
+                    id="point-address"
+                    name="endereco"
+                    type="text"
+                    minlength="5"
+                    maxlength="255"
+                    placeholder="Calle, número, ciudad y región"
+                    required
+                  />
+                </div>
+
+                <div class="profile-field">
+                  <label for="point-latitude">Latitud *</label>
+
+                  <input
+                    id="point-latitude"
+                    name="latitude"
+                    type="number"
+                    inputmode="decimal"
+                    min="-90"
+                    max="90"
+                    step="any"
+                    placeholder="Ej.: -29.6842"
+                    required
+                  />
+                </div>
+
+                <div class="profile-field">
+                  <label for="point-longitude">Longitud *</label>
+
+                  <input
+                    id="point-longitude"
+                    name="longitude"
+                    type="number"
+                    inputmode="decimal"
+                    min="-180"
+                    max="180"
+                    step="any"
+                    placeholder="Ej.: -53.8069"
+                    required
+                  />
+                </div>
+
+                <div class="profile-field">
+                  <label for="point-opening-time">
+                    Hora de apertura
+                  </label>
+
+                  <input
+                    id="point-opening-time"
+                    name="horario_abertura"
+                    type="time"
+                  />
+                </div>
+
+                <div class="profile-field">
+                  <label for="point-closing-time">
+                    Hora de cierre
+                  </label>
+
+                  <input
+                    id="point-closing-time"
+                    name="horario_fechamento"
+                    type="time"
+                  />
+                </div>
+
+                <div class="profile-field collection-field--full">
+                  <label for="point-schedule-description">
+                    Descripción del horario
+                  </label>
+
+                  <input
+                    id="point-schedule-description"
+                    name="horario_descripcion"
+                    type="text"
+                    maxlength="255"
+                    placeholder="Ej.: Lunes a sábado, de 08:30 a 20:30. Miércoles cerrado."
+                  />
+                </div>
+
+                <div class="profile-field">
+                  <label for="point-contact">
+                    Número de contacto
+                  </label>
+
+                  <input
+                    id="point-contact"
+                    name="numero_contato"
+                    type="tel"
+                    maxlength="30"
+                    placeholder="Ej.: +56 9 1234 5678"
+                  />
+                </div>
+
+                <div class="profile-field collection-field--full">
+                  <label for="point-description">Descripción</label>
+
+                  <textarea
+                    id="point-description"
+                    name="descricao"
+                    rows="4"
+                    maxlength="1000"
+                    placeholder="Información adicional sobre el punto de recogida."
+                  ></textarea>
+                </div>
+              </div>
+
+              <fieldset class="collection-materials-fieldset">
+                <legend>Materiales aceptados *</legend>
+
+                <p class="collection-materials-fieldset__description">
+                  Selecciona al menos un material recibido por este punto.
+                </p>
+
+                <div
+                  class="collection-materials"
+                  data-point-materials
+                  aria-live="polite"
+                >
+                  <p class="collection-materials__loading">
+                    Cargando materiales disponibles...
+                  </p>
+                </div>
+              </fieldset>
+
+              <p
+                class="profile-form-message"
+                data-point-form-message
+                role="status"
+                hidden
+              ></p>
+
+              <div class="company-profile-form__footer">
+                <button
+                  class="secondary-button"
+                  type="button"
+                  data-cancel-point-form
+                >
+                  Cancelar
+                </button>
+
+                <button class="primary-button" type="submit">
+                  Guardar punto
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section
+            class="collection-map-section"
+            aria-labelledby="collection-map-title"
+          >
+            <div class="collection-map-section__heading">
+              <div>
+                <p class="quiz-panel__eyebrow">Mapa interactivo</p>
+
+                <h2 id="collection-map-title">
+                  Ubicación de los puntos de recogida
+                </h2>
+              </div>
+
+              <p data-collection-map-status>
+                Cargando puntos disponibles...
+              </p>
+            </div>
+
             <div
+              id="collection-points-map"
+              data-collection-map
+              role="region"
+              aria-label="Mapa con los puntos de recogida registrados"
+            ></div>
+          </section>
+
+          <section
+            class="collection-points-list"
+            aria-labelledby="available-points-title"
+          >
+            <div class="collection-points-list__heading">
+              <div>
+                <p class="quiz-panel__eyebrow">Directorio de reciclaje</p>
+
+                <h2 id="available-points-title">
+                  Puntos de recogida disponibles
+                </h2>
+              </div>
+
+              <p data-collection-points-status>
+                Cargando puntos registrados...
+              </p>
+            </div>
+
+            <div
+              class="collection-points-grid"
               data-collection-points
               aria-live="polite"
             ></div>
           </section>
+
         </section>
       </main>
     </div>

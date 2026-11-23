@@ -1323,6 +1323,10 @@ if (companyProfileForm) {
   companyProfileForm.addEventListener("submit", saveCompanyProfile);
 }
 
+if (passwordForm) {
+  passwordForm.addEventListener("submit", saveAccountPassword);
+}
+
 if (sustainabilityPage && actionCatalog) {
   void loadPlan().then(() => {
     renderPlan();

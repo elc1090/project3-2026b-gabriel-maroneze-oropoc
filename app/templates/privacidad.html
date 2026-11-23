@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Política de privacidad de EcoAvanza"
+    />
+    <title>Política de Privacidad | EcoAvanza</title>
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="{{ url_for('static', path='images/favicon.svg') }}"
+    />
+
+    <script src="{{ url_for('static', path='js/theme.js') }}"></script>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/styles.css') }}?v=3"
+    />
+  </head>
+
+  <body class="legal-page">
+    <button
+      class="theme-toggle theme-toggle--floating"
+      type="button"
+      data-theme-toggle
+      aria-pressed="true"
+      aria-label="Activar tema claro"
+    >
+      <svg
+        class="theme-toggle__moon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z"
+        />
+      </svg>
+
+      <svg
+        class="theme-toggle__sun"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="4" />
+        <path
+          d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"
+        />
+      </svg>
+
+      <span data-theme-toggle-label>Tema claro</span>
+    </button>
+
+    <main class="legal-main">
+      <article class="legal-card">
+        <header class="legal-card__header">
+          <a class="legal-back" href="/">← Volver al inicio</a>
+
+          <p class="dashboard-kicker">Documentación legal</p>
+          <h1>Política de Privacidad de EcoAvanza</h1>
+          <p class="legal-updated">Última actualización: noviembre de 2026</p>
+        </header>
+
+        <section class="legal-section">
+          <h2>1. Información que recopilamos</h2>
+          <p>
+            EcoAvanza recopila únicamente los datos necesarios para el acceso y la
+            gestión ambiental de tu empresa:
+          </p>
+          <ul>
+            <li>
+              <strong>Datos de cuenta y autenticación:</strong> correo electrónico,
+              nombre de la empresa y, cuando inicias sesión con Google, el
+              identificador único de Google (<code>sub</code>), nombre y correo
+              verificado proporcionados por Google Sign-In.
+            </li>
+            <li>
+              <strong>Datos de diagnóstico y planificación:</strong> perfil de la
+              empresa, respuestas del diagnóstico de sostenibilidad, acciones del
+              plan de acción y registros de residuos o puntos de recogida.
+            </li>
+            <li>
+              <strong>Cookies de sesión:</strong> utilizamos la cookie técnica
+              <code>ecoavanza_session</code> exclusivamente para mantener tu sesión
+              autenticada de forma segura.
+            </li>
+          </ul>
+        </section>
+
+        <section class="legal-section">
+          <h2>2. Uso de la información</h2>
+          <p>Utilizamos la información recopilada exclusivamente para:</p>
+          <ul>
+            <li>Autenticar el acceso a tu panel empresarial en EcoAvanza.</li>
+            <li>
+              Calcular los resultados automáticos del diagnóstico de sostenibilidad.
+            </li>
+            <li>
+              Generar sugerencias personalizadas mediante la API de Google Gemini
+              cuando la empresa lo solicita explícitamente en la sección Ruta
+              Sostenible (sin enviar contraseñas ni credenciales privadas).
+            </li>
+            <li>
+              Almacenar planes de acción, residuos y puntos de recogida registrados.
+            </li>
+          </ul>
+        </section>
+
+        <section class="legal-section">
+          <h2>3. Compartición y almacenamiento de datos</h2>
+          <p>
+            EcoAvanza no vende, alquila ni comparte datos personales con terceros
+            para fines publicitarios. La información se almacena en una base de
+            datos PostgreSQL asociada a la aplicación y se protege mediante
+            contraseñas cifradas y cookies firmadas.
+          </p>
+        </section>
+
+        <section class="legal-section">
+          <h2>4. Retención, eliminación y contacto</h2>
+          <p>
+            EcoAvanza es una aplicación académica de gestión ambiental
+            desarrollada en la Universidad Federal de Santa Maria (UFSM). Para
+            solicitar la revisión o eliminación de los datos asociados a tu
+            cuenta, puedes escribir a
+            <a href="mailto:ecoavanza196@gmail.com">ecoavanza196@gmail.com</a>.
+          </p>
+        </section>
+
+        <footer class="legal-card__footer">
+          <a href="/terminos">Ver Términos de Servicio</a>
+          <a href="/">Ir al inicio de sesión</a>
+        </footer>
+      </article>
+    </main>
+  </body>
+</html>

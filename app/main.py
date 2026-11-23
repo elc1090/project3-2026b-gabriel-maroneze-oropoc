@@ -1178,7 +1178,23 @@ def pagina_cadastro(request: Request):
         name="cadastro.html",
         context={"erro": None, "email": ""},
     )
+    
+@app.get("/privacidad", response_class=HTMLResponse, include_in_schema=False)
+def pagina_privacidade(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="privacidad.html",
+        context={},
+    )
 
+
+@app.get("/terminos", response_class=HTMLResponse, include_in_schema=False)
+def pagina_termos(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="terminos.html",
+        context={},
+    )
 
 @app.post("/cadastro", response_class=HTMLResponse, include_in_schema=False)
 def cadastrar_empresa(

@@ -20,6 +20,7 @@
     />
 
     <script src="{{ url_for('static', path='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', path='js/language.js') }}" defer></script>
     <script
       src="https://accounts.google.com/gsi/client"
       async
@@ -37,6 +38,15 @@
   </head>
 
   <body class="login-page">
+    <button
+      class="theme-toggle theme-toggle--floating language-toggle--floating"
+      type="button"
+      data-language-toggle
+      aria-label="Mudar para português"
+      title="Mudar para português"
+    >
+      <span data-language-toggle-label>PT</span>
+    </button>
     <button
       class="theme-toggle theme-toggle--floating"
       type="button"

@@ -505,7 +505,9 @@ input {
 
 .workspace-header {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 12px;
   padding: 24px clamp(28px, 4vw, 68px);
 }
 
@@ -2467,6 +2469,10 @@ html[data-theme="dark"] .theme-toggle__sun {
   top: 20px;
   right: 22px;
   z-index: 5;
+}
+
+.language-toggle--floating {
+  right: 176px;
 }
 
 html[data-theme="dark"] {

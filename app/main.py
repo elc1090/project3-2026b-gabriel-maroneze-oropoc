@@ -621,7 +621,7 @@ def autenticar_empresa_google(credential: str) -> tuple[int, str] | None:
     if not isinstance(google_sub, str) or not google_sub:
         return None
 
-    # Primeiro, procura um vínculo Google já existente.
+    # 1. Primeiro, procura um vínculo Google já existente.
     with abrir_conexao() as conexao:
         with conexao.cursor() as cursor:
             cursor.execute(
@@ -638,7 +638,7 @@ def autenticar_empresa_google(credential: str) -> tuple[int, str] | None:
     if empresa_vinculada is not None:
         return empresa_vinculada[0], empresa_vinculada[1]
 
-    # No primeiro login, vincula a conta à empresa que possui o mesmo e-mail.
+    # 2. Valida o e-mail verificado retornado pelo Google.
     email_google = dados_google.get("email")
     email_verificado = dados_google.get("email_verified") is True
     dominio_workspace = dados_google.get("hd")
@@ -651,13 +651,9 @@ def autenticar_empresa_google(credential: str) -> tuple[int, str] | None:
     except ValidationError:
         return None
 
-    # Para o primeiro vínculo automático, aceita Gmail ou Google Workspace.
-    email_confiavel = email_normalizado.endswith("@gmail.com") or (
-        isinstance(dominio_workspace, str) and bool(dominio_workspace)
+    nome_google = (
+        str(dados_google.get("name") or "").strip()[:120] or "Mi Empresa"
     )
-
-    if not email_confiavel:
-        return None
 
     with abrir_conexao() as conexao:
         with conexao.cursor() as cursor:
@@ -671,8 +667,53 @@ def autenticar_empresa_google(credential: str) -> tuple[int, str] | None:
             )
             empresa = cursor.fetchone()
 
-            if empresa is None:
-                return None
+            if empresa is not None:
+                # Para vincular a uma conta já existente, mantém a exigência de Gmail ou Workspace.
+                email_confiavel = email_normalizado.endswith("@gmail.com") or (
+                    isinstance(dominio_workspace, str) and bool(dominio_workspace)
+                )
+
+                if not email_confiavel:
+                    return None
+            else:
+                # Auto-cadastro pelo login federado (Just-in-Time Provisioning).
+                senha_aleatoria_hash = password_hash.hash(
+                    secrets.token_urlsafe(32)
+                )
+
+                cursor.execute(
+                    """
+                    INSERT INTO empresas (nome, email_acesso, senha_hash)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (LOWER(email_acesso)) DO NOTHING
+                    RETURNING id, nome
+                    """,
+                    (nome_google, email_normalizado, senha_aleatoria_hash),
+                )
+                empresa = cursor.fetchone()
+
+                if empresa is None:
+                    cursor.execute(
+                        """
+                        SELECT id, nome
+                        FROM empresas
+                        WHERE LOWER(email_acesso) = %s
+                        """,
+                        (email_normalizado,),
+                    )
+                    empresa = cursor.fetchone()
+
+                if empresa is None:
+                    return None
+
+                cursor.execute(
+                    """
+                    INSERT INTO planos_sustentaveis (empresa_id, acoes)
+                    VALUES (%s, '[]'::jsonb)
+                    ON CONFLICT (empresa_id) DO NOTHING
+                    """,
+                    (empresa[0],),
+                )
 
             cursor.execute(
                 """

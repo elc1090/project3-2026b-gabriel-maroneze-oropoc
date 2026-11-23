@@ -19,9 +19,13 @@ https://project3-2026b-gabriel-maroneze-oropoc-1.onrender.com
 ## Proposta
 Tema sugerido: Sistema de informações em colaboração com turma de Administração (Chile).
 
-__Gabriel Maroneze:__ Pensando e ouvindo mais sobre a proposta sugerida, gostei da ideia e da oportunidade única de colaboração com alunos de outra universidade. Pretendo mantê-la se possível. Também gostaria de seguir utilizando as mesmas tecnologias de antes (PostgreSQL, Python e FastAPI) para tentar aumentar meu nível de compreensão nelas e possivelmente passar a utilizá-las como fonte de trabalho no futuro. Não tenho sugestão de dupla, mas gostaria de seguir trabalhando com o João Daniel também, se possível. Tenho flexibilidade de horários quinta-feira pelo final das tardes, sextas-feiras a tarde/final de tarde e aos domingos para reuniões síncronas.
-
-__Joao Daniel:__ Sobre a proposta sugerida, gostei da ideia e da oportunidade única de colaboração com alunos de outra universidade. Acredito que agora com uma dupla o trabalho vai ser mais bem aproveitado e, olhando para o trabalho anterior, pensamos que seria melhor mantermos com as ferramentas utilizadas pelo Gabriel (PostgreSQL, Python e FastAPI) para tentar aumentar o nível de compreensão nelas e possivelmente passar a utilizá-las como fonte de trabalho no futuro.
+Continuar o desenvolvimento do sistema em colaboração com equipe no Chile, incluindo login federado, aba de mapeamento de pontos de coleta de resíduos e IA como serviço
+Proposta (incluindo tecnologias): 
+- Login federado com google accounts
+- Adição da API Key do Gemini vinculada às contas google de usuários (pelo baixo consumo de tokens) para gerar um feedback personalizado às empresas (similar a um dos sites do projeto I)
+- Adição de um manual para o uso da aplicação (requisito da aluna do Coil)
+- Adição das funcionalidades de Pontos de Coleta com cadastro e consulta por parte das empresas (requisito da aluna do Coil): Uso do Open Street View e LeafLet
+- Botão para alterar o idioma
 
 
 
@@ -33,6 +37,8 @@ __Joao Daniel:__ Sobre a proposta sugerida, gostei da ideia e da oportunidade ú
  Feita essa interpretacao do caso, mandamos as nossas observacoes para elas, que aceitaram e comecamos a pensar sobre como iriamos fazer cada tela, cada informacao e a autentificacao. A parte mais ligada a API e a integracao dos materiais entregues pelas alunas ao banco de dados e a forma que esse material iria estar no aplicativo foi mais a parte do Gabriel, a parte de modelagem, requisicoes, depuracoes e o deploy ficou mais para o Joao.
  Uma parte muito impactante no trabalho foi que, muitas coisas que sempre dao errado nos nossos trabalhos tambem deram nesse como: dificuldades com deploy, bugs com o vscode e github, dificuldades com o banco de dados; porem, dessa vez a gente resolveu muito mais rapidamente, e nao foi por causa da IA (por que nas outras tambem tinhamos usado e demorou horrores) mas sim por que sabiamos qual era o erro e aonde tinhamos que ir para consertar.
  O codigo em si nao tinha muito misterio, a unica coisa mais complexo que tinhamos que trabalhar era a autentificacao e a relacao entre as respostas dos perfis com os diagnosticos do sistema.
+ Depois de fazermos o grosso no ultimo trabalho, continuamos nesse com a intuito de melhorar a aplicacao para o usuario e tambem colocar alguns requisitos que a aluna do nosso grupo pediu, alem do proprio login federado. O Gabriel ficou responsavel pela API do Gemini que ele queria implementar e o Joao ficou responsavel pelos requisitos que a aluno chilena pediu (tutorial, ajustes no front). O login federado foi simples de implementar pois usamos o modelo dado em aula como base, alem do proprio google ajudar bastante com seus tutoriais. Depois de ter feito essas coisas o Gabriel foi colocar o mapa com pontos que ele tinha feito para o projeto 1 na aplicacao, junto com dois pontos que a aluna chilena ja havia nos dado. O botao para mudar o idioma acabou nao sendo implementado pois tinha muitos textos pegos direto no back e outros gerados automaticamente em espanhol (IA) e nao apenas textos no front que poderiam ser substituidos depois com facilidade, como o navegador tem a opcao de traduzir a gente pensou que a falta desse botao nao seria um problema.
+ A divisao de tarefas e o planejamento com a aluna chilena ficou mais com o Joao e as mudancas mais conectadas ao Back ficou mais a cargo do Gabriel, porem a conversa e o entendimento das acoes uns dos outros sempre esteve presente em todas as etapas.
 
 ### Trechos de código
 
@@ -80,6 +86,7 @@ __Joao Daniel:__ Sobre a proposta sugerida, gostei da ideia e da oportunidade ú
 - RENDER
 - DOCKER DESKTOP
 - pgAdmin Web Service
+- Google Cloud
 
 ## Referências e créditos
 
@@ -88,6 +95,7 @@ __Joao Daniel:__ Sobre a proposta sugerida, gostei da ideia e da oportunidade ú
 - Copilot VSCode
 - ChatGPT (Configurações do Docker)
 - Materiais de Segurança e Defesa em Ambientes Digitais (hash)
+- Materiais das atividades de Desenvolvimento Web
 
 
 

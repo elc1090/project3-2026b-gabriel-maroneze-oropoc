@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Términos de servicio de EcoAvanza"
+    />
+    <title>Términos de Servicio | EcoAvanza</title>
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="{{ url_for('static', path='images/favicon.svg') }}"
+    />
+
+    <script src="{{ url_for('static', path='js/theme.js') }}"></script>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/styles.css') }}?v=3"
+    />
+  </head>
+
+  <body class="legal-page">
+    <button
+      class="theme-toggle theme-toggle--floating"
+      type="button"
+      data-theme-toggle
+      aria-pressed="true"
+      aria-label="Activar tema claro"
+    >
+      <svg
+        class="theme-toggle__moon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z"
+        />
+      </svg>
+
+      <svg
+        class="theme-toggle__sun"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="4" />
+        <path
+          d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"
+        />
+      </svg>
+
+      <span data-theme-toggle-label>Tema claro</span>
+    </button>
+
+    <main class="legal-main">
+      <article class="legal-card">
+        <header class="legal-card__header">
+          <a class="legal-back" href="/">← Volver al inicio</a>
+
+          <p class="dashboard-kicker">Documentación legal</p>
+          <h1>Términos de Servicio de EcoAvanza</h1>
+          <p class="legal-updated">Última actualización: noviembre de 2026</p>
+        </header>
+
+        <section class="legal-section">
+          <h2>1. Aceptación de los términos</h2>
+          <p>
+            Al acceder o crear una cuenta en EcoAvanza (ya sea mediante correo y
+            contraseña o mediante Google Sign-In), aceptas utilizar la plataforma
+            conforme a estos Términos de Servicio.
+          </p>
+        </section>
+
+        <section class="legal-section">
+          <h2>2. Propósito de la plataforma</h2>
+          <p>
+            EcoAvanza es una aplicación web orientada a la gestión ambiental
+            empresarial, desarrollada con fines académicos y de demostración en
+            colaboración universitaria. Permite realizar diagnósticos de
+            sostenibilidad, organizar planes de acción, generar sugerencias con
+            inteligencia artificial y visualizar puntos de recogida de residuos.
+          </p>
+        </section>
+
+        <section class="legal-section">
+          <h2>3. Uso responsable y contenido</h2>
+          <ul>
+            <li>
+              El usuario es responsable de la veracidad de los datos registrados
+              en su perfil, diagnósticos y puntos de recogida.
+            </li>
+            <li>
+              No está permitido utilizar la plataforma para publicar información
+              falsa, ofensiva o intentar comprometer la seguridad del servicio.
+            </li>
+            <li>
+              Las recomendaciones generadas por IA y los horarios o ubicaciones de
+              los puntos de recogida tienen carácter orientativo e informativo.
+            </li>
+          </ul>
+        </section>
+
+        <section class="legal-section">
+          <h2>4. Disponibilidad y contacto</h2>
+          <p>
+            Al tratarse de un proyecto académico alojado en infraestructura en la
+            nube, el servicio puede sufrir mantenimientos o interrupciones sin
+            previo aviso. Para consultas o soporte, contáctanos en
+            <a href="mailto:ecoavanza196@gmail.com">ecoavanza196@gmail.com</a>.
+          </p>
+        </section>
+
+        <footer class="legal-card__footer">
+          <a href="/privacidad">Ver Política de Privacidad</a>
+          <a href="/">Ir al inicio de sesión</a>
+        </footer>
+      </article>
+    </main>
+  </body>
+</html>

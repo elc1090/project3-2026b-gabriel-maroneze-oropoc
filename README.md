@@ -34,10 +34,15 @@ Proposta (incluindo tecnologias):
 ### Processo
 
  Primeiramente, estavamos na duvida de como iamos organizar os materias enviados pelas outras alunas do Chile, o que elas queriam e as nossas possibilidaades de execucao. Essa primeira fase demorou muito pois ainda nao tinhamos a total dimensao do que elas queriam, foi quando elas nos enviaram um pdf com todas as telas que queriam e varias abas aberta e cheias de informacoes (umas redundantes, outras desnecessarias, layouts muito carregados), isso nos assustou num primeiro momento mas o Joao lembrou das atividades de engenharia de software e IHC para criar um mini projeto para nos situarmos onde estavamos, onde queriamos ir e o que deveriamos ajustar do pdf enviado.
+ 
  Feita essa interpretacao do caso, mandamos as nossas observacoes para elas, que aceitaram e comecamos a pensar sobre como iriamos fazer cada tela, cada informacao e a autentificacao. A parte mais ligada a API e a integracao dos materiais entregues pelas alunas ao banco de dados e a forma que esse material iria estar no aplicativo foi mais a parte do Gabriel, a parte de modelagem, requisicoes, depuracoes e o deploy ficou mais para o Joao.
+ 
  Uma parte muito impactante no trabalho foi que, muitas coisas que sempre dao errado nos nossos trabalhos tambem deram nesse como: dificuldades com deploy, bugs com o vscode e github, dificuldades com o banco de dados; porem, dessa vez a gente resolveu muito mais rapidamente, e nao foi por causa da IA (por que nas outras tambem tinhamos usado e demorou horrores) mas sim por que sabiamos qual era o erro e aonde tinhamos que ir para consertar.
+ 
  O codigo em si nao tinha muito misterio, a unica coisa mais complexo que tinhamos que trabalhar era a autentificacao e a relacao entre as respostas dos perfis com os diagnosticos do sistema.
+ 
  Depois de fazermos o grosso no ultimo trabalho, continuamos nesse com a intuito de melhorar a aplicacao para o usuario e tambem colocar alguns requisitos que a aluna do nosso grupo pediu, alem do proprio login federado. O Gabriel ficou responsavel pela API do Gemini que ele queria implementar e o Joao ficou responsavel pelos requisitos que a aluno chilena pediu (tutorial, ajustes no front). O login federado foi simples de implementar pois usamos o modelo dado em aula como base, alem do proprio google ajudar bastante com seus tutoriais. Depois de ter feito essas coisas o Gabriel foi colocar o mapa com pontos que ele tinha feito para o projeto 1 na aplicacao, junto com dois pontos que a aluna chilena ja havia nos dado. O botao para mudar o idioma acabou nao sendo implementado pois tinha muitos textos pegos direto no back e outros gerados automaticamente em espanhol (IA) e nao apenas textos no front que poderiam ser substituidos depois com facilidade, como o navegador tem a opcao de traduzir a gente pensou que a falta desse botao nao seria um problema.
+ 
  A divisao de tarefas e o planejamento com a aluna chilena ficou mais com o Joao e as mudancas mais conectadas ao Back ficou mais a cargo do Gabriel, porem a conversa e o entendimento das acoes uns dos outros sempre esteve presente em todas as etapas.
 
 ### Trechos de código

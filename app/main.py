@@ -159,13 +159,23 @@ class RespostaDiagnosticoUpdate(BaseModel):
     valor: int = Field(ge=0, le=3)
 
 
+#Nova função para abrir conexão
 def abrir_conexao():
+    database_url = os.getenv("DATABASE_URL", "").strip()
+
+    if database_url:
+        return psycopg.connect(
+            database_url,
+            connect_timeout=10,
+        )
+
     return psycopg.connect(
         host=os.getenv("DB_HOST", "db"),
         port=os.getenv("DB_PORT", "5432"),
         dbname=os.getenv("POSTGRES_DB"),
         user=os.getenv("POSTGRES_USER"),
         password=os.getenv("POSTGRES_PASSWORD"),
+        connect_timeout=10,
     )
 
 

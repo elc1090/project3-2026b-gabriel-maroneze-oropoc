@@ -30,6 +30,38 @@ const pointFormMessage = document.querySelector(
   "[data-point-form-message]",
 );
 
+const filterDropdown = document.querySelector(
+  "[data-filter-dropdown]",
+);
+
+const openFilterButton = document.querySelector(
+  "[data-open-filter]",
+);
+
+const filterPanel = document.querySelector(
+  "[data-filter-panel]",
+);
+
+const filterOptionsContainer = document.querySelector(
+  "[data-filter-options]",
+);
+
+const filterSummaryText = document.querySelector(
+  "[data-filter-summary]",
+);
+
+const applyFilterButton = document.querySelector(
+  "[data-apply-filter]",
+);
+
+const clearFilterButton = document.querySelector(
+  "[data-clear-filter]",
+);
+
+const refreshPointsButton = document.querySelector(
+  "[data-refresh-points]",
+);
+
 const mapContainer = document.querySelector(
   "[data-collection-map]",
 );
@@ -52,6 +84,8 @@ const DEFAULT_MAP_ZOOM = 11;
 let collectionMap = null;
 let markersLayer = null;
 let markersByPointId = new Map();
+let loadedPoints = [];
+let loadedMaterials = [];
 
 function toggleCompanyMenu() {
   if (!menuTrigger || !menuPanel) {
@@ -164,6 +198,161 @@ function createMaterialOption(material) {
   label.append(checkbox, text);
 
   return label;
+}
+
+function getPointMaterialIds(point) {
+  if (!Array.isArray(point.materiais)) {
+    return [];
+  }
+
+  return point.materiais
+    .map((material) => {
+      if (typeof material === "object" && material !== null) {
+        return Number(material.id);
+      }
+
+      return null;
+    })
+    .filter((id) => Number.isFinite(id));
+}
+
+function createFilterMaterialOption(material) {
+  const label = document.createElement("label");
+  const checkbox = document.createElement("input");
+  const text = document.createElement("span");
+
+  label.className = "collection-filter__option";
+
+  checkbox.type = "checkbox";
+  checkbox.name = "filter_material";
+  checkbox.value = String(material.id);
+  checkbox.dataset.materialName = material.nome;
+
+  text.textContent = material.nome;
+
+  label.append(checkbox, text);
+
+  return label;
+}
+
+function populateFilterOptions(materials) {
+  if (!filterOptionsContainer) {
+    return;
+  }
+
+  if (materials.length === 0) {
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "collection-materials__loading";
+    emptyMessage.textContent = "No hay materiales disponibles.";
+    filterOptionsContainer.replaceChildren(emptyMessage);
+    return;
+  }
+
+  filterOptionsContainer.replaceChildren(
+    ...materials.map(createFilterMaterialOption),
+  );
+}
+
+function getSelectedFilterMaterialIds() {
+  if (!filterOptionsContainer) {
+    return [];
+  }
+
+  const checkedInputs = filterOptionsContainer.querySelectorAll(
+    'input[type="checkbox"]:checked',
+  );
+
+  return Array.from(checkedInputs)
+    .map((checkbox) => Number(checkbox.value))
+    .filter((id) => Number.isFinite(id));
+}
+
+function updateFilterSummaryText() {
+  if (!filterSummaryText) {
+    return;
+  }
+
+  const count = getSelectedFilterMaterialIds().length;
+
+  if (count === 0) {
+    filterSummaryText.textContent = "Seleccionar materiales";
+    return;
+  }
+
+  filterSummaryText.textContent =
+    count === 1
+      ? "1 material seleccionado"
+      : `${count} materiales seleccionados`;
+}
+
+function setFilterDropdownOpen(isOpen) {
+  if (!filterDropdown || !openFilterButton) {
+    return;
+  }
+
+  filterDropdown.classList.toggle("is-open", isOpen);
+  openFilterButton.setAttribute("aria-expanded", String(isOpen));
+}
+
+function toggleFilterDropdown() {
+  if (!filterDropdown) {
+    return;
+  }
+
+  const isOpen = !filterDropdown.classList.contains("is-open");
+  setFilterDropdownOpen(isOpen);
+}
+
+function closeFilterDropdown(restoreFocus = false) {
+  if (!filterDropdown?.classList.contains("is-open")) {
+    return;
+  }
+
+  setFilterDropdownOpen(false);
+
+  if (restoreFocus) {
+    openFilterButton?.focus();
+  }
+}
+
+function renderCollectionPoints(points) {
+  renderMapPoints(points);
+  renderPointCards(points);
+}
+
+function applyFilter() {
+  const selectedIds = getSelectedFilterMaterialIds();
+
+  if (selectedIds.length === 0) {
+    renderCollectionPoints(loadedPoints);
+    closeFilterDropdown();
+    return;
+  }
+
+  const filteredPoints = loadedPoints.filter((point) => {
+    const pointMaterialIds = getPointMaterialIds(point);
+    return selectedIds.some((materialId) =>
+      pointMaterialIds.includes(materialId),
+    );
+  });
+
+  renderCollectionPoints(filteredPoints);
+  closeFilterDropdown();
+}
+
+function clearFilter() {
+  if (filterOptionsContainer) {
+    const checkboxes = filterOptionsContainer.querySelectorAll(
+      'input[type="checkbox"]',
+    );
+
+    for (const checkbox of checkboxes) {
+      checkbox.checked = false;
+    }
+  }
+
+  updateFilterSummaryText();
+  renderCollectionPoints(loadedPoints);
 }
 
 function initializeMap() {
@@ -304,8 +493,12 @@ function renderMapPoints(points) {
       DEFAULT_MAP_ZOOM,
     );
 
+    const hasActiveFilter = getSelectedFilterMaterialIds().length > 0;
+
     setMapStatus(
-      "No hay puntos de recogida registrados todavía.",
+      hasActiveFilter && loadedPoints.length > 0
+        ? "Ningún punto coincide con los materiales seleccionados."
+        : "No hay puntos de recogida registrados todavía.",
     );
 
     return;
@@ -498,16 +691,21 @@ function renderPointCards(points) {
   collectionPointsContainer.replaceChildren();
 
   if (points.length === 0) {
+    const hasActiveFilter = getSelectedFilterMaterialIds().length > 0;
     const emptyMessage = document.createElement("p");
 
     emptyMessage.className = "collection-points-list__empty";
     emptyMessage.textContent =
-      "Aún no hay puntos de recogida registrados.";
+      hasActiveFilter && loadedPoints.length > 0
+        ? "Ningún punto coincide con los materiales seleccionados."
+        : "Aún no hay puntos de recogida registrados.";
 
     collectionPointsContainer.append(emptyMessage);
 
     setCollectionPointsStatus(
-      "No hay puntos disponibles.",
+      hasActiveFilter && loadedPoints.length > 0
+        ? "0 puntos coinciden con el filtro."
+        : "No hay puntos disponibles.",
     );
 
     return;
@@ -527,6 +725,13 @@ function renderPointCards(points) {
 }
 
 async function loadCollectionPoints() {
+  if (refreshPointsButton) {
+    refreshPointsButton.disabled = true;
+  }
+
+  setMapStatus("Cargando puntos disponibles...");
+  setCollectionPointsStatus("Cargando puntos registrados...");
+
   try {
     const response = await fetch("/api/pontos", {
       credentials: "same-origin",
@@ -546,8 +751,8 @@ async function loadCollectionPoints() {
       );
     }
 
-    renderMapPoints(data.pontos);
-    renderPointCards(data.pontos);
+    loadedPoints = Array.isArray(data.pontos) ? data.pontos : [];
+    applyFilter();
   } catch (error) {
     console.error(
       "No se pudieron cargar los puntos de recogida.",
@@ -565,11 +770,15 @@ async function loadCollectionPoints() {
         "No se pudieron cargar los puntos de recogida.",
       true,
     );
+  } finally {
+    if (refreshPointsButton) {
+      refreshPointsButton.disabled = false;
+    }
   }
 }
 
 async function loadMaterials() {
-  if (!pointMaterialsContainer) {
+  if (!pointMaterialsContainer && !filterOptionsContainer) {
     return;
   }
 
@@ -591,21 +800,44 @@ async function loadMaterials() {
       );
     }
 
-    pointMaterialsContainer.replaceChildren(
-      ...data.materiais.map(createMaterialOption),
-    );
+    loadedMaterials = Array.isArray(data.materiais)
+      ? data.materiais
+      : [];
+
+    if (pointMaterialsContainer) {
+      pointMaterialsContainer.replaceChildren(
+        ...loadedMaterials.map(createMaterialOption),
+      );
+    }
+
+    populateFilterOptions(loadedMaterials);
+
+    if (openFilterButton) {
+      openFilterButton.disabled = false;
+    }
   } catch (error) {
     console.error("No se pudieron cargar los materiales.", error);
 
-    pointMaterialsContainer.replaceChildren();
+    if (pointMaterialsContainer) {
+      pointMaterialsContainer.replaceChildren();
 
-    const message = document.createElement("p");
-    message.className = "collection-materials__loading";
-    message.textContent =
-      error.message ??
-      "No se pudieron cargar los materiales disponibles.";
+      const message = document.createElement("p");
+      message.className = "collection-materials__loading";
+      message.textContent =
+        error.message ??
+        "No se pudieron cargar los materiales disponibles.";
 
-    pointMaterialsContainer.append(message);
+      pointMaterialsContainer.append(message);
+    }
+
+    if (filterSummaryText) {
+      filterSummaryText.textContent =
+        "No se pudieron cargar los materiales";
+    }
+
+    if (openFilterButton) {
+      openFilterButton.disabled = true;
+    }
   }
 }
 
@@ -758,6 +990,7 @@ async function deletePoint(point, button) {
       );
     }
 
+    collectionMap?.closePopup();
     await loadCollectionPoints();
   } catch (error) {
     console.error("No se pudo eliminar el punto.", error);
@@ -774,29 +1007,80 @@ async function deletePoint(point, button) {
 
 menuTrigger?.addEventListener("click", toggleCompanyMenu);
 
-document.addEventListener("click", (event) => {
-  if (!menuTrigger || !menuPanel) {
+openFilterButton?.addEventListener("click", toggleFilterDropdown);
+
+applyFilterButton?.addEventListener("click", applyFilter);
+
+clearFilterButton?.addEventListener("click", clearFilter);
+
+refreshPointsButton?.addEventListener("click", () => {
+  void loadCollectionPoints();
+});
+
+filterOptionsContainer?.addEventListener("change", updateFilterSummaryText);
+
+filterOptionsContainer?.addEventListener("keydown", (event) => {
+  const checkboxes = Array.from(
+    filterOptionsContainer.querySelectorAll('input[type="checkbox"]'),
+  );
+
+  if (checkboxes.length === 0) {
     return;
   }
 
+  const currentIndex = checkboxes.indexOf(document.activeElement);
+
+  if (currentIndex === -1) {
+    return;
+  }
+
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    const next = (currentIndex + 1) % checkboxes.length;
+    checkboxes[next].focus();
+  }
+
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    const previous =
+      (currentIndex - 1 + checkboxes.length) % checkboxes.length;
+    checkboxes[previous].focus();
+  }
+
+  if (event.key === "Enter") {
+    event.preventDefault();
+    const checkbox = checkboxes[currentIndex];
+    checkbox.checked = !checkbox.checked;
+    checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+});
+
+document.addEventListener("click", (event) => {
   const clickedElement = event.target;
 
   if (!(clickedElement instanceof Node)) {
     return;
   }
 
-  const clickedInsideMenu =
-    menuTrigger.contains(clickedElement) ||
-    menuPanel.contains(clickedElement);
+  if (menuTrigger && menuPanel) {
+    const clickedInsideMenu =
+      menuTrigger.contains(clickedElement) ||
+      menuPanel.contains(clickedElement);
 
-  if (!clickedInsideMenu) {
-    closeCompanyMenu();
+    if (!clickedInsideMenu) {
+      closeCompanyMenu();
+    }
+  }
+
+  if (filterDropdown && !filterDropdown.contains(clickedElement)) {
+    closeFilterDropdown();
   }
 });
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeCompanyMenu();
+    closeFilterDropdown(true);
 
     if (pointFormPanel && !pointFormPanel.hidden) {
       closePointForm();

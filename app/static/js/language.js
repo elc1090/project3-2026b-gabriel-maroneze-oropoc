@@ -442,6 +442,39 @@ function translateTextNode(node) {
   }
 }
 
+let isApplyingTranslations = false;
+let languageObserver = null;
+
+function observeLanguageChanges() {
+  if (!languageObserver) {
+    return;
+  }
+
+  languageObserver.observe(document.body, {
+    attributes: true,
+    attributeFilter: languageAttributeNames,
+    characterData: true,
+    childList: true,
+    subtree: true,
+  });
+}
+
+function runWithoutObserver(callback) {
+  if (isApplyingTranslations) {
+    return;
+  }
+
+  isApplyingTranslations = true;
+  languageObserver?.disconnect();
+
+  try {
+    callback();
+  } finally {
+    observeLanguageChanges();
+    isApplyingTranslations = false;
+  }
+}
+
 function translateAttributes(element, restore = false) {
   languageAttributeNames.forEach((attributeName) => {
     if (!element.hasAttribute(attributeName)) {
@@ -463,8 +496,9 @@ function translateAttributes(element, restore = false) {
 
     const state = values.get(attributeName);
     const currentValue = element.getAttribute(attributeName);
+
     if (restore) {
-      if (currentValue !== state.original) {
+      if (state.original !== null && currentValue !== state.original) {
         element.setAttribute(attributeName, state.original);
       }
       state.translated = null;
@@ -483,7 +517,9 @@ function translateAttributes(element, restore = false) {
       const translation = getPortugueseText(state.original);
       if (translation !== null) {
         state.translated = translation;
-        element.setAttribute(attributeName, translation);
+        if (currentValue !== translation) {
+          element.setAttribute(attributeName, translation);
+        }
       }
     } else {
       state.original = currentValue;
@@ -509,28 +545,37 @@ function translateNode(node, restoreAttributes = false) {
 function updateLanguageToggle() {
   const isPortuguese = languageRoot.lang === "pt-BR";
   document.querySelectorAll("[data-language-toggle]").forEach((button) => {
-    button.querySelector("[data-language-toggle-label]").textContent =
-      isPortuguese ? "ES" : "PT";
-    button.setAttribute(
-      "aria-label",
-      isPortuguese ? "Cambiar a español" : "Mudar para português",
-    );
-    button.setAttribute(
-      "title",
-      isPortuguese ? "Cambiar a español" : "Mudar para português",
-    );
+    const label = button.querySelector("[data-language-toggle-label]");
+    if (label) {
+      label.textContent = isPortuguese ? "ES" : "PT";
+    }
+
+    const nextLabel = isPortuguese
+      ? "Cambiar a español"
+      : "Mudar para português";
+
+    if (button.getAttribute("aria-label") !== nextLabel) {
+      button.setAttribute("aria-label", nextLabel);
+    }
+
+    if (button.getAttribute("title") !== nextLabel) {
+      button.setAttribute("title", nextLabel);
+    }
   });
 }
 
 function setLanguage(language) {
-  if (language === "es") {
-    translateNode(document.body, true);
-  }
+  runWithoutObserver(() => {
+    if (language === "es") {
+      translateNode(document.body, true);
+    }
 
-  languageRoot.lang = language;
-  localStorage.setItem("ecoavanza-language", language);
-  translateNode(document.body);
-  updateLanguageToggle();
+    languageRoot.lang = language;
+    localStorage.setItem("ecoavanza-language", language);
+    translateNode(document.body);
+    updateLanguageToggle();
+  });
+
   document.dispatchEvent(
     new CustomEvent("ecoavanza:language-change", {
       detail: { language },
@@ -542,32 +587,32 @@ const savedLanguage = localStorage.getItem("ecoavanza-language");
 languageRoot.lang = savedLanguage === "pt-BR" ? "pt-BR" : "es";
 
 document.addEventListener("DOMContentLoaded", () => {
-  translateNode(document.body);
-  updateLanguageToggle();
+  languageObserver = new MutationObserver((mutations) => {
+    if (isApplyingTranslations) {
+      return;
+    }
+
+    runWithoutObserver(() => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "childList") {
+          mutation.addedNodes.forEach((addedNode) => translateNode(addedNode));
+        } else if (mutation.type === "characterData") {
+          translateTextNode(mutation.target);
+        } else if (mutation.type === "attributes") {
+          translateAttributes(mutation.target);
+        }
+      });
+    });
+  });
+
+  runWithoutObserver(() => {
+    translateNode(document.body);
+    updateLanguageToggle();
+  });
 
   document.querySelectorAll("[data-language-toggle]").forEach((button) => {
     button.addEventListener("click", () => {
       setLanguage(languageRoot.lang === "pt-BR" ? "es" : "pt-BR");
     });
-  });
-
-  const languageObserver = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === "childList") {
-        mutation.addedNodes.forEach(translateNode);
-      } else if (mutation.type === "characterData") {
-        translateTextNode(mutation.target);
-      } else if (mutation.type === "attributes") {
-        translateAttributes(mutation.target);
-      }
-    });
-  });
-
-  languageObserver.observe(document.body, {
-    attributes: true,
-    attributeFilter: languageAttributeNames,
-    characterData: true,
-    childList: true,
-    subtree: true,
   });
 });

@@ -375,6 +375,123 @@ def inicializar_banco() -> None:
                         for ordem_pergunta, texto in enumerate(perguntas, 1)
                     ],
                 )
+            materiais_iniciais = [
+                "Plástico PET",
+                "Plástico",
+                "Cartón",
+                "Papel",
+                "Vidrio",
+                "Latas de aluminio",
+                "Latas",
+                "Tetra pack",
+            ]
+            cursor.executemany(
+                """
+                INSERT INTO materiais (nome)
+                VALUES (%s)
+                ON CONFLICT (nome) DO NOTHING
+                """,
+                [(nome_material,) for nome_material in materiais_iniciais],
+            )
+
+            cursor.execute("SELECT COUNT(*) FROM pontos_coleta")
+            if cursor.fetchone()[0] == 0:
+                pontos_iniciais = [
+                    (
+                        "Punto Limpio Sodimac La Serena - Paseo Balmaceda",
+                        "Av. Balmaceda 2885, La Serena, Región de Coquimbo",
+                        -29.9259134,
+                        -71.2593166,
+                        "08:30",
+                        "20:30",
+                        "Lunes a Sábado 08:30 a 20:30 hrs (Miércoles cerrado por mantención)",
+                        None,
+                        "TriCiclos",
+                        None,
+                        [
+                            "Plástico PET",
+                            "Cartón",
+                            "Papel",
+                            "Vidrio",
+                            "Latas de aluminio",
+                            "Tetra pack",
+                        ],
+                    ),
+                    (
+                        "Centro Demostrativo Ambiental Punto Limpio El Culebrón",
+                        "Calle México 607, Barrio San Juan, Coquimbo, Región de Coquimbo",
+                        -29.9783743,
+                        -71.3261320,
+                        "10:00",
+                        "17:00",
+                        "Lunes a Viernes 10:00 a 17:00 hrs",
+                        None,
+                        "Municipalidad de Coquimbo",
+                        "Es el punto limpio más grande de la región.",
+                        [
+                            "Plástico",
+                            "Papel",
+                            "Cartón",
+                            "Latas",
+                            "Vidrio",
+                        ],
+                    ),
+                ]
+
+                for (
+                    nome,
+                    endereco,
+                    latitude,
+                    longitude,
+                    horario_abertura,
+                    horario_fechamento,
+                    horario_descripcion,
+                    numero_contato,
+                    operador,
+                    descricao,
+                    materiais_nomes,
+                ) in pontos_iniciais:
+                    cursor.execute(
+                        """
+                        INSERT INTO pontos_coleta (
+                            nome,
+                            endereco,
+                            latitude,
+                            longitude,
+                            horario_abertura,
+                            horario_fechamento,
+                            horario_descripcion,
+                            numero_contato,
+                            operador,
+                            descricao
+                        )
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        RETURNING id
+                        """,
+                        (
+                            nome,
+                            endereco,
+                            latitude,
+                            longitude,
+                            horario_abertura,
+                            horario_fechamento,
+                            horario_descripcion,
+                            numero_contato,
+                            operador,
+                            descricao,
+                        ),
+                    )
+                    ponto_id = cursor.fetchone()[0]
+                    cursor.execute(
+                        """
+                        INSERT INTO ponto_material (ponto_id, material_id)
+                        SELECT %s, id
+                        FROM materiais
+                        WHERE nome = ANY(%s)
+                        """,
+                        (ponto_id, materiais_nomes),
+                    )
+                
 
     nome_empresa = (
         os.getenv("INITIAL_COMPANY_NAME")

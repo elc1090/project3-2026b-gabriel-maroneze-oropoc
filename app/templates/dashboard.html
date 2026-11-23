@@ -11,7 +11,6 @@
       href="{{ url_for('static', path='images/favicon.svg') }}"
     />
     <script src="{{ url_for('static', path='js/theme.js') }}"></script>
-    <script src="{{ url_for('static', path='js/language.js') }}" defer></script>
 
     <link
       rel="stylesheet"
@@ -114,15 +113,6 @@
 
       <main class="app-workspace" aria-label="Área principal de la aplicación">
         <header class="workspace-header">
-          <button
-            class="theme-toggle language-toggle"
-            type="button"
-            data-language-toggle
-            aria-label="Mudar para português"
-            title="Mudar para português"
-          >
-            <span data-language-toggle-label>PT</span>
-          </button>
           <button
             class="theme-toggle"
             type="button"

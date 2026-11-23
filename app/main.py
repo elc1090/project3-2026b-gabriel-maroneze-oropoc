@@ -1124,7 +1124,7 @@ def gerar_recomendacoes_com_gemini(
     respostas: list[dict],
 ) -> RecomendacoesPersonalizadas:
     if not GEMINI_API_KEY:
-        raise RuntimeError("GEMINI_API_KEY não foi definida.")
+        raise RuntimeError("GEMINI_API_KEY no fue definida.")
 
     cliente = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -1140,7 +1140,7 @@ def gerar_recomendacoes_com_gemini(
     )
 
     if not interacao.output_text:
-        raise ValueError("O Gemini não retornou recomendações.")
+        raise ValueError("Gemini no devolvió recomendaciones.")
 
     return RecomendacoesPersonalizadas.model_validate_json(
         interacao.output_text,

@@ -10,7 +10,6 @@
     <title>Resultados | EcoAvanza</title>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', path='images/favicon.svg') }}" />
     <script src="{{ url_for('static', path='js/theme.js') }}"></script>
-    <script src="{{ url_for('static', path='js/language.js') }}" defer></script>
 
     <link
       rel="stylesheet"
@@ -109,15 +108,6 @@
         aria-label="RESULTADOS DEL DIAGNÓSTICO"
       >
         <header class="workspace-header">
-          <button
-            class="theme-toggle language-toggle"
-            type="button"
-            data-language-toggle
-            aria-label="Mudar para português"
-            title="Mudar para português"
-          >
-            <span data-language-toggle-label>PT</span>
-          </button>
           <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="true" aria-label="Activar tema claro">
             <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z" />

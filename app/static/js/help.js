@@ -1,28 +1,14 @@
 const helpContent = {
-  es: {
-    title: "Ayuda",
-    intro: "Aquí tienes una guía rápida de las funciones disponibles.",
-    close: "Cerrar ayuda",
-    items: [
-      ["Mi empresa", "Consulta y actualiza los datos de la empresa. En esta sección también puedes revisar el resumen del perfil y administrar las acciones del plan sostenible."],
-      ["Diagnóstico", "Responde todas las preguntas seleccionando cómo se realiza cada práctica. Las respuestas se guardan automáticamente y puedes navegar entre las dimensiones."],
-      ["Resultados", "Consulta la puntuación general, los resultados por dimensión, las fortalezas, las oportunidades de mejora y las recomendaciones para la empresa."],
-      ["Ruta Sostenible", "En “Elegir acciones”, selecciona iniciativas; en “Organizar agenda”, programa fechas; y en “Resumen”, acompaña el estado de las actividades."],
-      ["Puntos de Recogida", "Busca puntos disponibles en el mapa y encuentra lugares adecuados para entregar residuos reciclables y otros materiales."],
-    ],
-  },
-  "pt-BR": {
-    title: "Ajuda",
-    intro: "Aqui está um guia rápido das funções disponíveis.",
-    close: "Fechar ajuda",
-    items: [
-      ["Minha empresa", "Consulte e atualize os dados da empresa. Nesta seção, também é possível revisar o resumo do perfil e administrar as ações do plano sustentável."],
-      ["Diagnóstico", "Responda todas as perguntas indicando como cada prática é realizada. As respostas são salvas automaticamente e você pode navegar entre as dimensões."],
-      ["Resultados", "Confira a pontuação geral, os resultados por dimensão, os pontos fortes, as oportunidades de melhoria e as recomendações para a empresa."],
-      ["Rota Sustentável", "Em “Escolher ações”, selecione iniciativas; em “Organizar agenda”, programe datas; e em “Resumo”, acompanhe o andamento das atividades."],
-      ["Pontos de Coleta", "Procure pontos disponíveis no mapa e encontre locais adequados para entregar resíduos recicláveis e outros materiais."],
-    ],
-  },
+  title: "Ayuda",
+  intro: "Aquí tienes una guía rápida de las funciones disponibles.",
+  close: "Cerrar ayuda",
+  items: [
+    ["Mi empresa", "Consulta y actualiza los datos de la empresa. En esta sección también puedes revisar el resumen del perfil y administrar las acciones del plan sostenible."],
+    ["Diagnóstico", "Responde todas las preguntas seleccionando cómo se realiza cada práctica. Las respuestas se guardan automáticamente y puedes navegar entre las dimensiones."],
+    ["Resultados", "Consulta la puntuación general, los resultados por dimensión, las fortalezas, las oportunidades de mejora y las recomendaciones para la empresa."],
+    ["Ruta Sostenible", "En “Elegir acciones”, selecciona iniciativas; en “Organizar agenda”, programa fechas; y en “Resumen”, acompaña el estado de las actividades."],
+    ["Puntos de Recogida", "Busca puntos disponibles en el mapa y encuentra lugares adecuados para entregar residuos reciclables y otros materiales."],
+  ],
 };
 
 function createHelpModal() {
@@ -58,13 +44,9 @@ function createHelpModal() {
   return modal;
 }
 
-function currentHelpLanguage() {
-  return document.documentElement.lang === "pt-BR" ? "pt-BR" : "es";
-}
-
 function renderHelpModal() {
   const modal = createHelpModal();
-  const content = helpContent[currentHelpLanguage()];
+  const content = helpContent;
 
   modal.querySelector("#help-modal-title").textContent = content.title;
   modal.querySelector("#help-modal-intro").textContent = content.intro;
@@ -115,4 +97,3 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-document.addEventListener("ecoavanza:language-change", renderHelpModal);

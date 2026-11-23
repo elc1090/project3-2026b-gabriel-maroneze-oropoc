@@ -2581,10 +2581,6 @@ html[data-theme="dark"] .theme-toggle__sun {
   z-index: 5;
 }
 
-.language-toggle--floating {
-  right: 176px;
-}
-
 html[data-theme="dark"] {
   color-scheme: dark;
   --forest-950: #e3efe5;

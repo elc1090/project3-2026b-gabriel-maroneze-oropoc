@@ -216,7 +216,6 @@ function renderQuestion() {
 
   elements.nextButton.disabled =
     isBusy || (isConcluded && isLastQuestion);
-  elements.nextButton.hidden = isConcluded;
   elements.viewResultsButton.hidden = !showResultsShortcut;
   elements.viewResultsButton.disabled = isBusy;
 

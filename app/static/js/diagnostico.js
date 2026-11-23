@@ -37,6 +37,7 @@ let diagnosticDimensions = [];
 let currentDimension = 0;
 let currentQuestion = 0;
 let diagnosticStatus = "em_andamento";
+let showResultsShortcut = false;
 let isConcluding = false;
 let isRestarting = false;
 
@@ -216,7 +217,7 @@ function renderQuestion() {
   elements.nextButton.disabled =
     isBusy || (isConcluded && isLastQuestion);
   elements.nextButton.hidden = isConcluded;
-  elements.viewResultsButton.hidden = !isConcluded;
+  elements.viewResultsButton.hidden = !showResultsShortcut;
   elements.viewResultsButton.disabled = isBusy;
 
   if (isRestarting) {
@@ -398,6 +399,7 @@ async function concludeDiagnostic() {
     const data = await response.json();
 
     diagnosticStatus = data.diagnostico.status;
+    showResultsShortcut = true;
 
     window.alert(
       "El diagnóstico ha finalizado correctamente. Las respuestas se guardaron y ya no se podrán modificar.",
@@ -444,6 +446,7 @@ async function restartDiagnostic() {
 
     answers.clear();
     diagnosticStatus = data.diagnostico.status;
+    showResultsShortcut = false;
     currentDimension = 0;
     currentQuestion = 0;
 
@@ -559,7 +562,14 @@ elements.nextButton.addEventListener("click", () => {
 });
 
 elements.viewResultsButton.addEventListener("click", () => {
+  showResultsShortcut = false;
+  render();
   window.location.assign("/resultados");
+});
+
+window.addEventListener("pagehide", () => {
+  showResultsShortcut = false;
+  elements.viewResultsButton.hidden = true;
 });
 
 const menuTrigger = document.querySelector(".company-menu__trigger");

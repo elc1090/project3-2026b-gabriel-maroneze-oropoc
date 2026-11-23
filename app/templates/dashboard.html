@@ -11,14 +11,17 @@
       href="{{ url_for('static', path='images/favicon.svg') }}"
     />
     <script src="{{ url_for('static', path='js/theme.js') }}"></script>
-    <script src="{{ url_for('static', path='js/language.js') }}" defer></script>
 
     <link
       rel="stylesheet"
-      href="{{ url_for('static', path='css/styles.css') }}?v=3"
+      href="{{ url_for('static', path='css/styles.css') }}?v=4"
     />
     <script
       src="{{ url_for('static', path='js/dashboard.js') }}"
+      defer
+    ></script>
+    <script
+      src="{{ url_for('static', path='js/help.js') }}"
       defer
     ></script>
   </head>
@@ -87,8 +90,8 @@
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z" />
-                <circle cx="12" cy="9" r="2.5" />
-              </svg>
+              <circle cx="12" cy="9" r="2.5" />
+            </svg>
 
             <span>Puntos de Recogida</span>
           </a>
@@ -97,7 +100,7 @@
 
         <div class="sidebar-botanical" aria-hidden="true"></div>
 
-        <a class="sidebar-link sidebar-help" href="#ajuda" data-page="Ayuda">
+        <button class="sidebar-link sidebar-help" type="button" data-help-open>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="9" />
             <path
@@ -105,20 +108,11 @@
             />
           </svg>
           <span>Ayuda</span>
-        </a>
+        </button>
       </aside>
 
       <main class="app-workspace" aria-label="Área principal de la aplicación">
         <header class="workspace-header">
-          <button
-            class="theme-toggle language-toggle"
-            type="button"
-            data-language-toggle
-            aria-label="Mudar para português"
-            title="Mudar para português"
-          >
-            <span data-language-toggle-label>PT</span>
-          </button>
           <button
             class="theme-toggle"
             type="button"
@@ -189,6 +183,13 @@
             </button>
 
             <div class="company-menu__panel" id="company-menu-panel" hidden>
+              <a
+                class="company-menu__profile-action"
+                href="#perfil-empresa"
+              >
+                Perfil y contraseña
+              </a>
+
               <form action="/logout" method="post">
                 <button class="company-menu__logout" type="submit">
                   Cerrar sesión
@@ -581,6 +582,92 @@
 
               <button class="primary-button" type="submit">
                 Guardar información
+              </button>
+            </div>
+          </form>
+
+          <form
+            class="company-profile-form company-security-form"
+            id="seguridad-cuenta"
+            data-password-form
+          >
+            <div class="company-profile-form__heading">
+              <h2>Seguridad y contraseña</h2>
+              <p data-password-subtitle>
+                Administra la contraseña de acceso para entrar con correo
+                electrónico y contraseña.
+              </p>
+            </div>
+
+            <div class="company-profile-fields">
+              <div class="profile-field company-security-form__full">
+                <label for="account-email">Correo de acceso</label>
+                <input
+                  id="account-email"
+                  name="account_email"
+                  type="email"
+                  readonly
+                />
+              </div>
+
+              <div
+                class="profile-field company-security-form__full"
+                data-current-password-group
+              >
+                <label for="current-password">Contraseña actual *</label>
+                <input
+                  id="current-password"
+                  name="current_password"
+                  type="password"
+                  autocomplete="current-password"
+                />
+              </div>
+
+              <div class="profile-field">
+                <label for="new-password">Nueva contraseña *</label>
+                <input
+                  id="new-password"
+                  name="new_password"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  maxlength="128"
+                  placeholder="Mínimo 8 caracteres"
+                  required
+                />
+              </div>
+
+              <div class="profile-field">
+                <label for="confirm-password">
+                  Confirmar nueva contraseña *
+                </label>
+                <input
+                  id="confirm-password"
+                  name="confirm_password"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  maxlength="128"
+                  placeholder="Repite la nueva contraseña"
+                  required
+                />
+              </div>
+            </div>
+
+            <p
+              class="profile-form-message"
+              data-password-message
+              role="status"
+              hidden
+            ></p>
+
+            <div class="company-profile-form__footer">
+              <button
+                class="primary-button"
+                type="submit"
+                data-password-submit
+              >
+                Guardar contraseña
               </button>
             </div>
           </form>

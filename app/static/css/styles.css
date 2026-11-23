@@ -3768,3 +3768,27 @@ html[data-theme="dark"] .legal-page {
 html[data-theme="dark"] .legal-card {
   background: var(--surface-raised);
 }
+
+
+.profile-field[hidden] {
+  display: none;
+}
+
+.company-security-form {
+  margin-top: 24px;
+}
+
+.company-security-form__full {
+  grid-column: 1 / -1;
+}
+
+.profile-field input[readonly] {
+  color: var(--ink-700);
+  background: var(--sage-100);
+  cursor: default;
+}
+
+html[data-theme="dark"] .profile-field input[readonly] {
+  color: var(--ink-700);
+  background: var(--surface-muted);
+}

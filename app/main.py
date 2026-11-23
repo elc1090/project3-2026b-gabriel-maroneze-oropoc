@@ -53,6 +53,11 @@ class PerfilEmpresaUpdate(BaseModel):
     sector: str = Field(min_length=2, max_length=100)
 
 
+class AlterarSenhaUpdate(BaseModel):
+    senha_atual: str | None = Field(default=None, max_length=128)
+    nova_senha: str = Field(min_length=8, max_length=128)
+    confirmar_senha: str = Field(min_length=8, max_length=128)
+
 
 class PlanoAcao(BaseModel):
     id: str = Field(min_length=1, max_length=80)
@@ -188,7 +193,8 @@ def inicializar_banco() -> None:
                     id BIGSERIAL PRIMARY KEY,
                     nome VARCHAR(120) NOT NULL,
                     email_acesso VARCHAR(254) NOT NULL UNIQUE,
-                    senha_hash TEXT NOT NULL
+                    senha_hash TEXT NOT NULL,
+                    senha_definida BOOLEAN NOT NULL DEFAULT TRUE
                 )
                 """,
                 """
@@ -313,6 +319,13 @@ def inicializar_banco() -> None:
                 """,
             ):
                 cursor.execute(statement)
+                
+            cursor.execute(
+                """
+                ALTER TABLE empresas
+                ADD COLUMN IF NOT EXISTS senha_definida BOOLEAN NOT NULL DEFAULT TRUE
+                """
+            )
 
             cursor.execute(
                 """
@@ -683,13 +696,14 @@ def autenticar_empresa_google(credential: str) -> tuple[int, str] | None:
 
                 cursor.execute(
                     """
-                    INSERT INTO empresas (nome, email_acesso, senha_hash)
-                    VALUES (%s, %s, %s)
+                    INSERT INTO empresas (nome, email_acesso, senha_hash, senha_definida)
+                    VALUES (%s, %s, %s, FALSE)
                     ON CONFLICT (LOWER(email_acesso)) DO NOTHING
                     RETURNING id, nome
                     """,
                     (nome_google, email_normalizado, senha_aleatoria_hash),
                 )
+                
                 empresa = cursor.fetchone()
 
                 if empresa is None:
@@ -1473,10 +1487,18 @@ def obter_perfil(request: Request):
                 (empresa_id,),
             )
             registro = cursor.fetchone()
-            cursor.execute("SELECT nome FROM empresas WHERE id = %s", (empresa_id,))
-            nome_empresa = cursor.fetchone()[0]
+            cursor.execute(
+                "SELECT nome, email_acesso, senha_definida FROM empresas WHERE id = %s",
+                (empresa_id,),
+            )
+            empresa_dados = cursor.fetchone()
 
-    return {"perfil": registro[0] if registro else {}, "nome_empresa": nome_empresa}
+    return {
+        "perfil": registro[0] if registro else {},
+        "nome_empresa": empresa_dados[0],
+        "email_acesso": empresa_dados[1],
+        "senha_definida": empresa_dados[2],
+    }
 
 
 @app.put("/api/perfil", include_in_schema=False)
@@ -1507,6 +1529,74 @@ def salvar_perfil(perfil: PerfilEmpresaUpdate, request: Request):
             )
     request.session["empresa_nome"] = dados["company_name"]
     return {"mensagem": "Perfil guardado correctamente.", "perfil": dados}
+
+
+@app.put("/api/conta/senha", include_in_schema=False)
+def atualizar_senha_conta(dados: AlterarSenhaUpdate, request: Request):
+    empresa_id = request.session.get("empresa_id")
+    if not empresa_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Inicia sesión para actualizar la contraseña.",
+        )
+
+    if dados.nova_senha != dados.confirmar_senha:
+        raise HTTPException(
+            status_code=422,
+            detail="La nueva contraseña y su confirmación no coinciden.",
+        )
+
+    with abrir_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT senha_hash, senha_definida
+                FROM empresas
+                WHERE id = %s
+                """,
+                (empresa_id,),
+            )
+            registro = cursor.fetchone()
+
+            if registro is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Cuenta no encontrada.",
+                )
+
+            senha_hash_atual, senha_definida = registro
+
+            if senha_definida:
+                if not dados.senha_atual:
+                    raise HTTPException(
+                        status_code=422,
+                        detail="Introduce tu contraseña actual.",
+                    )
+
+                if not password_hash.verify(dados.senha_atual, senha_hash_atual):
+                    raise HTTPException(
+                        status_code=400,
+                        detail="La contraseña actual es incorrecta.",
+                    )
+
+            cursor.execute(
+                """
+                UPDATE empresas
+                SET senha_hash = %s,
+                    senha_definida = TRUE
+                WHERE id = %s
+                """,
+                (password_hash.hash(dados.nova_senha), empresa_id),
+            )
+
+    return {
+        "mensagem": (
+            "Contraseña actualizada correctamente."
+            if senha_definida
+            else "Contraseña definida correctamente. Ahora también puedes iniciar sesión con tu correo y contraseña."
+        ),
+        "senha_definida": True,
+    }
 
 
 @app.get("/api/plano", include_in_schema=False)

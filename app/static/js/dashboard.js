@@ -7,6 +7,16 @@ const companyDisplayName = document.querySelector("[data-company-display-name]")
 const companyProfilePage = document.querySelector('[data-view="perfil-empresa"]');
 const companyProfileForm = document.querySelector("[data-company-profile-form]");
 const profileMessage = document.querySelector("[data-profile-message]");
+
+const passwordForm = document.querySelector("[data-password-form]");
+const passwordSubtitle = document.querySelector("[data-password-subtitle]");
+const currentPasswordGroup = document.querySelector("[data-current-password-group]");
+const currentPasswordInput = document.querySelector("#current-password");
+const accountEmailInput = document.querySelector("#account-email");
+const passwordMessage = document.querySelector("[data-password-message]");
+const passwordSubmitButton = document.querySelector("[data-password-submit]");
+let accountHasPassword = true;
+
 const resultsPage = document.querySelector('[data-view="resultados"]');
 const helpPage = document.querySelector('[data-view="ajuda"]');
 const sustainabilityPage = document.querySelector('[data-view="rota-sustentavel"]');
@@ -186,6 +196,122 @@ function showProfileMessage(message, isError = false) {
   profileMessage.textContent = message;
   profileMessage.classList.toggle("is-error", isError);
   profileMessage.hidden = !message;
+}
+
+function showPasswordMessage(message, isError = false) {
+  if (!passwordMessage) {
+    return;
+  }
+
+  passwordMessage.textContent = message;
+  passwordMessage.classList.toggle("is-error", isError);
+  passwordMessage.hidden = !message;
+}
+
+function getPasswordErrorMessage(data) {
+  if (typeof data?.detail === "string") {
+    return data.detail;
+  }
+
+  if (Array.isArray(data?.detail) && data.detail.length > 0) {
+    return data.detail.map((item) => item.msg).join(" ");
+  }
+
+  return "No se pudo actualizar la contraseña.";
+}
+
+function updatePasswordFormState(emailAcesso, hasPassword) {
+  if (accountEmailInput && typeof emailAcesso === "string") {
+    accountEmailInput.value = emailAcesso;
+  }
+
+  accountHasPassword = Boolean(hasPassword);
+
+  if (currentPasswordGroup) {
+    currentPasswordGroup.hidden = !accountHasPassword;
+  }
+
+  if (currentPasswordInput) {
+    currentPasswordInput.required = accountHasPassword;
+    if (!accountHasPassword) {
+      currentPasswordInput.value = "";
+    }
+  }
+
+  if (passwordSubtitle) {
+    passwordSubtitle.textContent = accountHasPassword
+      ? "Cambia tu contraseña actual cuando lo necesites."
+      : "Tu cuenta fue creada con Google. Define una contraseña si también deseas iniciar sesión con tu correo electrónico.";
+  }
+
+  if (passwordSubmitButton) {
+    passwordSubmitButton.textContent = accountHasPassword
+      ? "Actualizar contraseña"
+      : "Definir contraseña";
+  }
+}
+
+async function saveAccountPassword(event) {
+  event.preventDefault();
+  if (!passwordForm) {
+    return;
+  }
+
+  const formData = new FormData(passwordForm);
+  const currentPassword = String(formData.get("current_password") ?? "");
+  const newPassword = String(formData.get("new_password") ?? "");
+  const confirmPassword = String(formData.get("confirm_password") ?? "");
+
+  if (newPassword !== confirmPassword) {
+    showPasswordMessage("La nueva contraseña y su confirmación no coinciden.", true);
+    return;
+  }
+
+  if (passwordSubmitButton) {
+    passwordSubmitButton.disabled = true;
+  }
+
+  showPasswordMessage("");
+
+  try {
+    const response = await fetch("/api/conta/senha", {
+      method: "PUT",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        senha_atual: accountHasPassword ? currentPassword : null,
+        nova_senha: newPassword,
+        confirmar_senha: confirmPassword,
+      }),
+    });
+
+    if (response.status === 401) {
+      window.location.assign("/");
+      return;
+    }
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(getPasswordErrorMessage(data));
+    }
+
+    passwordForm.elements.current_password.value = "";
+    passwordForm.elements.new_password.value = "";
+    passwordForm.elements.confirm_password.value = "";
+
+    updatePasswordFormState(accountEmailInput?.value ?? "", true);
+    showPasswordMessage(data.mensagem ?? "Contraseña actualizada correctamente.");
+  } catch (error) {
+    console.error("No se pudo actualizar la contraseña.", error);
+    showPasswordMessage(
+      error.message ?? "No se pudo actualizar la contraseña.",
+      true,
+    );
+  } finally {
+    if (passwordSubmitButton) {
+      passwordSubmitButton.disabled = false;
+    }
+  }
 }
 
 function getTodayString() {

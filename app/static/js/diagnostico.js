@@ -54,6 +54,7 @@ const elements = {
   previousButton: document.querySelector("#previous-button"),
   restartButton: document.querySelector("#restart-button"),
   nextButton: document.querySelector("#next-button"),
+  viewResultsButton: document.querySelector("#view-results-button"),
   supportImportance: document.querySelector("#support-importance"),
 };
 
@@ -214,6 +215,8 @@ function renderQuestion() {
 
   elements.nextButton.disabled =
     isBusy || (isConcluded && isLastQuestion);
+  elements.viewResultsButton.hidden = !isConcluded;
+  elements.viewResultsButton.disabled = isBusy;
 
   if (isRestarting) {
     elements.nextButton.textContent = "Iniciando...";
@@ -552,6 +555,10 @@ elements.nextButton.addEventListener("click", () => {
   }
 
   concludeDiagnostic();
+});
+
+elements.viewResultsButton.addEventListener("click", () => {
+  window.location.assign("/resultados");
 });
 
 const menuTrigger = document.querySelector(".company-menu__trigger");

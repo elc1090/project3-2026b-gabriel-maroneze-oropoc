@@ -26,7 +26,7 @@
 
     <link
       rel="stylesheet"
-      href="{{ url_for('static', path='css/styles.css') }}?v=3"
+      href="{{ url_for('static', path='css/styles.css') }}?v=4"
     />
 
     <link
@@ -43,6 +43,10 @@
 
     <script
       src="{{ url_for('static', path='js/pontos.js') }}"
+      defer
+    ></script>
+    <script
+      src="{{ url_for('static', path='js/help.js') }}"
       defer
     ></script>
   </head>
@@ -146,10 +150,10 @@
 
         <div class="sidebar-botanical" aria-hidden="true"></div>
 
-        <a
+        <button
           class="sidebar-link sidebar-help"
-          href="/painel#ajuda"
-          data-page="Ayuda"
+          type="button"
+          data-help-open
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="9" />
@@ -159,7 +163,7 @@
           </svg>
 
           <span>Ayuda</span>
-        </a>
+        </button>
       </aside>
 
       <main

@@ -391,6 +391,7 @@ async function loadCompanyProfile() {
       companyProfileForm.elements.company_name.value = data.nome_empresa;
     }
     renderCompanyOverview(profile);
+    updatePasswordFormState(data.email_acesso, data.senha_definida);
   } catch (error) {
     console.error("No se pudo cargar el perfil de la empresa.", error);
     showProfileMessage(
@@ -445,12 +446,16 @@ if (menuTrigger && menuPanel) {
   });
 }
 
-document.querySelector(".company-menu__profile-link")?.addEventListener("click", () => {
-  menuTrigger?.setAttribute("aria-expanded", "false");
-  if (menuPanel) {
-    menuPanel.hidden = true;
-  }
-});
+  document
+    .querySelectorAll(".company-menu__profile-link, .company-menu__profile-action")
+    .forEach((link) => {
+      link.addEventListener("click", () => {
+        menuTrigger?.setAttribute("aria-expanded", "false");
+        if (menuPanel) {
+          menuPanel.hidden = true;
+        }
+      });
+    });
 
 function setStorageMessage(message) {
   storageMessage.textContent = message;
